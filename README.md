@@ -7,8 +7,16 @@
 
 ## Developing
 
+With local development server
+
 ```bash
 cargo tauri dev
+```
+
+Without local development server
+
+```bash
+cargo run
 ```
 
 ## Building for Release
