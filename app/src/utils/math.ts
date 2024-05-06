@@ -131,4 +131,8 @@ export class $Math {
     static average(array: number[]): number {
         return array.reduce((a, b) => a + b) / array.length;
     }
+
+    static range(num: number): Array<number> {
+        return Array.from({ length: num }, (_, i) => i);
+    }
 }
