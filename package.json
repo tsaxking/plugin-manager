@@ -1,10 +1,10 @@
 {
   "scripts": {
-    "build:css": "tailwindcss -i app/src/styles/style.css -o app/dist/style.css",
     "build:ts": "ts-node scripts/esbuild.ts",
-    "dev": "npm run build:css && npm run build:ts"
+    "dev": "npm run build:ts"
   },
   "dependencies": {
+    "bootstrap": "^5.3.3",
     "esbuild-plugin-tailwindcss": "^1.2.0",
     "esbuild-svelte": "^0.8.0",
     "fuzzy-search": "^3.2.1",
@@ -17,7 +17,6 @@
     "@types/fuzzy-search": "^2.1.5",
     "esbuild": "^0.20.2",
     "esbuild-server": "^0.3.0",
-    "tailwindcss": "^3.4.3",
     "ts-node": "^10.9.2"
   }
 }

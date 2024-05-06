@@ -1,5 +1,25 @@
 <script lang="ts">
-let message = 'test';
+  import Navbar from "./components/Navbar.svelte";
+  import Rack from "./components/Rack.svelte";
+  import RackItem from "./components/RackItem.svelte";
 </script>
 
-{message}
+<Navbar tabs={['Rack', 'Patchbay']} />
+<Rack>
+  <RackItem name="Compressor" />
+  <RackItem name="Reverb" />
+  <RackItem name="Compressor" />
+  <!-- <RackItem name="Reverb" />
+  <RackItem name="Compressor" />
+  <RackItem name="Reverb" />
+  <RackItem name="Compressor" />
+  <RackItem name="Reverb" />
+  <RackItem name="Compressor" />
+  <RackItem name="Reverb" />
+  <RackItem name="Compressor" />
+  <RackItem name="Reverb" />
+  <RackItem name="Compressor" />
+  <RackItem name="Reverb" />
+  <RackItem name="Compressor" />
+  <RackItem name="Reverb" /> -->
+</Rack>
