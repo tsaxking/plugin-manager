@@ -2,7 +2,7 @@
   "scripts": {
     "build:css": "tailwindcss -i app/src/styles/style.css -o app/dist/style.css",
     "build:ts": "ts-node scripts/esbuild.ts",
-    "build": "npm run build:ts && npm run build:css"
+    "dev": "npm run build:css && npm run build:ts"
   },
   "dependencies": {
     "esbuild-plugin-tailwindcss": "^1.2.0",
@@ -13,8 +13,8 @@
   },
   "devDependencies": {
     "@types/fuzzy-search": "^2.1.5",
-    "concurrently": "^8.2.2",
-    "esbuild": "0.20.2",
+    "esbuild": "^0.20.2",
+    "esbuild-server": "^0.3.0",
     "tailwindcss": "^3.4.3"
   }
 }
