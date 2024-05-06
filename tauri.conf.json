@@ -7,7 +7,7 @@
     },
     "tauri": {
         "bundle": {
-            "identifier": "sfz.plugin_manager",
+            "identifier": "sfz.plugin-manager",
             "icon": ["icon.png"]
         },
         "allowlist": {
