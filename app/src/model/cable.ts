@@ -2,6 +2,7 @@ import { getCatenaryPathSVG } from "../utils/calcs/linear-algebra/catenary";
 import { Input, Output } from "./io";
 import { RackItem } from "./rack-item";
 import { colors } from "./rack-item";
+import { EventEmitter } from "../utils/event-emitter";
 
 const cablesDiv = document.createElement('div');
 cablesDiv.style.position = 'fixed';
@@ -11,7 +12,32 @@ cablesDiv.style.width = '100%';
 cablesDiv.style.pointerEvents = 'none';
 document.body.appendChild(cablesDiv);
 
+type Events = {
+    change: Input|Output|null;
+}
+
 export class Cable {
+    private static _state: Input|Output|null = null;
+    public static get state() { return Cable._state; }
+    public static set state(value: Input|Output|null) {
+        Cable._state = value;
+        Cable.emit('change', value);
+    }
+
+    private static readonly emitter = new EventEmitter<keyof Events>();
+
+    public static on<T extends keyof Events>(event: T, listener: (arg: Events[T]) => void) {
+        Cable.emitter.on(event, listener);
+    }
+
+    public static off<T extends keyof Events>(event: T, listener: (arg: Events[T]) => void) {
+        Cable.emitter.off(event, listener);
+    }
+
+    public static emit<T extends keyof Events>(event: T, arg: Events[T]) {
+        Cable.emitter.emit(event, arg);
+    }
+    
     // public static readonly cables: Cable[] = [];
 
     public static generate(rackItems: RackItem[]) {

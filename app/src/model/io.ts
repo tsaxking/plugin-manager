@@ -191,14 +191,13 @@ export class IO extends IOEmitter<IOEvents> {
     }
 
     serialize() {
-        return this.outputs.map(o => o.connections.map(i => i.rackItem.id + ':' + i.index + ':' + o.index));
+        return this.outputs.map(o => o.connections.map(i => i.rackItem.id + ':' + o.index + ':' + i.index));
     }
 
     deserialize(data: string[][]) {
-        console.log(RackItem.items);
         for (const output of data) {
             for (const connection of output) {
-                const [id, inputIndex, outputIndex] = connection.split(':');
+                const [id, outputIndex, inputIndex] = connection.split(':');
                 const output = this.rackItem.io[this.type].outputs[+outputIndex];
                 const input = RackItem.items.find(i => i.id === id)?.io[this.type].inputs[+inputIndex];
                 if (output && input) {

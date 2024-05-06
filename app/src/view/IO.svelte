@@ -1,12 +1,32 @@
 <script lang="ts">
-    import { IO } from "../model/io";
+  import { Cable } from "../model/cable";
+    import { IO, Input, Output } from "../model/io";
   import { colors } from "../model/rack-item";
-    import { Color } from "../utils/color";
     import { capitalize } from "../utils/text";
 
     export let io: IO;
 
     let color = colors[io.type];
+
+    let active: Input|Output|null = Cable.state;
+
+    Cable.on('change', (a) => active = a);
+
+
+    const click = (io: Input | Output) => {
+        if (Cable.state) {
+            if (Cable.state instanceof Output && io instanceof Input) {
+                Cable.state.connect(io);
+            } else if (Cable.state instanceof Input && io instanceof Output) {
+                io.connect(Cable.state);
+            } else {
+                console.log('Invalid connection');
+            }
+            Cable.state = null;
+        } else {
+            Cable.state = io;
+        }
+    }
 </script>
 
 <!-- {#each io.inputs as i, index}
@@ -41,8 +61,13 @@
                 {#each io.inputs as i, index}
                 <div class="d-flex justify-content-start">
                     <p
-                        class="text-light"
-                        style="background-color: {color.toString()};"
+                        on:click={() => click(i)}
+                        class="text-light cursor-pointer"
+                        style="background-color: {
+                        color
+                        .setAlpha(Object.is(active, i) ? 0.5 : 1)
+                        .toString()
+                        };"
                     >
                         {capitalize(i.name)}
                     </p>
@@ -55,8 +80,11 @@
                 {#each io.outputs as o, index}
                 <div class="d-flex justify-content-end">
                     <p
-                        class="text-light"
-                        style="background-color: {color.toString()};"
+                        on:click={() => click(o)}
+                        class="text-light cursor-pointer"
+                        style="background-color: {color
+                            .setAlpha(Object.is(active, o) ? 0.5 : 1)
+                        .toString()};"
                     >
                         {capitalize(o.name)}
                     </p>
