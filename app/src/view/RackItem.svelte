@@ -1,5 +1,6 @@
 <script lang="ts">
-    import { RackItem } from "../model/rack-item";
+import { RackItem } from "../model/rack-item";
+    import IO from "./IO.svelte";
 
     type BootstrapColor = 'primary' | 'secondary' | 'success' | 'danger' | 'info' | 'light' | 'dark' | 'warning';
 
@@ -7,8 +8,8 @@
     export let display: 'io' | 'control' = 'io';
 
     let title = item.title;
-    let note = item.note || '';
-    let color: BootstrapColor = item.color || 'dark';
+    let note = item.note;
+    let color: BootstrapColor = item.color;
     let x = item.x;
     let y = item.y;
     let units = item.width;
@@ -100,6 +101,11 @@ svg {
 .screw-4 {
     right: 2px;
 }
+
+.io {
+    position: absolute;
+    top: 60px;
+}
 </style>
 
 <div
@@ -115,6 +121,23 @@ svg {
     {#if title}
         <h1>{title}</h1>
         <small>{note}</small>
+    {/if}
+    {#if display === 'io'}
+        <div class="io">
+            <!-- <div class="d-flex justify-content-between">
+                <p>
+                    Input
+                </p>
+                <p>
+                    Output
+                </p>
+            </div> -->
+            <IO io={item.io.audio} />
+            <IO io={item.io.midi} />
+            <IO io={item.io.cv} />
+        </div>
+    {:else if display === 'control'}
+        <slot />
     {/if}
     <slot />
     {#each [1, 2, 3, 4] as index}

@@ -7,12 +7,12 @@ import RackImage from "./RackBackground.svelte";
 const i = new RackItem(
     [4,1],
     8,
-    'danger',
+    'dark',
     'Compressor',
     {
-        audio: [2, 2],
-        midi: [0, 0],
-        cv: [0, 0],
+        audio: [4, 2],
+        midi: [1, 0],
+        cv: [0, 1],
     },
     "note"
 );

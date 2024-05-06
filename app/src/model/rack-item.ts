@@ -37,9 +37,9 @@ export class RackItem {
         [this.x, this.y] = point;
 
         this.io = {
-            midi: new IO('midi', ...io.midi),
-            audio: new IO('audio', ...io.audio),
-            cv: new IO('cv', ...io.cv),
+            midi: new IO('midi', ...io.midi, this),
+            audio: new IO('audio', ...io.audio, this),
+            cv: new IO('cv', ...io.cv, this),
         };
     }
 
