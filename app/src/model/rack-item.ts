@@ -15,9 +15,29 @@ type Events = {
     'destroy': void;
     'move': { x: number, y: number };
     'update': void;
+};
+
+type GlobalEvents = {
+    'destroy': RackItem;
+    'move': RackItem;
+    'update': RackItem;
 }
 
 export class RackItem {
+    private static readonly emitter = new EventEmitter<keyof GlobalEvents>();
+    public static on<K extends keyof GlobalEvents>(event: K, listener: (e: GlobalEvents[K]) => void): void {
+        this.emitter.on(event, listener);
+    }
+
+    public static off<K extends keyof GlobalEvents>(event: K, listener?: (e: GlobalEvents[K]) => void): void {
+        this.emitter.off(event, listener);
+    }
+
+    public static emit<K extends keyof GlobalEvents>(event: K, e: GlobalEvents[K]): void {
+        this.emitter.emit(event, e);
+    }
+
+
     public static items: RackItem[] = [];
 
     private readonly emitter = new EventEmitter<keyof Events>();
@@ -130,6 +150,8 @@ export class RackItem {
 
     moveTo(x: number, y: number) {
         return attempt(() => {
+            if (x < 0 || y < 0) throw new Error('Invalid position');
+            // console.log('moving to', x, y);
             // check if the new position is valid
             const { items } = RackItem;
             const end = x + this.width;
@@ -145,6 +167,8 @@ export class RackItem {
 
             this.x = x;
             this.y = y;
+            this.emit('move', { x, y });
+            RackItem.emit('move', this);
         });
     }
 

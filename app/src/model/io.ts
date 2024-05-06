@@ -112,6 +112,7 @@ export class Output extends IOEmitter<OutputEvents> {
     connect(input: Input) {
         return attempt(() => {
             if (this.type !== input.type) throw new Error('Cannot connect different types');
+            if (this.rackItem.id === input.rackItem.id) throw new Error('Cannot connect to itself');
             this.connections.push(input);
             this.emit('connect', input);
             IO.emit('change', undefined);

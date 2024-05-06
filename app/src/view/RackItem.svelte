@@ -14,17 +14,17 @@ import { RackItem } from "../model/rack-item";
     let y = item.y;
     let units = item.width;
 
-    // type Drag = (e: DragEvent) => void;
+    type Drag = (e: DragEvent) => void;
 
-    // export let dragstart: Drag = (e) => {
-    //     console.log('dragging');
-    // };
-    // export let dragover: Drag = (e) => {
-    //     console.log('dragging over');
-    // };
-    // export let drop: Drag = (e) => {
-    //     console.log('dropped');
-    // };
+    export let dragstart: Drag = (e) => {
+        console.log('dragging');
+    };
+    export let dragover: Drag = (e) => {
+        console.log('dragging over');
+    };
+    export let drop: Drag = (e) => {
+        console.log('dropped');
+    };
 
     let textColor: BootstrapColor = (() => {
         switch (color) {
@@ -109,8 +109,10 @@ svg {
 }
 </style>
 
+<!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
-    draggable 
+    id="ri-{item.id}"
+    draggable
     class="rack-item"
     style="
         top: {y * 380}px; 

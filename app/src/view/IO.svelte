@@ -54,7 +54,7 @@
     </div>
 {/each} -->
 
-<div class="container-fluid">
+<div class="container-fluid no-select">
     <div class="row">
         <div class="col-6">
             <div class="container-fluid">

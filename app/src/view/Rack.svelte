@@ -55,6 +55,7 @@ oscillator.moveTo(22, 1);
 controller.moveTo(9, 1);
 
 IO.on('change', Cable.view);
+RackItem.on('move', Cable.view);
 
 // midiInput.io.midi.outputs[0].connect(controller.io.midi.inputs[0]);
 // controller.io.control.outputs[0].connect(oscillator.io.control.inputs[0]);
