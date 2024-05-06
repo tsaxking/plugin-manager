@@ -38,7 +38,7 @@ export const getCatenaryPathSVG = (start: Point, end: Point, sag: number): strin
     }
   
     const controlX = Math.round((start.x + end.x) / 2);
-    const controlY = Math.round(Math.max(start.y, end.y) + length - distance * 0.5);
+    const controlY = Math.round(Math.max(start.y, end.y) + length - distance * 0.5) * sag;
   
     return `M ${start.x} ${start.y} Q ${controlX} ${controlY} ${end.x} ${end.y}`;
 }

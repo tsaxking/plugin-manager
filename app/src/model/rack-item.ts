@@ -2,6 +2,14 @@ import { attempt } from "../utils/check";
 import { EventEmitter } from "../utils/event-emitter";
 import { Point2D } from "../utils/calcs/linear-algebra/point";
 import { IO, io } from "./io";
+import { Color } from "../utils/color";
+import { abbreviate } from "../utils/text";
+
+export const colors = {
+    audio: Color.fromHex('#425df5'),
+    midi: Color.fromHex('#30a136'),
+    control: Color.fromHex('#f54242'),
+}
 
 type Events = {
     'destroy': void;
@@ -14,14 +22,34 @@ export class RackItem {
 
     private readonly emitter = new EventEmitter<keyof Events>();
 
+    public static getAvailablePoint() {
+        const items = RackItem.items.slice();
+        items.sort((a, b) => {
+            if (a.y !== b.y) return a.y - b.y;
+            return a.x - b.x;
+        });
+
+        let y = 0;
+        let x = 0;
+        for (const item of items) {
+            if (item.y !== y) {
+                y = item.y;
+                x = 0;
+            }
+            x = item.end;
+        }
+        return [x, y] as Point2D;
+    }
+
     public x = 0;
     public y = 0;
     public io: {
         midi: IO;
         audio: IO;
-        cv: IO;
+        control: IO;
     };
 
+    private readonly _note: string;
 
     constructor(
         point: Point2D,
@@ -29,7 +57,8 @@ export class RackItem {
         public color: 'primary' | 'secondary' | 'success' | 'danger' | 'info' | 'light' | 'dark' | 'warning',
         public readonly title: string,
         io: io,
-        public note: string,
+        note: string,
+        public readonly id: string
     ) {
         if (this.width < 8) throw new Error('Invalid width');
         RackItem.items.push(this);
@@ -39,8 +68,13 @@ export class RackItem {
         this.io = {
             midi: new IO('midi', ...io.midi, this),
             audio: new IO('audio', ...io.audio, this),
-            cv: new IO('cv', ...io.cv, this),
+            control: new IO('control', ...io.control, this),
         };
+        this._note = note;
+    }
+
+    get note() {
+        return abbreviate(this._note, 10 + Math.floor(this.width * 1.25));
     }
 
     get end() {
@@ -51,18 +85,21 @@ export class RackItem {
         return attempt(() => {
             // check if the new position is valid
             const { items } = RackItem;
-            const vertical = items.filter(item => item.y === y);
-            const horizontal = vertical.filter(item => {
-                // check start position
-                if (this.end <= item.x) return false;
-                if (this.x >= item.end) return false;
-                return true;
-            });
-            if (horizontal.length) throw new Error('Invalid position');
-    
-            this.x = x;
-            this.y = y;
-            this.emit('move', { x, y });
+            const _y = this.y + y;
+            const _x = this.x + x;
+            const end = _x + this.width;
+
+            for (const item of items) {
+                if (item === this) continue;
+                if (item.y === _y) {
+                    if (item.x < end && item.end > _x) {
+                        throw new Error('Invalid position');
+                    }
+                }
+            }
+
+            this.x += x;
+            this.y += y;
         });
     }
 

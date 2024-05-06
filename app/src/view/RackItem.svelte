@@ -32,6 +32,8 @@ import { RackItem } from "../model/rack-item";
             case 'secondary':
             case 'success':
             case 'danger':
+            case 'warning':
+            case 'info':
             case 'dark':
                 return 'light';
             default:
@@ -47,11 +49,10 @@ import { RackItem } from "../model/rack-item";
 </script>
 
 <style>
-div {
-    display: block;
+.rack-item {
     width: 100%;
     height: 100%;
-    position: relative;
+    position: fixed;
 }
 
 h1,
@@ -110,6 +111,7 @@ svg {
 
 <div
     draggable 
+    class="rack-item"
     style="
         top: {y * 380}px; 
         left: {x * 16}px; 
@@ -123,7 +125,7 @@ svg {
         <small>{note}</small>
     {/if}
     {#if display === 'io'}
-        <div class="io">
+        <div class="io position-relative">
             <!-- <div class="d-flex justify-content-between">
                 <p>
                     Input
@@ -134,7 +136,7 @@ svg {
             </div> -->
             <IO io={item.io.audio} />
             <IO io={item.io.midi} />
-            <IO io={item.io.cv} />
+            <IO io={item.io.control} />
         </div>
     {:else if display === 'control'}
         <slot />
