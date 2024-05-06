@@ -1,6 +1,10 @@
 [package]
-name = "plugin-manager"
+name = "main"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+tauri = { version = "1.6.2", features = ["custom-protocol"] }
+
+[build-dependencies]
+tauri-build = { version = "1.5.1", features = [] }

@@ -1,0 +1,25 @@
+{
+    "build": {
+    "beforeBuildCommand": "cd app && npm run build",
+    "beforeDevCommand": "cd app && npm run dev",
+    "devPath": "http://localhost:5173",
+        "distDir": "app/dist"
+    },
+    "tauri": {
+        "bundle": {
+            "identifier": "sfz.plugin_manager",
+            "icon": ["icon.png"]
+        },
+        "allowlist": {
+            "all": false
+        },
+        "windows": [
+            {
+                "width": 800,
+                "height": 600,
+                "resizable": true,
+                "fullscreen": false
+            }
+        ]
+    }
+}
