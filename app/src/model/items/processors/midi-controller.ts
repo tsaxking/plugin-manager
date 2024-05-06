@@ -9,6 +9,9 @@ export class Controller extends RackItem {
         outputs: string[],
     ) {
         super(
+            id,
+            
+            name,
             RackItem.getAvailablePoint(),
             8,
             'danger',
@@ -18,8 +21,6 @@ export class Controller extends RackItem {
                 midi: [inputs, []],
                 control: [[], outputs]
             },
-            name,
-            id
         )
     }
 }

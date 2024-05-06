@@ -18,7 +18,7 @@ type Events = {
 }
 
 export class RackItem {
-    public static readonly items: RackItem[] = [];
+    public static items: RackItem[] = [];
 
     private readonly emitter = new EventEmitter<keyof Events>();
 
@@ -41,6 +41,53 @@ export class RackItem {
         return [x, y] as Point2D;
     }
 
+    public static serialize() {
+        return JSON.stringify(RackItem.items.map(i => i.serialize()));
+    }
+
+    public static deserialize(data: string) {
+        const items = JSON.parse(data) as unknown[];
+        if (!Array.isArray(items)) throw new Error('Invalid data');
+        if (items.some(i => typeof i !== 'object')) throw new Error('Invalid data');
+        // if (items.some(i => (i as { id: string }).id)) throw new Error('Invalid data');
+        const rackItems = items as {
+            id: string;
+            note: string;
+            point: Point2D;
+            width: number;
+            color: 'primary' | 'secondary' | 'success' | 'danger' | 'info' | 'light' | 'dark' | 'warning';
+            title: string;
+            io: io;
+            routing: {
+                audio: string[][];
+                midi: string[][];
+                control: string[][];
+            }
+        }[];
+        
+        RackItem.items = [];
+
+        const generated = rackItems.map(i => new RackItem(
+            i.id,
+            i.note,
+            i.point,
+            i.width,
+            i.color,
+            i.title,
+            i.io
+        ));
+
+        for (const g of generated) {
+            const item = rackItems.find(i => i.id === g.id);
+            if (!item) throw new Error('Invalid data'); // should never happen
+            g.io.audio.deserialize(item.routing.audio);
+            g.io.midi.deserialize(item.routing.midi);
+            g.io.control.deserialize(item.routing.control);
+        }
+
+        return generated;
+    }
+
     public x = 0;
     public y = 0;
     public io: {
@@ -52,17 +99,15 @@ export class RackItem {
     private readonly _note: string;
 
     constructor(
+        public readonly id: string,
+        note: string,
         point: Point2D,
         public width: number,
         public color: 'primary' | 'secondary' | 'success' | 'danger' | 'info' | 'light' | 'dark' | 'warning',
         public readonly title: string,
         io: io,
-        note: string,
-        public readonly id: string
     ) {
         if (this.width < 8) throw new Error('Invalid width');
-        RackItem.items.push(this);
-
         [this.x, this.y] = point;
 
         this.io = {
@@ -71,6 +116,8 @@ export class RackItem {
             control: new IO('control', ...io.control, this),
         };
         this._note = note;
+
+        RackItem.items.push(this);
     }
 
     get note() {
@@ -81,25 +128,23 @@ export class RackItem {
         return this.x + this.width;
     }
 
-    move(x: number, y: number) {
+    moveTo(x: number, y: number) {
         return attempt(() => {
             // check if the new position is valid
             const { items } = RackItem;
-            const _y = this.y + y;
-            const _x = this.x + x;
-            const end = _x + this.width;
+            const end = x + this.width;
 
             for (const item of items) {
                 if (item === this) continue;
-                if (item.y === _y) {
-                    if (item.x < end && item.end > _x) {
+                if (item.y === y) {
+                    if (item.x < end && item.end > x) {
                         throw new Error('Invalid position');
                     }
                 }
             }
 
-            this.x += x;
-            this.y += y;
+            this.x = x;
+            this.y = y;
         });
     }
 
@@ -126,4 +171,27 @@ export class RackItem {
     update() {
 
     }
+
+    serialize() {
+        return {
+            id: this.id,
+            note: this._note,
+            point: [this.x, this.y] as Point2D,
+            width: this.width,
+            color: this.color,
+            title: this.title,
+            io: {
+                audio: [this.io.audio.inputs.map(i => i.name), this.io.audio.outputs.map(o => o.name)],
+                midi: [this.io.midi.inputs.map(i => i.name), this.io.midi.outputs.map(o => o.name)],
+                control: [this.io.control.inputs.map(i => i.name), this.io.control.outputs.map(o => o.name)],
+            },
+            routing: {
+                audio: this.io.audio.serialize(),
+                midi: this.io.midi.serialize(),
+                control: this.io.control.serialize(),
+            }
+        }
+    }
 };
+
+Object.assign(window, { RackItem });

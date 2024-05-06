@@ -7,6 +7,9 @@ export class Gain extends RackItem {
         id: string
     ) {
         super(
+            id,
+            
+            name,
             RackItem.getAvailablePoint(),
             8,
             'dark',
@@ -16,8 +19,6 @@ export class Gain extends RackItem {
                 midi: [[], []],
                 control: [[], []]
             },
-            name,
-            id
         );
     }
 }

@@ -6,6 +6,9 @@ export class EQ extends RackItem {
         name: string,
     ) {
         super(
+            id,
+            
+            name,
             RackItem.getAvailablePoint(),
             8,
             'warning',
@@ -15,8 +18,6 @@ export class EQ extends RackItem {
                 midi: [[], []],
                 control: [[], []]
             },
-            name,
-            id
         );
     }
 }

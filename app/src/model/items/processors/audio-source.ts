@@ -7,6 +7,9 @@ export class AudioSource extends RackItem {
         outputs: string[],
     ) {
         super(
+            id,
+            
+            name,
             RackItem.getAvailablePoint(),
             8,
             'light',
@@ -16,8 +19,6 @@ export class AudioSource extends RackItem {
                 midi: [[], []],
                 control: [[], []]
             },
-            name,
-            id
         );
     }
 }

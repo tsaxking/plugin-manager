@@ -24,6 +24,7 @@ type OutputEvents = {
 type IOEvents = {
     connect: { input: Input, output: Output };
     disconnect: { input: Input, output: Output };
+    change: void;
 }
 
 class IOEmitter<Events> {
@@ -67,7 +68,7 @@ export class Input extends IOEmitter<InputEvents> {
     get point() {
         const { type } = this;
         const { x, y } = this.rackItem;
-        const index = this.io.inputs.indexOf(this);
+        const { index } = this;
 
         const maxAudio = max(this.rackItem.io.audio.inputs.length, this.rackItem.io.audio.outputs.length);
         const maxMidi = max(this.rackItem.io.midi.inputs.length, this.rackItem.io.midi.outputs.length);
@@ -95,6 +96,10 @@ export class Input extends IOEmitter<InputEvents> {
     get rackItem() {
         return this.io.rackItem;
     }
+
+    get index() {
+        return this.io.inputs.indexOf(this);
+    }
 }
 
 export class Output extends IOEmitter<OutputEvents> {
@@ -108,11 +113,14 @@ export class Output extends IOEmitter<OutputEvents> {
         return attempt(() => {
             if (this.type !== input.type) throw new Error('Cannot connect different types');
             this.connections.push(input);
+            this.emit('connect', input);
+            IO.emit('change', undefined);
         });
     }
 
     disconnect(input: Input) {
         this.connections = this.connections.filter(c => c !== input);
+        IO.emit('change', undefined);
     }
 
     get point() {
@@ -146,10 +154,28 @@ export class Output extends IOEmitter<OutputEvents> {
     get rackItem() {
         return this.io.rackItem;
     }
+
+    get index() {
+        return this.io.outputs.indexOf(this);
+    }
 }
 
 
 export class IO extends IOEmitter<IOEvents> {
+    private static readonly emitter = new EventEmitter<keyof IOEvents>();
+
+    public static on<K extends keyof IOEvents>(event: K, cb: (data: IOEvents[K]) => void) {
+        IO.emitter.on(event, cb);
+    }
+
+    public static emit<K extends keyof IOEvents>(event: K, data: IOEvents[K]) {
+        IO.emitter.emit(event, data);
+    }
+
+    public static off<K extends keyof IOEvents>(event: K, cb: (data: IOEvents[K]) => void) {
+        IO.emitter.off(event, cb);
+    }
+
     public readonly inputs: Input[];
     public readonly outputs: Output[];
     
@@ -162,5 +188,25 @@ export class IO extends IOEmitter<IOEvents> {
         super();
         this.inputs = inputs.map(i => new Input(type, this, i));
         this.outputs = outputs.map(o => new Output(type, this, o));
+    }
+
+    serialize() {
+        return this.outputs.map(o => o.connections.map(i => i.rackItem.id + ':' + i.index + ':' + o.index));
+    }
+
+    deserialize(data: string[][]) {
+        console.log(RackItem.items);
+        for (const output of data) {
+            for (const connection of output) {
+                const [id, inputIndex, outputIndex] = connection.split(':');
+                const output = this.rackItem.io[this.type].outputs[+outputIndex];
+                const input = RackItem.items.find(i => i.id === id)?.io[this.type].inputs[+inputIndex];
+                if (output && input) {
+                    output.connect(input);
+                } else {
+                    console.warn('Unable to connect IOs: ', output, input);
+                }
+            }
+        }
     }
 }

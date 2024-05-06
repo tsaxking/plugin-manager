@@ -6,6 +6,9 @@ export class Gate extends RackItem {
         id: string
     ) {
         super(
+            id,
+            
+            name,
             RackItem.getAvailablePoint(),
             8,
             'dark',
@@ -15,8 +18,6 @@ export class Gate extends RackItem {
                 midi: [[], []],
                 control: [[], []]
             },
-            name,
-            id
         );
     }
 }

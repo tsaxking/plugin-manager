@@ -7,6 +7,8 @@ export class Reverb extends RackItem {
         name: string
     ) {
         super(
+            id,
+            name,
             RackItem.getAvailablePoint(),
             8,
             'dark',
@@ -16,8 +18,6 @@ export class Reverb extends RackItem {
                 midi: [[], []],
                 control: [[], []]
             },
-            name,
-            id
         );
     }
 }

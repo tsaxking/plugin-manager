@@ -3,9 +3,16 @@ import { Input, Output } from "./io";
 import { RackItem } from "./rack-item";
 import { colors } from "./rack-item";
 
+const cablesDiv = document.createElement('div');
+cablesDiv.style.position = 'fixed';
+cablesDiv.style.zIndex = '1000';
+cablesDiv.style.height = '100%';
+cablesDiv.style.width = '100%';
+cablesDiv.style.pointerEvents = 'none';
+document.body.appendChild(cablesDiv);
+
 export class Cable {
     // public static readonly cables: Cable[] = [];
-
 
     public static generate(rackItems: RackItem[]) {
         const io = rackItems.flatMap(i => [i.io.midi, i.io.audio, i.io.control]);
@@ -18,8 +25,9 @@ export class Cable {
     }
 
     public static view() {
+        cablesDiv.innerHTML = '';
         const cables = Cable.generate(RackItem.items);
-        for (const c of cables) document.body.appendChild(c.build());
+        for (const c of cables) cablesDiv.appendChild(c.build());
     }
 
 
@@ -38,7 +46,7 @@ export class Cable {
 
     build() {
         this.svg.innerHTML = ''; // clear the svg
-        const pathStr = getCatenaryPathSVG(this.input.point, this.output.point, .6);
+        const pathStr = getCatenaryPathSVG(this.input.point, this.output.point, .75);
         const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
         path.setAttribute('d', pathStr);
         path.style.stroke = colors[this.type].toString();

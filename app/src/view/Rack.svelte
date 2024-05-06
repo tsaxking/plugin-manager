@@ -10,6 +10,7 @@ import RackImage from "./RackBackground.svelte";
   import { Compressor } from "../model/items/processors/compressor";
   import { Reverb } from "../model/items/processors/reverb";
     import { AudioOutput } from "../model/items/processors/audio-output";
+    import { IO } from '../model/io';
 
 const midiInput = new Instrument(
     Random.uuid(),
@@ -47,11 +48,13 @@ const output = new AudioOutput(
     ['Left', 'Right'],
 );
 
-output.move(32, 0);
-reverb.move(16, 0);
-compressor.move(12, 0);
-oscillator.move(8, 1);
-controller.move(4, 1);
+output.moveTo(60, 0);
+reverb.moveTo(48, 0);
+compressor.moveTo(32, 0);
+oscillator.moveTo(22, 1);
+controller.moveTo(9, 1);
+
+IO.on('change', Cable.view);
 
 midiInput.io.midi.outputs[0].connect(controller.io.midi.inputs[0]);
 controller.io.control.outputs[0].connect(oscillator.io.control.inputs[0]);
@@ -62,8 +65,6 @@ compressor.io.audio.outputs[0].connect(reverb.io.audio.inputs[0]);
 reverb.io.audio.outputs[0].connect(output.io.audio.inputs[0]);
 reverb.io.audio.outputs[1].connect(output.io.audio.inputs[1]);
 
-
-Cable.view();
 </script>
 
 <RackImage x={200} y={3}/>

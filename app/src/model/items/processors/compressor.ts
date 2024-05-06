@@ -7,6 +7,9 @@ export class Compressor extends RackItem {
         name: string,
     ) {
         super(
+            id,
+            
+            name,
             RackItem.getAvailablePoint(),
             8,
             'warning',
@@ -16,8 +19,6 @@ export class Compressor extends RackItem {
                 midi: [[], []],
                 control: [[], []]
             },
-            name,
-            id
         );
     }
 }

@@ -8,6 +8,9 @@ export class Instrument extends RackItem {
         outputs: string[],
     ) {
         super(
+            id,
+            
+            name,
             RackItem.getAvailablePoint(),
             8,
             'light',
@@ -17,8 +20,6 @@ export class Instrument extends RackItem {
                 midi: [inputs, outputs],
                 control: [[], []]
             },
-            name,
-            id
         );
     }
 }

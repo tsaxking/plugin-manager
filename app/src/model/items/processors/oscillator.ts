@@ -7,6 +7,9 @@ export class Oscillator extends RackItem {
         inputs: string[],
     ) {
         super(
+            id,
+            
+            name,
             RackItem.getAvailablePoint(),
             8,
             'success',
@@ -16,8 +19,6 @@ export class Oscillator extends RackItem {
                 midi: [[], []],
                 control: [inputs, []]
             },
-            name,
-            id
         )
     }
 }
