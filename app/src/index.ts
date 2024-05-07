@@ -38,10 +38,12 @@ interact('.rack-item').draggable({
     listeners: {
         move: event => {
             const target: HTMLDivElement = event.target;
-            const prevX = parseFloat((target.getAttribute('data-x') || '0'));
-            const prevY = parseFloat((target.getAttribute('data-y') || '0'));
-            let x: number = (parseFloat((target.getAttribute('data-x')) || '0')) + event.dx;
-            let y: number = (parseFloat((target.getAttribute('data-y')) || '0')) + event.dy;
+            const prevX = parseFloat(target.getAttribute('data-x') || '0');
+            const prevY = parseFloat(target.getAttribute('data-y') || '0');
+            let x: number =
+                parseFloat(target.getAttribute('data-x') || '0') + event.dx;
+            let y: number =
+                parseFloat(target.getAttribute('data-y') || '0') + event.dy;
 
             // for some reason, the y value jumps 380px on the last event
             // this is a hack to fix that
@@ -102,18 +104,40 @@ interact('.rack-item').draggable({
             const id = target.id.split('-')[1];
             const item = rack.items.find(i => i.id === id);
             if (item) {
-                const dx =
-                    parseFloat(target.getAttribute('data-x') || '0') / 16;
-                const dy =
-                    parseFloat(target.getAttribute('data-y') || '0') / 380 + 1;
-                const { x, y } = item;
-                item.moveTo(Math.floor(x + dx), Math.floor(y + dy));
+                const startX = parseFloat(
+                    target.getAttribute('data-start-x') || '0'
+                );
+                const startY = parseFloat(
+                    target.getAttribute('data-start-y') || '0'
+                );
+                const dX = parseFloat(target.getAttribute('data-x') || '0');
+                const dY = parseFloat(target.getAttribute('data-y') || '0');
+
+                const centerX = startX + dX;
+                const centerY = startY + dY;
+
+                const dx2 = Math.round((centerX - startX) / 16);
+                const dy2 = Math.round((centerY - startY) / 380);
+
+                // console.log({
+                //     dx2,
+                //     dy2,
+                //     centerX,
+                //     centerY,
+                //     startX,
+                //     startY,
+                //     dX,
+                //     dY
+                // });
+
+                item.moveTo(item.x + dx2, item.y + dy2);
             }
             target.style.zIndex = target.getAttribute('data-z') || '0';
             target.setAttribute('data-x', '0');
             target.setAttribute('data-y', '0');
 
             target.style.transform = `translate(0px, 0px)`;
+            Cable.view(rack.items, true);
         },
         start: event => {
             const target: HTMLDivElement = event.target;
@@ -126,6 +150,8 @@ interact('.rack-item').draggable({
 
             target.setAttribute('data-x', '0');
             target.setAttribute('data-y', '0');
+            target.setAttribute('data-start-x', `${centerX}`);
+            target.setAttribute('data-start-y', `${centerY}`);
         },
     },
 });
@@ -182,4 +208,3 @@ IO.on('change', () => Cable.view(rack.items, true));
 RackItem.on('display', () => Cable.view(rack.items, true));
 RackItem.on('move', () => Cable.view(rack.items, true));
 Cable.view(rack.items, true);
-RackItem.on('new', () => Cable.view(rack.items, true));

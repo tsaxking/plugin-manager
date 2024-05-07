@@ -117,15 +117,11 @@ export class Input extends IOEmitter<InputEvents> {
     }
 
     get connections() {
-        return this.io.rackItem.rack.items.filter(
-            (rackItem) => {
-                return rackItem.io[this.type].outputs.some(
-                    (output) => output.connections.some(
-                        (input) => input === this
-                    )
-                )
-            }
-        )
+        return this.io.rackItem.rack.items.filter(rackItem => {
+            return rackItem.io[this.type].outputs.some(output =>
+                output.connections.some(input => input === this)
+            );
+        });
     }
 }
 
