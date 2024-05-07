@@ -57,7 +57,7 @@ item.on('move', ({ x: X, y: Y }) => {
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
-    id="ri-{item.id}"
+    id="ri_{item.id}"
     draggable
     class="rack-item"
     style="
