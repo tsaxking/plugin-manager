@@ -1,12 +1,7 @@
 
 import { Random } from "./utils/math";
 import { Cable } from "./model/cable";
-import { Instrument } from "./model/items/processors/instrument";
-import { Controller } from "./model/items/processors/midi-controller";
-import { Oscillator } from "./model/items/processors/oscillator";
-import { Compressor } from "./model/items/processors/compressor";
-import { Reverb } from "./model/items/processors/reverb";
-  import { AudioOutput } from "./model/items/processors/audio-output";
+import { Processors } from "./model/items/processors";
   import { IO } from './model/io';
 // import './styles/animate.css';
 import './styles/global.css';
@@ -23,9 +18,15 @@ import Index from './view/Index.svelte';
 import interact from 'interactjs';
 import { RackItem } from './model/rack-item';
 import { Point } from "./utils/calcs/linear-algebra/point";
+import { Rack } from "./model/state";
+
+const rack = new Rack();
 
 new Index({
-    target: document.body
+    target: document.body,
+    props: {
+        rack
+    }
 });
 
 interact('.rack-item').draggable({
@@ -49,7 +50,7 @@ interact('.rack-item').draggable({
             target.setAttribute('data-y', `${y}`);
 
             const id = event.target.id.split('-')[1];
-            const item = RackItem.items.find(i => i.id === id);
+            const item = rack.items.find(i => i.id === id);
             if (item) {
                 const cables = item.cables;
                 for (const i in cables) {
@@ -67,13 +68,13 @@ interact('.rack-item').draggable({
                     }
                     c.build();
                 }
-                Cable.view(false);
+                Cable.view(rack.items, false);
             }
         },
         end: (event) => {
             const target: HTMLDivElement = event.target;
             const id = target.id.split('-')[1];
-            const item = RackItem.items.find(i => i.id === id);
+            const item = rack.items.find(i => i.id === id);
             if (item) {
                 const dx = parseFloat((target.getAttribute('data-x')) || '0') / 16;
                 const dy = parseFloat((target.getAttribute('data-y')) || '0') / 380 + 1;
@@ -99,37 +100,44 @@ interact('.rack-item').draggable({
     }
 });
 
-const midiInput = new Instrument(
+const midiInput = Processors.instrument(
+    rack,
     Random.uuid(),
     'Keystation 88 Pro',
     ['MIDI In'],
     ['MIDI Out'],
 );
 
-const controller = new Controller(
+const controller = Processors.midiController(
+    rack,
     Random.uuid(),
     'ASDR',
     ['MIDI In'],
     ['Volume', 'Pitch', 'Modulation'],
 );
 
-const oscillator = new Oscillator(
+const oscillator = Processors.oscillator(
+    rack,
     Random.uuid(),
     'Sine',
     ['Volume', 'Pitch', 'Modulation']
 );
 
-const compressor = new Compressor(
+const compressor = Processors.compressor(
+    rack,
     Random.uuid(),
     'Compressor',
 );
 
-const reverb = new Reverb(
+const reverb = Processors.reverb(
+    rack,
     Random.uuid(),
     'Concert Hall',
+    true
 );
 
-const output = new AudioOutput(
+const output = Processors.audioOutput(
+    rack,
     Random.uuid(),
     'Main Out',
     ['Left', 'Right'],
@@ -151,7 +159,7 @@ reverb.io.audio.outputs[0].connect(output.io.audio.inputs[0]);
 reverb.io.audio.outputs[1].connect(output.io.audio.inputs[1]);
 
 
-IO.on('change', () => Cable.view(true));
-RackItem.on('display', () => Cable.view(true));
-RackItem.on('move', () => Cable.view(true));
-Cable.view(true);
+IO.on('change', () => Cable.view(rack.items, true));
+RackItem.on('display', () => Cable.view(rack.items, true));
+RackItem.on('move', () => Cable.view(rack.items, true));
+Cable.view(rack.items, true);

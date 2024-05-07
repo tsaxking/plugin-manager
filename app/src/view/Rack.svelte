@@ -4,22 +4,24 @@
 import RackImage from "./RackBackground.svelte";
   import { onMount } from "svelte";
   import { Cable } from "../model/cable";
+  import { Rack } from "../model/state";
 
   export let display: 'io' | 'control' = 'io';
+  export let rack: Rack;
 
-  $: RackItem.display = display;
+  $: Rack.display = display;
 
-let items: RackItem[] = RackItem.items;
+let items: RackItem[] = rack.items;
 
 let cableTarget: HTMLDivElement;
 
 onMount(() => {
-    items = RackItem.items;
+    items = rack.items;
     Cable.setTarget(cableTarget);
 });
 
 RackItem.on('new', () => {
-    items = RackItem.items;
+    items = rack.items;
 });
 </script>
 

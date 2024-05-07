@@ -67,36 +67,38 @@
         <div class="col-6">
             <div class="container-fluid">
                 {#each io.inputs as i, index}
-                <div class="d-flex justify-content-start">
-                    <p
-                        on:click={() => click(i)}
-                        class="text-light cursor-pointer"
-                        style="background-color: {
-                        color
-                        .setAlpha(Object.is(active, i) ? 0.5 : 1)
-                        .toString()
-                        };"
-                    >
-                        {capitalize(i.name)}
-                    </p>
-                </div>
+                    <div class="d-flex justify-content-start">
+                        <p
+                            on:click={() => click(i)}
+                            class="text-light cursor-pointer"
+                            style="background-color: {
+                            color
+                            .clone()
+                            .setAlpha(Object.is(active, i) ? 0.5 : 1)
+                            .toString()
+                            };"
+                        >
+                            {capitalize(i.name)}
+                        </p>
+                    </div>
                 {/each}
             </div>
         </div>
         <div class="col-6">
             <div class="container-fluid">
                 {#each io.outputs as o, index}
-                <div class="d-flex justify-content-end">
-                    <p
-                        on:click={() => click(o)}
-                        class="text-light cursor-pointer"
-                        style="background-color: {color
-                            .setAlpha(Object.is(active, o) ? 0.5 : 1)
-                        .toString()};"
-                    >
-                        {capitalize(o.name)}
-                    </p>
-                </div>
+                    <div class="d-flex justify-content-end">
+                        <p
+                            on:click={() => click(o)}
+                            class="text-light cursor-pointer"
+                            style="background-color: {color
+                            .clone()
+                                .setAlpha(Object.is(active, o) ? 0.5 : 1)
+                            .toString()};"
+                        >
+                            {capitalize(o.name)}
+                        </p>
+                    </div>
                 {/each}
             </div>
         </div>

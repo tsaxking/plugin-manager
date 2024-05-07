@@ -3,6 +3,7 @@ import { Input, Output } from "./io";
 import { RackItem } from "./rack-item";
 import { colors } from "./rack-item";
 import { EventEmitter } from "../utils/event-emitter";
+import { Rack } from "./state";
 
 
 
@@ -48,11 +49,11 @@ export class Cable {
         });
     }
 
-    public static view(update: boolean) {
+    public static view(rackItems: RackItem[], update: boolean) {
         Cable.target.innerHTML = '';
         Cable.all = [];
-        if (RackItem.display === 'control') return;
-        const cables = Cable.generate(RackItem.items);
+        if (Rack.display === 'control') return;
+        const cables = Cable.generate(rackItems);
         if (update) {
             for (const c of cables) {
                 c.input.update();

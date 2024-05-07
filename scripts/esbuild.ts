@@ -1,6 +1,7 @@
 import * as esbuildServer from 'esbuild-server';
 import esbuildSvelte from "esbuild-svelte";
 import { typescript } from 'svelte-preprocess-esbuild';
+import { sassPlugin } from 'esbuild-sass-plugin';
 
 esbuildServer
     .createServer(
@@ -20,6 +21,9 @@ esbuildServer
                             }
                         })
                     ]
+                }),
+                sassPlugin({
+                    filter: /\.s[ac]ss$/,
                 })
             ],
             logLevel: 'info',

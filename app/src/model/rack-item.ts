@@ -5,6 +5,7 @@ import { IO, io } from "./io";
 import { Color } from "../utils/color";
 import { abbreviate } from "../utils/text";
 import { Cable } from "./cable";
+import { Rack } from "./state";
 
 export const colors = {
     audio: Color.fromHex('#425df5'),
@@ -27,13 +28,6 @@ type GlobalEvents = {
 }
 
 export class RackItem {
-    private static _display: 'io' | 'control' = 'io';
-    public static get display() { return this._display; }
-    public static set display(value: 'io' | 'control') {
-        this._display = value;
-        RackItem.emit('display', value);
-    }
-
     private static readonly emitter = new EventEmitter<keyof GlobalEvents>();
     public static on<K extends keyof GlobalEvents>(event: K, listener: (e: GlobalEvents[K]) => void): void {
         this.emitter.on(event, listener);
@@ -47,75 +41,8 @@ export class RackItem {
         this.emitter.emit(event, e);
     }
 
-    public static items: RackItem[] = [];
-
     private readonly emitter = new EventEmitter<keyof Events>();
 
-    public static getAvailablePoint() {
-        const items = RackItem.items.slice();
-        items.sort((a, b) => {
-            if (a.y !== b.y) return a.y - b.y;
-            return a.x - b.x;
-        });
-
-        let y = 0;
-        let x = 0;
-        for (const item of items) {
-            if (item.y !== y) {
-                y = item.y;
-                x = 0;
-            }
-            x = item.end;
-        }
-        return [x, y] as Point2D;
-    }
-
-    public static serialize() {
-        return JSON.stringify(RackItem.items.map(i => i.serialize()));
-    }
-
-    public static deserialize(data: string) {
-        const items = JSON.parse(data) as unknown[];
-        if (!Array.isArray(items)) throw new Error('Invalid data');
-        if (items.some(i => typeof i !== 'object')) throw new Error('Invalid data');
-        // if (items.some(i => (i as { id: string }).id)) throw new Error('Invalid data');
-        const rackItems = items as {
-            id: string;
-            note: string;
-            point: Point2D;
-            width: number;
-            color: 'primary' | 'secondary' | 'success' | 'danger' | 'info' | 'dark' | 'warning';
-            title: string;
-            io: io;
-            routing: {
-                audio: string[][];
-                midi: string[][];
-                control: string[][];
-            }
-        }[];
-        
-        RackItem.items = [];
-
-        const generated = rackItems.map(i => new RackItem(
-            i.id,
-            i.note,
-            i.point,
-            i.width,
-            i.color,
-            i.title,
-            i.io
-        ));
-
-        for (const g of generated) {
-            const item = rackItems.find(i => i.id === g.id);
-            if (!item) throw new Error('Invalid data'); // should never happen
-            g.io.audio.deserialize(item.routing.audio);
-            g.io.midi.deserialize(item.routing.midi);
-            g.io.control.deserialize(item.routing.control);
-        }
-
-        return generated;
-    }
 
     public x = 0;
     public y = 0;
@@ -128,6 +55,7 @@ export class RackItem {
     private readonly _note: string;
 
     constructor(
+        public readonly rack: Rack,
         public readonly id: string,
         note: string,
         point: Point2D,
@@ -146,7 +74,7 @@ export class RackItem {
         };
         this._note = note;
 
-        RackItem.items.push(this);
+        rack.items.push(this);
         RackItem.emit('new', this);
     }
 
@@ -163,7 +91,7 @@ export class RackItem {
             if (x < 0 || y < 0) throw new Error('Invalid position');
             // console.log('moving to', x, y);
             // check if the new position is valid
-            const { items } = RackItem;
+            const { items } = this.rack;
             const end = x + this.width;
 
             for (const item of items) {
@@ -183,9 +111,9 @@ export class RackItem {
     }
 
     destroy() {
-        const index = RackItem.items.indexOf(this);
+        const index = this.rack.items.indexOf(this);
         if (index !== -1) {
-            RackItem.items.splice(index, 1);
+            this.rack.items.splice(index, 1);
             this.emit('destroy', undefined);
         }
     }

@@ -6,6 +6,7 @@
   "dependencies": {
     "bootstrap": "^5.3.3",
     "esbuild-plugin-tailwindcss": "^1.2.0",
+    "esbuild-sass-plugin": "^3.2.0",
     "esbuild-svelte": "^0.8.0",
     "fuzzy-search": "^3.2.1",
     "interactjs": "^1.10.27",
@@ -16,8 +17,10 @@
     "@tauri-apps/api": "^1.5.4",
     "@tauri-apps/cli": "^1.5.12",
     "@types/fuzzy-search": "^2.1.5",
+    "@types/jquery": "^3.5.29",
     "esbuild": "^0.20.2",
     "esbuild-server": "^0.3.0",
+    "jquery": "^3.7.1",
     "ts-node": "^10.9.2"
   }
 }
