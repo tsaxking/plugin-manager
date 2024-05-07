@@ -1,7 +1,7 @@
 {
     "scripts": {
         "build": "ts-node scripts/esbuild.ts",
-        "dev": "npm run build:ts"
+        "dev": "npm run build watch"
     },
     "dependencies": {
         "bootstrap": "^5.3.3",
