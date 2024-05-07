@@ -42,7 +42,6 @@ import { RackItem } from "../model/rack-item";
     })();
 
     item.on('move', ({ x: X, y: Y}) => {
-        console.log('move', X, Y);
         x: x = X;
         y = Y;
     });
