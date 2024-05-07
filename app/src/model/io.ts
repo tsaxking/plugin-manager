@@ -115,6 +115,18 @@ export class Input extends IOEmitter<InputEvents> {
     isConnected(output: Output) {
         return output.isConnected(this);
     }
+
+    get connections() {
+        return this.io.rackItem.rack.items.filter(
+            (rackItem) => {
+                return rackItem.io[this.type].outputs.some(
+                    (output) => output.connections.some(
+                        (input) => input === this
+                    )
+                )
+            }
+        )
+    }
 }
 
 export class Output extends IOEmitter<OutputEvents> {
@@ -135,6 +147,12 @@ export class Output extends IOEmitter<OutputEvents> {
                 throw new Error('Cannot connect different types');
             if (this.rackItem.id === input.rackItem.id)
                 throw new Error('Cannot connect to itself');
+            if (this.connections.length) {
+                throw new Error('Output already connected');
+            }
+            if (input.connections.length) {
+                throw new Error('Input already connected');
+            }
             this.connections.push(input);
             this.emit('connect', input);
             IO.emit('change', undefined);
