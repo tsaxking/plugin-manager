@@ -3,7 +3,7 @@
     export let y = 1;
 </script>
 
-<div class="position-fixed">
+<div class="position-absolute">
     {#each Array.from({ length: y }) as _, yIndex}
         <div class="ws-nowrap">
             {#each Array.from({ length: x }) as _, xIndex}

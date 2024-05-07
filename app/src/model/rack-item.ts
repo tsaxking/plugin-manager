@@ -4,6 +4,7 @@ import { Point2D } from "../utils/calcs/linear-algebra/point";
 import { IO, io } from "./io";
 import { Color } from "../utils/color";
 import { abbreviate } from "../utils/text";
+import { Cable } from "./cable";
 
 export const colors = {
     audio: Color.fromHex('#425df5'),
@@ -22,9 +23,17 @@ type GlobalEvents = {
     'move': RackItem;
     'update': RackItem;
     'new': RackItem;
+    'display': 'io' | 'control';
 }
 
 export class RackItem {
+    private static _display: 'io' | 'control' = 'io';
+    public static get display() { return this._display; }
+    public static set display(value: 'io' | 'control') {
+        this._display = value;
+        RackItem.emit('display', value);
+    }
+
     private static readonly emitter = new EventEmitter<keyof GlobalEvents>();
     public static on<K extends keyof GlobalEvents>(event: K, listener: (e: GlobalEvents[K]) => void): void {
         this.emitter.on(event, listener);
@@ -37,7 +46,6 @@ export class RackItem {
     public static emit<K extends keyof GlobalEvents>(event: K, e: GlobalEvents[K]): void {
         this.emitter.emit(event, e);
     }
-
 
     public static items: RackItem[] = [];
 
@@ -217,6 +225,11 @@ export class RackItem {
                 control: this.io.control.serialize(),
             }
         }
+    }
+
+    get cables() {
+        const cables = Cable.all;
+        return cables.filter(c => Object.is(c.input.rackItem, this) || Object.is(c.output.rackItem, this));
     }
 };
 

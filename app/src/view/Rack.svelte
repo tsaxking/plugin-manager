@@ -7,6 +7,8 @@ import RackImage from "./RackBackground.svelte";
 
   export let display: 'io' | 'control' = 'io';
 
+  $: RackItem.display = display;
+
 let items: RackItem[] = RackItem.items;
 
 let cableTarget: HTMLDivElement;
@@ -21,10 +23,7 @@ RackItem.on('new', () => {
 });
 </script>
 
-<div class="position-relative">
-    <div class="position-absolute" 
-        class:d-none={display !== 'io'}
-    bind:this={cableTarget}></div>
+<div class="position-relative" bind:this={cableTarget}>
     <RackImage x={200} y={3}/>
 
     {#each items as item}

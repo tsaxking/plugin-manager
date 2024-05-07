@@ -48,6 +48,7 @@ const IO_SIZE = 18+10+4;
 
 export class Input extends IOEmitter<InputEvents> {
     // public connections: Output[] = [];
+    public point = new Point(0, 0);
 
     constructor(public readonly type: 'midi' | 'audio' | 'control', public readonly io: IO, public readonly name: string) {
         super();
@@ -65,7 +66,7 @@ export class Input extends IOEmitter<InputEvents> {
     //     this.connections = this.connections.filter(c => c !== output);
     // }
 
-    get point() {
+    update() {
         const { type } = this;
         const { x, y } = this.rackItem;
         const { index } = this;
@@ -86,11 +87,10 @@ export class Input extends IOEmitter<InputEvents> {
                 break;
         }
 
+        this.point.x = x * 16;
+        this.point.y = y * 380 + 60 + displacement * IO_SIZE + 16;
 
-        return new Point(
-            x * 16,
-            y * 380 + 60 + displacement * IO_SIZE + 16
-        );
+        return this.point;
     }
 
     get rackItem() {
@@ -108,6 +108,7 @@ export class Input extends IOEmitter<InputEvents> {
 
 export class Output extends IOEmitter<OutputEvents> {
     public connections: Input[] = [];
+    public point = new Point(0, 0);
 
     constructor(public readonly type: 'midi' | 'audio' | 'control', public readonly io: IO, public readonly name: string) {
         super();
@@ -128,7 +129,7 @@ export class Output extends IOEmitter<OutputEvents> {
         IO.emit('change', undefined);
     }
 
-    get point() {
+    update() {
         const { type } = this;
         const { x, y } = this.io.rackItem;
         const index = this.io.outputs.indexOf(this);
@@ -150,10 +151,10 @@ export class Output extends IOEmitter<OutputEvents> {
                 break;
         }
 
-        return new Point(
-            x * 16 + 16 * this.io.rackItem.width,
-            y * 380 + 60 + displacement * IO_SIZE + 16
-        );
+        this.point.x = x * 16 + 16 * this.io.rackItem.width;
+        this.point.y = y * 380 + 60 + displacement * IO_SIZE + 16;
+
+        return this.point;
     }
 
     get rackItem() {

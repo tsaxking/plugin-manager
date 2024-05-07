@@ -22,6 +22,7 @@ import Index from './view/Index.svelte';
 
 import interact from 'interactjs';
 import { RackItem } from './model/rack-item';
+import { Point } from "./utils/calcs/linear-algebra/point";
 
 new Index({
     target: document.body
@@ -46,6 +47,23 @@ interact('.rack-item').draggable({
 
             target.setAttribute('data-x', `${x}`);
             target.setAttribute('data-y', `${y}`);
+
+            const id = event.target.id.split('-')[1];
+            const item = RackItem.items.find(i => i.id === id);
+            if (item) {
+                const cables = item.cables;
+                for (const c of cables) {
+                    const delta = new Point(event.dx, event.dy);
+                    if (Object.is(c.input.rackItem, item)) {
+                        c.input.point = c.input.point.add(delta);
+                    }
+                    if (Object.is(c.output.rackItem, item)) {
+                        c.output.point = c.output.point.add(delta);
+                    }
+                    c.build();
+                }
+                Cable.view(false);
+            }
         },
         end: (event) => {
             const target: HTMLDivElement = event.target;
@@ -65,6 +83,7 @@ interact('.rack-item').draggable({
 
         },
         start: (event) => {
+
             const target: HTMLDivElement = event.target;
             target.setAttribute('data-z', target.style.zIndex);
             target.style.zIndex = '1000';
@@ -117,9 +136,6 @@ compressor.moveTo(32, 0);
 oscillator.moveTo(22, 1);
 controller.moveTo(9, 1);
 
-IO.on('change', Cable.view);
-RackItem.on('move', Cable.view);
-
 midiInput.io.midi.outputs[0].connect(controller.io.midi.inputs[0]);
 controller.io.control.outputs[0].connect(oscillator.io.control.inputs[0]);
 controller.io.control.outputs[1].connect(oscillator.io.control.inputs[1]);
@@ -128,3 +144,9 @@ oscillator.io.audio.outputs[0].connect(compressor.io.audio.inputs[0]);
 compressor.io.audio.outputs[0].connect(reverb.io.audio.inputs[0]);
 reverb.io.audio.outputs[0].connect(output.io.audio.inputs[0]);
 reverb.io.audio.outputs[1].connect(output.io.audio.inputs[1]);
+
+
+IO.on('change', () => Cable.view(true));
+RackItem.on('display', () => Cable.view(true));
+RackItem.on('move', () => Cable.view(true));
+Cable.view(true);
