@@ -139,8 +139,8 @@ const reverb = Processors.reverb(
 const output = Processors.audioOutput(
     rack,
     Random.uuid(),
-    'Main Out',
-    ['Left', 'Right'],
+    'UMC 1820',
+    Array.from({ length: 10 }, (_, i) => `${i+1}`),
 );
 
 output.moveTo(60, 0);
