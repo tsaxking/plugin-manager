@@ -1,5 +1,5 @@
-import { EventEmitter } from "./event-emitter";
+import { EventEmitter } from './event-emitter';
 
 export const emitter = new EventEmitter();
 
-document.addEventListener('keydown', (e) => {});
+document.addEventListener('keydown', e => {});

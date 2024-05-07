@@ -1,48 +1,56 @@
-import { attempt } from "../utils/check";
-import { EventEmitter } from "../utils/event-emitter";
-import { Point2D } from "../utils/calcs/linear-algebra/point";
-import { IO, io } from "./io";
-import { Color } from "../utils/color";
-import { abbreviate } from "../utils/text";
-import { Cable } from "./cable";
-import { Rack } from "./state";
+import { attempt } from '../utils/check';
+import { EventEmitter } from '../utils/event-emitter';
+import { Point2D } from '../utils/calcs/linear-algebra/point';
+import { IO, io } from './io';
+import { Color } from '../utils/color';
+import { abbreviate } from '../utils/text';
+import { Cable } from './cable';
+import { Rack } from './state';
 
 export const colors = {
     audio: Color.fromHex('#425df5'),
     midi: Color.fromHex('#30a136'),
     control: Color.fromHex('#f54242'),
-}
+};
 
 type Events = {
-    'destroy': void;
-    'move': { x: number, y: number };
-    'update': void;
+    destroy: void;
+    move: { x: number; y: number };
+    update: void;
 };
 
 type GlobalEvents = {
-    'destroy': RackItem;
-    'move': RackItem;
-    'update': RackItem;
-    'new': RackItem;
-    'display': 'io' | 'control';
-}
+    destroy: RackItem;
+    move: RackItem;
+    update: RackItem;
+    new: RackItem;
+    display: 'io' | 'control';
+};
 
 export class RackItem {
     private static readonly emitter = new EventEmitter<keyof GlobalEvents>();
-    public static on<K extends keyof GlobalEvents>(event: K, listener: (e: GlobalEvents[K]) => void): void {
+    public static on<K extends keyof GlobalEvents>(
+        event: K,
+        listener: (e: GlobalEvents[K]) => void
+    ): void {
         this.emitter.on(event, listener);
     }
 
-    public static off<K extends keyof GlobalEvents>(event: K, listener?: (e: GlobalEvents[K]) => void): void {
+    public static off<K extends keyof GlobalEvents>(
+        event: K,
+        listener?: (e: GlobalEvents[K]) => void
+    ): void {
         this.emitter.off(event, listener);
     }
 
-    public static emit<K extends keyof GlobalEvents>(event: K, e: GlobalEvents[K]): void {
+    public static emit<K extends keyof GlobalEvents>(
+        event: K,
+        e: GlobalEvents[K]
+    ): void {
         this.emitter.emit(event, e);
     }
 
     private readonly emitter = new EventEmitter<keyof Events>();
-
 
     public x = 0;
     public y = 0;
@@ -60,9 +68,16 @@ export class RackItem {
         note: string,
         point: Point2D,
         public width: number,
-        public color: 'primary' | 'secondary' | 'success' | 'danger' | 'info' | 'dark' | 'warning',
+        public color:
+            | 'primary'
+            | 'secondary'
+            | 'success'
+            | 'danger'
+            | 'info'
+            | 'dark'
+            | 'warning',
         public readonly title: string,
-        io: io,
+        io: io
     ) {
         if (this.width < 8) throw new Error('Invalid width');
         [this.x, this.y] = point;
@@ -118,11 +133,17 @@ export class RackItem {
         }
     }
 
-    on<K extends keyof Events>(event: K, listener: (e: Events[K]) => void): void {
+    on<K extends keyof Events>(
+        event: K,
+        listener: (e: Events[K]) => void
+    ): void {
         this.emitter.on(event, listener);
     }
-    
-    off<K extends keyof Events>(event: K, listener?: (e: Events[K]) => void): void {
+
+    off<K extends keyof Events>(
+        event: K,
+        listener?: (e: Events[K]) => void
+    ): void {
         this.emitter.off(event, listener);
     }
 
@@ -130,9 +151,7 @@ export class RackItem {
         this.emitter.emit(event, e);
     }
 
-    update() {
-
-    }
+    update() {}
 
     serialize() {
         return {
@@ -143,22 +162,35 @@ export class RackItem {
             color: this.color,
             title: this.title,
             io: {
-                audio: [this.io.audio.inputs.map(i => i.name), this.io.audio.outputs.map(o => o.name)],
-                midi: [this.io.midi.inputs.map(i => i.name), this.io.midi.outputs.map(o => o.name)],
-                control: [this.io.control.inputs.map(i => i.name), this.io.control.outputs.map(o => o.name)],
+                audio: [
+                    this.io.audio.inputs.map(i => i.name),
+                    this.io.audio.outputs.map(o => o.name),
+                ],
+                midi: [
+                    this.io.midi.inputs.map(i => i.name),
+                    this.io.midi.outputs.map(o => o.name),
+                ],
+                control: [
+                    this.io.control.inputs.map(i => i.name),
+                    this.io.control.outputs.map(o => o.name),
+                ],
             },
             routing: {
                 audio: this.io.audio.serialize(),
                 midi: this.io.midi.serialize(),
                 control: this.io.control.serialize(),
-            }
-        }
+            },
+        };
     }
 
     get cables() {
         const cables = Cable.all;
-        return cables.filter(c => Object.is(c.input.rackItem, this) || Object.is(c.output.rackItem, this));
+        return cables.filter(
+            c =>
+                Object.is(c.input.rackItem, this) ||
+                Object.is(c.output.rackItem, this)
+        );
     }
-};
+}
 
 Object.assign(window, { RackItem });

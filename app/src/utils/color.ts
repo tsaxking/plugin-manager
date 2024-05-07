@@ -149,7 +149,7 @@ const colors = {
     whitesmoke: [245, 245, 245, 1],
     yellow: [255, 255, 0, 1],
     yellowgreen: [154, 205, 50, 1],
-    rebeccapurple: [102, 51, 153, 1]
+    rebeccapurple: [102, 51, 153, 1],
 };
 
 export type ColorStr = keyof typeof colors;
@@ -312,7 +312,7 @@ const BootstrapColors = {
     // "green": Color.fromHex('#006600').rgba.values,
     'green-light': [179, 255, 179, 1],
     // "green-light": Color.fromHex('#66ff66').rgba.values,
-    'green-dark': [0, 51, 0, 1]
+    'green-dark': [0, 51, 0, 1],
     // "green-dark": Color.fromHex('#003300').rgba.values
 };
 
@@ -483,7 +483,7 @@ export class Color {
             if (next) {
                 intervals.push({
                     diff: Math.abs(hue - next),
-                    hues: [hue, next]
+                    hues: [hue, next],
                 });
             }
 
@@ -546,7 +546,7 @@ export class Color {
                     return {
                         name,
                         distance,
-                        color: new Color(r2, g2, b2)
+                        color: new Color(r2, g2, b2),
                     };
                 }
 
@@ -555,7 +555,7 @@ export class Color {
             {
                 name: '',
                 distance: Infinity,
-                color: new Color(0, 0, 0)
+                color: new Color(0, 0, 0),
             } as ClosestColor
         );
     }
@@ -580,7 +580,7 @@ export class Color {
                     return {
                         name,
                         distance,
-                        color: new Color(r2, g2, b2)
+                        color: new Color(r2, g2, b2),
                     };
                 }
 
@@ -589,7 +589,7 @@ export class Color {
             {
                 name: '',
                 distance: Infinity,
-                color: new Color(0, 0, 0)
+                color: new Color(0, 0, 0),
             } as ClosestColor
         );
     }
@@ -683,7 +683,7 @@ export class Color {
             setBlue: (value: number) => {
                 this.b = value;
                 return this;
-            }
+            },
         };
     }
 
@@ -692,7 +692,7 @@ export class Color {
             ...this.rgb,
             values: [...this.rgb.values, this.a],
             toString: () => `rgba(${this.r}, ${this.g}, ${this.b}, ${this.a})`,
-            setAlpha: this.setAlpha
+            setAlpha: this.setAlpha,
         };
     }
 
@@ -769,7 +769,7 @@ export class Color {
                 this.b = color.b;
 
                 return this;
-            }
+            },
         };
     }
 
@@ -794,7 +794,7 @@ export class Color {
                 this.a = color.a;
 
                 return this;
-            }
+            },
         };
     }
 
@@ -817,7 +817,7 @@ export class Color {
             setBlue: (value: number) => {
                 this.b = value;
                 return this;
-            }
+            },
         };
     }
 
@@ -831,7 +831,7 @@ export class Color {
             ...this.hex,
             values: [r, g, b, a],
             toString: () => `#${r}${g}${b}${a}`,
-            setAlpha: this.setAlpha
+            setAlpha: this.setAlpha,
         };
     }
 
@@ -873,7 +873,7 @@ export class Color {
 
         const g = [
             this,
-            ...hues.map(h => Color.fromHSL(h, hsl[1], hsl[2], this.a))
+            ...hues.map(h => Color.fromHSL(h, hsl[1], hsl[2], this.a)),
         ];
 
         return new Gradient(...g);
