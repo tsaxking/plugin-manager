@@ -52,7 +52,7 @@ import { RackItem } from "../model/rack-item";
 .rack-item {
     width: 100%;
     height: 100%;
-    position: fixed;
+    position: absolute;
 }
 
 h1,

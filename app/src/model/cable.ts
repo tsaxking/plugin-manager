@@ -4,13 +4,7 @@ import { RackItem } from "./rack-item";
 import { colors } from "./rack-item";
 import { EventEmitter } from "../utils/event-emitter";
 
-const cablesDiv = document.createElement('div');
-cablesDiv.style.position = 'fixed';
-cablesDiv.style.zIndex = '1000';
-cablesDiv.style.height = '100%';
-cablesDiv.style.width = '100%';
-cablesDiv.style.pointerEvents = 'none';
-document.body.appendChild(cablesDiv);
+
 
 type Events = {
     change: Input|Output|null;
@@ -23,6 +17,8 @@ export class Cable {
         Cable._state = value;
         Cable.emit('change', value);
     }
+
+    private static readonly target = document.createElement('div');
 
     private static readonly emitter = new EventEmitter<keyof Events>();
 
@@ -51,9 +47,18 @@ export class Cable {
     }
 
     public static view() {
-        cablesDiv.innerHTML = '';
+        Cable.target.innerHTML = '';
         const cables = Cable.generate(RackItem.items);
-        for (const c of cables) cablesDiv.appendChild(c.build());
+        for (const c of cables) Cable.target.appendChild(c.build());
+    }
+
+    public static setTarget(target: HTMLDivElement) {
+        Cable.target.style.position = 'fixed';
+        Cable.target.style.zIndex = '1000';
+        Cable.target.style.height = '100%';
+        Cable.target.style.width = '100%';
+        Cable.target.style.pointerEvents = 'none';
+        target.appendChild(Cable.target);
     }
 
 
