@@ -1,6 +1,6 @@
 [
     {
-        "id": "DIZJIo32orIWZ6sx:instrument",
+        "id": "D4hNL0N1wk2DR5kA|instrument",
         "note": "Keystation 88 Pro",
         "point": [0, 0],
         "width": 8,
@@ -13,12 +13,12 @@
         },
         "routing": {
             "audio": [],
-            "midi": [["5DKem5YUvKGCYikz:midi-controller:0"]],
+            "midi": [["J5P3i9OYPkS8wD4K|midi-controller:0"]],
             "control": []
         }
     },
     {
-        "id": "5DKem5YUvKGCYikz:midi-controller",
+        "id": "J5P3i9OYPkS8wD4K|midi-controller",
         "note": "ASDR",
         "point": [9, 1],
         "width": 8,
@@ -33,14 +33,14 @@
             "audio": [],
             "midi": [],
             "control": [
-                ["aOT5NJ6ol8umqS9L:oscillator:0"],
-                ["aOT5NJ6ol8umqS9L:oscillator:1"],
-                ["aOT5NJ6ol8umqS9L:oscillator:2"]
+                ["G5KIEnAj25cxJA1A|oscillator:0"],
+                ["G5KIEnAj25cxJA1A|oscillator:1"],
+                ["G5KIEnAj25cxJA1A|oscillator:2"]
             ]
         }
     },
     {
-        "id": "aOT5NJ6ol8umqS9L:oscillator",
+        "id": "G5KIEnAj25cxJA1A|oscillator",
         "note": "Sine",
         "point": [22, 1],
         "width": 8,
@@ -52,13 +52,13 @@
             "control": [["Volume", "Pitch", "Modulation"], []]
         },
         "routing": {
-            "audio": [["9VcuLV9ml5yOpZbJ:compressor:0"]],
+            "audio": [["JS98YAGftc7S5RHH|compressor:0"]],
             "midi": [],
             "control": []
         }
     },
     {
-        "id": "9VcuLV9ml5yOpZbJ:compressor",
+        "id": "JS98YAGftc7S5RHH|compressor",
         "note": "Compressor",
         "point": [32, 0],
         "width": 8,
@@ -70,13 +70,13 @@
             "control": [[], []]
         },
         "routing": {
-            "audio": [["YwspswBbp6rmWW73:reverb:0"]],
+            "audio": [["LzmermLR30TfH687|reverb:0"]],
             "midi": [],
             "control": []
         }
     },
     {
-        "id": "YwspswBbp6rmWW73:reverb",
+        "id": "LzmermLR30TfH687|reverb",
         "note": "Concert Hall",
         "point": [48, 0],
         "width": 8,
@@ -92,15 +92,15 @@
         },
         "routing": {
             "audio": [
-                ["tuNFr4MkLpXnQvPy:audio-output:0"],
-                ["tuNFr4MkLpXnQvPy:audio-output:1"]
+                ["pQk4xVhKVUQbk8dV|audio-output:0"],
+                ["pQk4xVhKVUQbk8dV|audio-output:1"]
             ],
             "midi": [],
             "control": []
         }
     },
     {
-        "id": "tuNFr4MkLpXnQvPy:audio-output",
+        "id": "pQk4xVhKVUQbk8dV|audio-output",
         "note": "UMC 1820",
         "point": [60, 0],
         "width": 8,

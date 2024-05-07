@@ -229,9 +229,7 @@ export class IO extends IOEmitter<IOEvents> {
 
     serialize() {
         return this.outputs.map(o =>
-            o.connections.map(
-                i => i.rackItem.id + ':' + i.index
-            )
+            o.connections.map(i => i.rackItem.id + ':' + i.index)
         );
     }
 
