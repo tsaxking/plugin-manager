@@ -19,6 +19,7 @@ jobs:
 
       - name: Install all dependencies
         run: |
+          ls -lsa
           npm i
           npm i --save-dev --force prettier-plugin-svelte prettier @typescript-eslint/parser @typescript-eslint/eslint-plugin@5.33.0 eslint typescript prettier-plugin-svelte svelte
           npm i -g eslint prettier svelte
