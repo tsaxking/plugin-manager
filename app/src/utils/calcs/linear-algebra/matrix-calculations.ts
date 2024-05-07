@@ -124,7 +124,7 @@ export function rotate2D(point: Point2D, angle: number): Point2D {
     const [x, y] = point;
     return [
         x * Math.cos(angle) - y * Math.sin(angle),
-        x * Math.sin(angle) + y * Math.cos(angle)
+        x * Math.sin(angle) + y * Math.cos(angle),
     ];
 }
 

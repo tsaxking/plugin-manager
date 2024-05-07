@@ -1,14 +1,19 @@
-import { io } from "../io";
-import { RackItem } from "../rack-item";
-import { Rack } from "../state";
-import { Random } from "../../utils/math";
+import { io } from '../io';
+import { RackItem } from '../rack-item';
+import { Rack } from '../state';
+import { Random } from '../../utils/math';
 
-const getId = (id: string, name: string) => id + ':' + name.toLowerCase()
+const getId = (id: string, name: string) => id + ':' + name.toLowerCase();
 
 export class Processors {
-// ▄▀▄ █ █ █▀▄ █ ▄▀▄ 
-// █▀█ ▀▄█ █▄▀ █ ▀▄▀ 
-    public static audioOutput(rack: Rack, id: string, name: string, inputs: string[]) {
+    // ▄▀▄ █ █ █▀▄ █ ▄▀▄
+    // █▀█ ▀▄█ █▄▀ █ ▀▄▀
+    public static audioOutput(
+        rack: Rack,
+        id: string,
+        name: string,
+        inputs: string[]
+    ) {
         return new RackItem(
             rack,
             getId(id, 'audio-output'),
@@ -20,12 +25,17 @@ export class Processors {
             {
                 audio: [inputs, []],
                 midi: [[], []],
-                control: [[], []]
+                control: [[], []],
             }
-        )
+        );
     }
 
-    public static audioSource(rack: Rack,id: string, name: string, outputs: string[]) {
+    public static audioSource(
+        rack: Rack,
+        id: string,
+        name: string,
+        outputs: string[]
+    ) {
         return new RackItem(
             rack,
             getId(id, 'audio-source'),
@@ -37,12 +47,17 @@ export class Processors {
             {
                 audio: [[], outputs],
                 midi: [[], []],
-                control: [[], []]
-            },
-        )
+                control: [[], []],
+            }
+        );
     }
 
-    public static compressor(rack: Rack,id: string, name: string, stereo = false) {
+    public static compressor(
+        rack: Rack,
+        id: string,
+        name: string,
+        stereo = false
+    ) {
         return new RackItem(
             rack,
             getId(id, 'compressor'),
@@ -52,14 +67,19 @@ export class Processors {
             'primary',
             'Compressor',
             {
-                audio: stereo ? [['L', 'R'], ['L', 'R']] : [['In'], ['Out']],
+                audio: stereo
+                    ? [
+                          ['L', 'R'],
+                          ['L', 'R'],
+                      ]
+                    : [['In'], ['Out']],
                 midi: [[], []],
-                control: [[], []]
-            },
-        )
+                control: [[], []],
+            }
+        );
     }
 
-    public static eq(rack: Rack,id: string, name: string, stereo = false) {
+    public static eq(rack: Rack, id: string, name: string, stereo = false) {
         return new RackItem(
             rack,
             getId(id, 'eq'),
@@ -69,14 +89,19 @@ export class Processors {
             'primary',
             'EQ',
             {
-                audio: stereo ? [['L', 'R'], ['L', 'R']] : [['In'], ['Out']],
+                audio: stereo
+                    ? [
+                          ['L', 'R'],
+                          ['L', 'R'],
+                      ]
+                    : [['In'], ['Out']],
                 midi: [[], []],
-                control: [[], []]
-            },
-        )
+                control: [[], []],
+            }
+        );
     }
 
-    public static gain(rack: Rack,id: string, name: string, stereo = false) {
+    public static gain(rack: Rack, id: string, name: string, stereo = false) {
         return new RackItem(
             rack,
             getId(id, 'gain'),
@@ -86,14 +111,19 @@ export class Processors {
             'primary',
             'Gain',
             {
-                audio: stereo ? [['L', 'R'], ['L', 'R']] : [['In'], ['Out']],
+                audio: stereo
+                    ? [
+                          ['L', 'R'],
+                          ['L', 'R'],
+                      ]
+                    : [['In'], ['Out']],
                 midi: [[], []],
-                control: [[], []]
-            },
-        )
+                control: [[], []],
+            }
+        );
     }
 
-    public static gate(rack: Rack,id: string, name: string, stereo = false) {
+    public static gate(rack: Rack, id: string, name: string, stereo = false) {
         return new RackItem(
             rack,
             getId(id, 'gate'),
@@ -103,14 +133,24 @@ export class Processors {
             'primary',
             'Gate',
             {
-                audio: stereo ? [['L', 'R'], ['L', 'R']] : [['In'], ['Out']],
+                audio: stereo
+                    ? [
+                          ['L', 'R'],
+                          ['L', 'R'],
+                      ]
+                    : [['In'], ['Out']],
                 midi: [[], []],
-                control: [[], []]
-            },
-        )
+                control: [[], []],
+            }
+        );
     }
 
-    public static limiter(rack: Rack,id: string, name: string, stereo = false) {
+    public static limiter(
+        rack: Rack,
+        id: string,
+        name: string,
+        stereo = false
+    ) {
         return new RackItem(
             rack,
             getId(id, 'limiter'),
@@ -120,14 +160,19 @@ export class Processors {
             'primary',
             'Limiter',
             {
-                audio: stereo ? [['L', 'R'], ['L', 'R']] : [['In'], ['Out']],
+                audio: stereo
+                    ? [
+                          ['L', 'R'],
+                          ['L', 'R'],
+                      ]
+                    : [['In'], ['Out']],
                 midi: [[], []],
-                control: [[], []]
-            },
-        )
-    }   
+                control: [[], []],
+            }
+        );
+    }
 
-    public static reverb(rack: Rack,id: string, name: string, stereo = false) {
+    public static reverb(rack: Rack, id: string, name: string, stereo = false) {
         return new RackItem(
             rack,
             getId(id, 'reverb'),
@@ -137,31 +182,41 @@ export class Processors {
             'primary',
             'Reverb',
             {
-                audio: stereo ? [['L', 'R'], ['L', 'R']] : [['In'], ['Out']],
+                audio: stereo
+                    ? [
+                          ['L', 'R'],
+                          ['L', 'R'],
+                      ]
+                    : [['In'], ['Out']],
                 midi: [[], []],
-                control: [[], []]
-            },
-        )
+                control: [[], []],
+            }
+        );
     }
 
-    public static delay(rack: Rack,id: string, name: string, stereo = false) {
+    public static delay(rack: Rack, id: string, name: string, stereo = false) {
         return new RackItem(
             rack,
             getId(id, 'delay'),
-                name,
+            name,
             rack.getAvailablePoint(),
             8,
             'primary',
             'Delay',
             {
-                audio: stereo ? [['L', 'R'], ['L', 'R']] : [['In'], ['Out']],
+                audio: stereo
+                    ? [
+                          ['L', 'R'],
+                          ['L', 'R'],
+                      ]
+                    : [['In'], ['Out']],
                 midi: [[], []],
-                control: [[], []]
-            },
-        )
+                control: [[], []],
+            }
+        );
     }
 
-    public static filter(rack: Rack,id: string, name: string, stereo = false) {
+    public static filter(rack: Rack, id: string, name: string, stereo = false) {
         return new RackItem(
             rack,
             getId(id, 'filter'),
@@ -171,17 +226,28 @@ export class Processors {
             'primary',
             'Filter',
             {
-                audio: stereo ? [['L', 'R'], ['L', 'R']] : [['In'], ['Out']],
+                audio: stereo
+                    ? [
+                          ['L', 'R'],
+                          ['L', 'R'],
+                      ]
+                    : [['In'], ['Out']],
                 midi: [[], []],
-                control: [[], []]
-            },
-        )
+                control: [[], []],
+            }
+        );
     }
 
-// █▄ ▄█ █ █▀▄ █ 
-// █ ▀ █ █ █▄▀ █ 
+    // █▄ ▄█ █ █▀▄ █
+    // █ ▀ █ █ █▄▀ █
 
-    public static instrument(rack: Rack,id: string, name: string, inputs: string[], outputs: string[]) {
+    public static instrument(
+        rack: Rack,
+        id: string,
+        name: string,
+        inputs: string[],
+        outputs: string[]
+    ) {
         return new RackItem(
             rack,
             getId(id, 'instrument'),
@@ -193,12 +259,17 @@ export class Processors {
             {
                 audio: [[], []],
                 midi: [inputs, outputs],
-                control: [[], []]
-            },
-        )
+                control: [[], []],
+            }
+        );
     }
 
-    public static oscillator(rack: Rack,id: string, name: string, inputs: string[]) {
+    public static oscillator(
+        rack: Rack,
+        id: string,
+        name: string,
+        inputs: string[]
+    ) {
         return new RackItem(
             rack,
             getId(id, 'oscillator'),
@@ -210,12 +281,18 @@ export class Processors {
             {
                 audio: [[], ['Out']],
                 midi: [[], []],
-                control: [inputs, []]
-            },
-        )
+                control: [inputs, []],
+            }
+        );
     }
 
-    public static sequencer(rack: Rack,id: string, name: string, inputs: string[], outputs: string[]) {
+    public static sequencer(
+        rack: Rack,
+        id: string,
+        name: string,
+        inputs: string[],
+        outputs: string[]
+    ) {
         return new RackItem(
             rack,
             getId(id, 'sequencer'),
@@ -227,12 +304,12 @@ export class Processors {
             {
                 audio: [[], []],
                 midi: [inputs, outputs],
-                control: [[], []]
-            },
-        )
+                control: [[], []],
+            }
+        );
     }
 
-    public static plugin(rack: Rack,id: string, name: string, io: io) {
+    public static plugin(rack: Rack, id: string, name: string, io: io) {
         return new RackItem(
             rack,
             getId(id, 'plugin'),
@@ -241,16 +318,20 @@ export class Processors {
             8,
             'dark',
             'Plugin',
-            io,
-        )
+            io
+        );
     }
 
+    // ▄▀▀ ▄▀▄ █▄ █ ▀█▀ █▀▄ ▄▀▄ █
+    // ▀▄▄ ▀▄▀ █ ▀█  █  █▀▄ ▀▄▀ █▄▄
 
-
-// ▄▀▀ ▄▀▄ █▄ █ ▀█▀ █▀▄ ▄▀▄ █   
-// ▀▄▄ ▀▄▀ █ ▀█  █  █▀▄ ▀▄▀ █▄▄ 
-
-    public static midiController(rack: Rack,id: string, name: string, inputs: string[], outputs: string[]) {
+    public static midiController(
+        rack: Rack,
+        id: string,
+        name: string,
+        inputs: string[],
+        outputs: string[]
+    ) {
         return new RackItem(
             rack,
             getId(id, 'midi-controller'),
@@ -262,12 +343,12 @@ export class Processors {
             {
                 audio: [[], []],
                 midi: [inputs, []],
-                control: [[], outputs]
-            },
-        )
+                control: [[], outputs],
+            }
+        );
     }
 
-    public static random(rack: Rack,id: string, name: string) {
+    public static random(rack: Rack, id: string, name: string) {
         return new RackItem(
             rack,
             getId(id, 'random'),
@@ -279,12 +360,12 @@ export class Processors {
             {
                 audio: [[], []],
                 midi: [['In'], []],
-                control: [[], ['Random']]
-            },
-        )
+                control: [[], ['Random']],
+            }
+        );
     }
 
-    public static lfo(rack: Rack,id: string, name: string) {
+    public static lfo(rack: Rack, id: string, name: string) {
         return new RackItem(
             rack,
             getId(id, 'lfo'),
@@ -296,8 +377,8 @@ export class Processors {
             {
                 audio: [[], []],
                 midi: [[], []],
-                control: [[], ['LFO']]
-            },
-        )
+                control: [[], ['LFO']],
+            }
+        );
     }
 }

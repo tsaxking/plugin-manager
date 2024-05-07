@@ -13,7 +13,11 @@ export const copy = (from: any, to: any) => {
 };
 
 export const copyWithPrototype = (obj: any) => {
-    return Object.assign(Object.create(Object.getPrototypeOf(obj)), copyNoRef(obj));
-}
+    return Object.assign(
+        Object.create(Object.getPrototypeOf(obj)),
+        copyNoRef(obj)
+    );
+};
 
-export const copyNoRef = <T = unknown>(obj: any) => JSON.parse(JSON.stringify(obj)) as T;
+export const copyNoRef = <T = unknown>(obj: any) =>
+    JSON.parse(JSON.stringify(obj)) as T;

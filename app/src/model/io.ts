@@ -1,7 +1,8 @@
-import { RackItem } from "./rack-item";
-import { EventEmitter } from "../utils/event-emitter";
-import { attempt } from "../utils/check";
-import { Point } from "../utils/calcs/linear-algebra/point";
+import { RackItem } from './rack-item';
+import { EventEmitter } from '../utils/event-emitter';
+import { attempt } from '../utils/check';
+import { Point } from '../utils/calcs/linear-algebra/point';
+import { Rack } from './state';
 
 const { max } = Math;
 
@@ -14,18 +15,18 @@ export type io = {
 type InputEvents = {
     connect: Output;
     disconnect: Output;
-}
+};
 
 type OutputEvents = {
     connect: Input;
     disconnect: Input;
-}
+};
 
 type IOEvents = {
-    connect: { input: Input, output: Output };
-    disconnect: { input: Input, output: Output };
+    connect: { input: Input; output: Output };
+    disconnect: { input: Input; output: Output };
     change: void;
-}
+};
 
 class IOEmitter<Events> {
     public readonly emitter = new EventEmitter<keyof Events>();
@@ -44,15 +45,19 @@ class IOEmitter<Events> {
 }
 
 // font size + margin + padding
-const IO_SIZE = 18+10+4;
+const IO_SIZE = 18 + 10 + 4;
 
 export class Input extends IOEmitter<InputEvents> {
     // public connections: Output[] = [];
     public point = new Point(0, 0);
 
-    constructor(public readonly type: 'midi' | 'audio' | 'control', public readonly io: IO, public readonly name: string) {
+    constructor(
+        public readonly type: 'midi' | 'audio' | 'control',
+        public readonly io: IO,
+        public readonly name: string
+    ) {
         super();
-    };
+    }
 
     // connect(output: Output) {
     //     return attempt(() => {
@@ -71,8 +76,14 @@ export class Input extends IOEmitter<InputEvents> {
         const { x, y } = this.rackItem;
         const { index } = this;
 
-        const maxAudio = max(this.rackItem.io.audio.inputs.length, this.rackItem.io.audio.outputs.length);
-        const maxMidi = max(this.rackItem.io.midi.inputs.length, this.rackItem.io.midi.outputs.length);
+        const maxAudio = max(
+            this.rackItem.io.audio.inputs.length,
+            this.rackItem.io.audio.outputs.length
+        );
+        const maxMidi = max(
+            this.rackItem.io.midi.inputs.length,
+            this.rackItem.io.midi.outputs.length
+        );
 
         let displacement = 0;
         switch (type) {
@@ -102,7 +113,7 @@ export class Input extends IOEmitter<InputEvents> {
     }
 
     isConnected(output: Output) {
-        return  output.isConnected(this);
+        return output.isConnected(this);
     }
 }
 
@@ -110,14 +121,20 @@ export class Output extends IOEmitter<OutputEvents> {
     public connections: Input[] = [];
     public point = new Point(0, 0);
 
-    constructor(public readonly type: 'midi' | 'audio' | 'control', public readonly io: IO, public readonly name: string) {
+    constructor(
+        public readonly type: 'midi' | 'audio' | 'control',
+        public readonly io: IO,
+        public readonly name: string
+    ) {
         super();
-    };
+    }
 
     connect(input: Input) {
         return attempt(() => {
-            if (this.type !== input.type) throw new Error('Cannot connect different types');
-            if (this.rackItem.id === input.rackItem.id) throw new Error('Cannot connect to itself');
+            if (this.type !== input.type)
+                throw new Error('Cannot connect different types');
+            if (this.rackItem.id === input.rackItem.id)
+                throw new Error('Cannot connect to itself');
             this.connections.push(input);
             this.emit('connect', input);
             IO.emit('change', undefined);
@@ -134,9 +151,14 @@ export class Output extends IOEmitter<OutputEvents> {
         const { x, y } = this.io.rackItem;
         const index = this.io.outputs.indexOf(this);
 
-        const maxAudio = max(this.rackItem.io.audio.inputs.length, this.rackItem.io.audio.outputs.length);
-        const maxMidi = max(this.rackItem.io.midi.inputs.length, this.rackItem.io.midi.outputs.length);
-
+        const maxAudio = max(
+            this.rackItem.io.audio.inputs.length,
+            this.rackItem.io.audio.outputs.length
+        );
+        const maxMidi = max(
+            this.rackItem.io.midi.inputs.length,
+            this.rackItem.io.midi.outputs.length
+        );
 
         let displacement = 0;
         switch (type) {
@@ -170,11 +192,13 @@ export class Output extends IOEmitter<OutputEvents> {
     }
 }
 
-
 export class IO extends IOEmitter<IOEvents> {
     private static readonly emitter = new EventEmitter<keyof IOEvents>();
 
-    public static on<K extends keyof IOEvents>(event: K, cb: (data: IOEvents[K]) => void) {
+    public static on<K extends keyof IOEvents>(
+        event: K,
+        cb: (data: IOEvents[K]) => void
+    ) {
         IO.emitter.on(event, cb);
     }
 
@@ -182,13 +206,16 @@ export class IO extends IOEmitter<IOEvents> {
         IO.emitter.emit(event, data);
     }
 
-    public static off<K extends keyof IOEvents>(event: K, cb: (data: IOEvents[K]) => void) {
+    public static off<K extends keyof IOEvents>(
+        event: K,
+        cb: (data: IOEvents[K]) => void
+    ) {
         IO.emitter.off(event, cb);
     }
 
     public readonly inputs: Input[];
     public readonly outputs: Output[];
-    
+
     constructor(
         public readonly type: 'midi' | 'audio' | 'control',
         inputs: string[],
@@ -201,15 +228,21 @@ export class IO extends IOEmitter<IOEvents> {
     }
 
     serialize() {
-        return this.outputs.map(o => o.connections.map(i => i.rackItem.id + ':' + o.index + ':' + i.index));
+        return this.outputs.map(o =>
+            o.connections.map(
+                i => i.rackItem.id + ':' + o.index + ':' + i.index
+            )
+        );
     }
 
-    deserialize(data: string[][]) {
+    deserialize(rack: Rack, data: string[][]) {
         for (const output of data) {
             for (const connection of output) {
                 const [id, outputIndex, inputIndex] = connection.split(':');
-                const output = this.rackItem.io[this.type].outputs[+outputIndex];
-                const input = RackItem.items.find(i => i.id === id)?.io[this.type].inputs[+inputIndex];
+                const output =
+                    this.rackItem.io[this.type].outputs[+outputIndex];
+                const input = rack.items.find(i => i.id === id)?.io[this.type]
+                    .inputs[+inputIndex];
                 if (output && input) {
                     output.connect(input);
                 } else {

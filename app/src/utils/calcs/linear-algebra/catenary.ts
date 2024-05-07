@@ -1,6 +1,11 @@
-import { Point } from "./point";
+import { Point } from './point';
 
-export const getCatenaryPathFn = (start: Point, end: Point, sag: number, segments: number): (x: number) => number => {
+export const getCatenaryPathFn = (
+    start: Point,
+    end: Point,
+    sag: number,
+    segments: number
+): ((x: number) => number) => {
     const dx = end.x - start.x;
     const dy = end.y - start.y;
 
@@ -16,29 +21,34 @@ export const getCatenaryPathFn = (start: Point, end: Point, sag: number, segment
         const y = sag * (Math.cosh((x - start.x) / sag - d) - a);
         return y + start.y;
     };
-}
+};
 
-export const getCatenaryPathSVG = (start: Point, end: Point, sag: number): string => {
+export const getCatenaryPathSVG = (
+    start: Point,
+    end: Point,
+    sag: number
+): string => {
     const distance = start.distance(end);
 
     let length = 100;
 
     switch (true) {
-      case distance < 400:
-        length = 420;
-        break;
-      case distance < 900:
-        length = 940;
-        break;
-      case distance < 1400:
-        length = 1440;
-        break;
-      default:
-        length = distance * 1.05;
+        case distance < 400:
+            length = 420;
+            break;
+        case distance < 900:
+            length = 940;
+            break;
+        case distance < 1400:
+            length = 1440;
+            break;
+        default:
+            length = distance * 1.05;
     }
-  
+
     const controlX = Math.round((start.x + end.x) / 2);
-    const controlY = Math.round(Math.max(start.y, end.y) + length - distance * 0.5) * sag;
-  
+    const controlY =
+        Math.round(Math.max(start.y, end.y) + length - distance * 0.5) * sag;
+
     return `M ${start.x} ${start.y} Q ${controlX} ${controlY} ${end.x} ${end.y}`;
-}
+};
