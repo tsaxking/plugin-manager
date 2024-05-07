@@ -381,4 +381,21 @@ export class Processors {
             }
         );
     }
+
+    public static duplicator(rack: Rack, id: string, name: string, type: 'audio' | 'midi' | 'controller') {
+        return new RackItem(
+            rack,
+            getId(id, 'duplicator'),
+            name,
+            rack.getAvailablePoint(),
+            8,
+            'danger',
+            'Duplicator',
+            {
+                audio: type === 'audio' ? [['In'], ['1', '2']] : [[], []],
+                midi: type === 'midi' ? [['In'], ['1', '2']] : [[], []],
+                control: type === 'controller' ? [['In'], ['1', '2']] : [[], []],
+            }
+        );
+    }
 }
