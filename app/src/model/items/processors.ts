@@ -3,7 +3,7 @@ import { RackItem } from '../rack-item';
 import { Rack } from '../state';
 import { Random } from '../../utils/math';
 
-const getId = (id: string, name: string) => id + ':' + name.toLowerCase();
+const getId = (id: string, name: string) => id + '|' + name.toLowerCase();
 
 export class Processors {
     // ▄▀▄ █ █ █▀▄ █ ▄▀▄

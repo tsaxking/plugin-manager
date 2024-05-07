@@ -48,7 +48,12 @@ export class Rack {
     }
 
     load() {
-        console.log('loading');
+        console.log('Clearing items...');
+        const serialized = this.serialize();
+        this.items = [];
+        // console.log('loading');
+        const items = this.deserialize(serialized);
+        console.log('Loaded', items);
     }
 
     perform() {
@@ -62,10 +67,12 @@ export class Rack {
     }
 
     serialize() {
+        console.log('Serializing...');
         return JSON.stringify(this.items.map(i => i.serialize()));
     }
 
     deserialize(data: string) {
+        console.log('Deserializing...');
         const items = JSON.parse(data) as unknown[];
         if (!Array.isArray(items)) throw new Error('Invalid data');
         if (items.some(i => typeof i !== 'object'))

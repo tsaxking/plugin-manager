@@ -230,15 +230,16 @@ export class IO extends IOEmitter<IOEvents> {
     serialize() {
         return this.outputs.map(o =>
             o.connections.map(
-                i => i.rackItem.id + ':' + o.index + ':' + i.index
+                i => i.rackItem.id + ':' + i.index
             )
         );
     }
 
     deserialize(rack: Rack, data: string[][]) {
-        for (const output of data) {
+        for (const outputIndex in data) {
+            const output = data[outputIndex];
             for (const connection of output) {
-                const [id, outputIndex, inputIndex] = connection.split(':');
+                const [id, inputIndex] = connection.split(':');
                 const output =
                     this.rackItem.io[this.type].outputs[+outputIndex];
                 const input = rack.items.find(i => i.id === id)?.io[this.type]
