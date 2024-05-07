@@ -102,8 +102,8 @@ interact('.rack-item').draggable({
         end: event => {
             const target: HTMLDivElement = event.target;
             const id = target.id.split('_')[1];
-            console.log(id);
-            console.log(rack.items.map(c => c.id));
+            // console.log(id);
+            // console.log(rack.items.map(c => c.id));
             const item = rack.items.find(i => i.id === id);
             if (item) {
                 const startX = parseFloat(
