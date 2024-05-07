@@ -80,7 +80,7 @@ export const toByteString = (byte: number): string => {
         KB: 1024,
         MB: 1048576,
         GB: 1073741824,
-        TB: 1099511627776
+        TB: 1099511627776,
     };
 
     const i = Math.floor(Math.log(byte) / Math.log(1024));
@@ -120,7 +120,6 @@ export const cost = (amount: number | string): string => {
 export const fmtNumber = (num: number | string): string => {
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 };
-
 
 /**
  * Returns the index of the string that is closest to the key

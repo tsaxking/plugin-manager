@@ -29,7 +29,7 @@ export const months: string[] = [
     'September',
     'October',
     'November',
-    'December'
+    'December',
 ];
 
 export const monthsShort: string[] = [
@@ -44,7 +44,7 @@ export const monthsShort: string[] = [
     'Sept',
     'Oct',
     'Nov',
-    'Dec'
+    'Dec',
 ];
 
 /**
@@ -60,7 +60,7 @@ export const days: string[] = [
     'Wednesday',
     'Thursday',
     'Friday',
-    'Saturday'
+    'Saturday',
 ];
 
 export const daysShort: string[] = [
@@ -70,7 +70,7 @@ export const daysShort: string[] = [
     'Wed',
     'Thu',
     'Fri',
-    'Sat'
+    'Sat',
 ];
 
 /**
@@ -186,7 +186,7 @@ const timezoneOffsets = {
     SST: -11, // Samoa Standard Time
     SDT: -10, // Samoa Daylight Time
     CHST: 10, // Chamorro Standard Time
-    UTC: 0 // Coordinated Universal Time
+    UTC: 0, // Coordinated Universal Time
 };
 
 type Timezone = keyof typeof timezoneOffsets;

@@ -2,8 +2,8 @@
 
 ## Dependencies
 
-- [Rustup](https://rustup.rs/)
-- Tauri Cli `cargo install tauri-cli`
+-   [Rustup](https://rustup.rs/)
+-   Tauri Cli `cargo install tauri-cli`
 
 ## Developing
 
@@ -24,4 +24,3 @@ cargo run
 ```bash
 cargo tauri build
 ```
-

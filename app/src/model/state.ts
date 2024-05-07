@@ -1,10 +1,12 @@
-import { Point2D } from "../utils/calcs/linear-algebra/point";
-import { io } from "./io";
-import { RackItem } from "./rack-item";
+import { Point2D } from '../utils/calcs/linear-algebra/point';
+import { io } from './io';
+import { RackItem } from './rack-item';
 
 export class Rack {
     private static _display: 'io' | 'control' = 'io';
-    public static get display() { return this._display; }
+    public static get display() {
+        return this._display;
+    }
     public static set display(value: 'io' | 'control') {
         this._display = value;
         RackItem.emit('display', value);
@@ -46,7 +48,12 @@ export class Rack {
     }
 
     load() {
-        console.log('loading');
+        console.log('Clearing items...');
+        const serialized = this.serialize();
+        this.items = [];
+        // console.log('loading');
+        const items = this.deserialize(serialized);
+        console.log('Loaded', items);
     }
 
     perform() {
@@ -60,51 +67,63 @@ export class Rack {
     }
 
     serialize() {
+        console.log('Serializing...');
         return JSON.stringify(this.items.map(i => i.serialize()));
     }
 
     deserialize(data: string) {
+        console.log('Deserializing...');
         const items = JSON.parse(data) as unknown[];
         if (!Array.isArray(items)) throw new Error('Invalid data');
-        if (items.some(i => typeof i !== 'object')) throw new Error('Invalid data');
+        if (items.some(i => typeof i !== 'object'))
+            throw new Error('Invalid data');
         // if (items.some(i => (i as { id: string }).id)) throw new Error('Invalid data');
         const rackItems = items as {
             id: string;
             note: string;
             point: Point2D;
             width: number;
-            color: 'primary' | 'secondary' | 'success' | 'danger' | 'info' | 'dark' | 'warning';
+            color:
+                | 'primary'
+                | 'secondary'
+                | 'success'
+                | 'danger'
+                | 'info'
+                | 'dark'
+                | 'warning';
             title: string;
             io: io;
             routing: {
                 audio: string[][];
                 midi: string[][];
                 control: string[][];
-            }
+            };
         }[];
-        
+
         this.items = [];
 
-        const generated = rackItems.map(i => new RackItem(
-            this,
-            i.id,
-            i.note,
-            i.point,
-            i.width,
-            i.color,
-            i.title,
-            i.io
-        ));
+        const generated = rackItems.map(
+            i =>
+                new RackItem(
+                    this,
+                    i.id,
+                    i.note,
+                    i.point,
+                    i.width,
+                    i.color,
+                    i.title,
+                    i.io
+                )
+        );
 
         for (const g of generated) {
             const item = rackItems.find(i => i.id === g.id);
             if (!item) throw new Error('Invalid data'); // should never happen
-            g.io.audio.deserialize(item.routing.audio);
-            g.io.midi.deserialize(item.routing.midi);
-            g.io.control.deserialize(item.routing.control);
+            g.io.audio.deserialize(this, item.routing.audio);
+            g.io.midi.deserialize(this, item.routing.midi);
+            g.io.control.deserialize(this, item.routing.control);
         }
 
         return generated;
     }
-
 }

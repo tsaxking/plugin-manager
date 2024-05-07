@@ -1,15 +1,15 @@
 <script lang="ts">
-  import { RackItem } from "../model/rack-item";
-    import FacePlate from "./RackItem.svelte";
-import RackImage from "./RackBackground.svelte";
-  import { onMount } from "svelte";
-  import { Cable } from "../model/cable";
-  import { Rack } from "../model/state";
+import { RackItem } from '../model/rack-item';
+import FacePlate from './RackItem.svelte';
+import RackImage from './RackBackground.svelte';
+import { onMount } from 'svelte';
+import { Cable } from '../model/cable';
+import { Rack } from '../model/state';
 
-  export let display: 'io' | 'control' = 'io';
-  export let rack: Rack;
+export let display: 'io' | 'control' = 'io';
+export let rack: Rack;
 
-  $: Rack.display = display;
+$: Rack.display = display;
 
 let items: RackItem[] = rack.items;
 
@@ -25,10 +25,10 @@ RackItem.on('new', () => {
 });
 </script>
 
-<div class="position-relative" bind:this={cableTarget}>
-    <RackImage x={200} y={3}/>
+<div class="position-relative" bind:this="{cableTarget}">
+    <RackImage x="{200}" y="{3}" />
 
     {#each items as item}
-        <FacePlate {item} bind:display={display}/>
+        <FacePlate {item} bind:display />
     {/each}
 </div>

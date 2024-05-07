@@ -1,22 +1,22 @@
-import { getCatenaryPathSVG } from "../utils/calcs/linear-algebra/catenary";
-import { Input, Output } from "./io";
-import { RackItem } from "./rack-item";
-import { colors } from "./rack-item";
-import { EventEmitter } from "../utils/event-emitter";
-import { Rack } from "./state";
-
-
+import { getCatenaryPathSVG } from '../utils/calcs/linear-algebra/catenary';
+import { Input, Output } from './io';
+import { RackItem } from './rack-item';
+import { colors } from './rack-item';
+import { EventEmitter } from '../utils/event-emitter';
+import { Rack } from './state';
 
 type Events = {
-    change: Input|Output|null;
-}
+    change: Input | Output | null;
+};
 
 export class Cable {
     public static all: Cable[] = [];
 
-    private static _state: Input|Output|null = null;
-    public static get state() { return Cable._state; }
-    public static set state(value: Input|Output|null) {
+    private static _state: Input | Output | null = null;
+    public static get state() {
+        return Cable._state;
+    }
+    public static set state(value: Input | Output | null) {
         Cable._state = value;
         Cable.emit('change', value);
     }
@@ -25,26 +25,36 @@ export class Cable {
 
     private static readonly emitter = new EventEmitter<keyof Events>();
 
-    public static on<T extends keyof Events>(event: T, listener: (arg: Events[T]) => void) {
+    public static on<T extends keyof Events>(
+        event: T,
+        listener: (arg: Events[T]) => void
+    ) {
         Cable.emitter.on(event, listener);
     }
 
-    public static off<T extends keyof Events>(event: T, listener: (arg: Events[T]) => void) {
+    public static off<T extends keyof Events>(
+        event: T,
+        listener: (arg: Events[T]) => void
+    ) {
         Cable.emitter.off(event, listener);
     }
 
     public static emit<T extends keyof Events>(event: T, arg: Events[T]) {
         Cable.emitter.emit(event, arg);
     }
-    
+
     // public static readonly cables: Cable[] = [];
 
     public static generate(rackItems: RackItem[]) {
-        const io = rackItems.flatMap(i => [i.io.midi, i.io.audio, i.io.control]);
+        const io = rackItems.flatMap(i => [
+            i.io.midi,
+            i.io.audio,
+            i.io.control,
+        ]);
         const inputs = io.flatMap(i => i.outputs);
         return inputs.flatMap(o => {
             return o.connections.map(c => {
-                return new Cable(c,o, o.type);
+                return new Cable(c, o, o.type);
             });
         });
     }
@@ -77,13 +87,16 @@ export class Cable {
         target.appendChild(div);
     }
 
-
-    public readonly svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    public readonly svg = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'svg'
+    );
 
     constructor(
         public readonly input: Input,
         public readonly output: Output,
-        public readonly type: 'midi' | 'audio' | 'control') {
+        public readonly type: 'midi' | 'audio' | 'control'
+    ) {
         this.svg.style.position = 'absolute';
         this.svg.style.zIndex = '1000';
         this.svg.style.height = '100%';
@@ -95,8 +108,15 @@ export class Cable {
 
     build() {
         this.svg.innerHTML = ''; // clear the svg
-        const pathStr = getCatenaryPathSVG(this.input.point, this.output.point, .75);
-        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        const pathStr = getCatenaryPathSVG(
+            this.input.point,
+            this.output.point,
+            0.75
+        );
+        const path = document.createElementNS(
+            'http://www.w3.org/2000/svg',
+            'path'
+        );
         path.setAttribute('d', pathStr);
         path.style.stroke = colors[this.type].toString();
         path.style.strokeWidth = '5';

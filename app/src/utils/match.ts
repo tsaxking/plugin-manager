@@ -11,7 +11,7 @@
  */
 type Case<T = unknown, A = unknown> = [
     predicate: (value: T) => boolean,
-    fn: (value: T) => A
+    fn: (value: T) => A,
 ];
 
 /**

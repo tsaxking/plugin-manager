@@ -1,40 +1,39 @@
 <script lang="ts">
-  import { Cable } from "../model/cable";
-    import { IO, Input, Output } from "../model/io";
-  import { colors } from "../model/rack-item";
-    import { capitalize } from "../utils/text";
+import { Cable } from '../model/cable';
+import { IO, Input, Output } from '../model/io';
+import { colors } from '../model/rack-item';
+import { capitalize } from '../utils/text';
 
-    export let io: IO;
+export let io: IO;
 
-    let color = colors[io.type];
+let color = colors[io.type];
 
-    let active: Input|Output|null = Cable.state;
+let active: Input | Output | null = Cable.state;
 
-    Cable.on('change', (a) => active = a);
+Cable.on('change', a => (active = a));
 
-
-    const click = (io: Input | Output) => {
-        if (Cable.state) {
-            if (Cable.state instanceof Output && io instanceof Input) {
-                if (Cable.state.isConnected(io)) {
-                    Cable.state.disconnect(io);
-                } else {
-                    Cable.state.connect(io);
-                }
-            } else if (Cable.state instanceof Input && io instanceof Output) {
-                if (io.isConnected(Cable.state)) {
-                    io.disconnect(Cable.state);
-                } else {
-                    io.connect(Cable.state);
-                }
+const click = (io: Input | Output) => {
+    if (Cable.state) {
+        if (Cable.state instanceof Output && io instanceof Input) {
+            if (Cable.state.isConnected(io)) {
+                Cable.state.disconnect(io);
             } else {
-                console.log('Invalid connection');
+                Cable.state.connect(io);
             }
-            Cable.state = null;
+        } else if (Cable.state instanceof Input && io instanceof Output) {
+            if (io.isConnected(Cable.state)) {
+                io.disconnect(Cable.state);
+            } else {
+                io.connect(Cable.state);
+            }
         } else {
-            Cable.state = io;
+            console.log('Invalid connection');
         }
+        Cable.state = null;
+    } else {
+        Cable.state = io;
     }
+};
 </script>
 
 <!-- {#each io.inputs as i, index}
@@ -69,14 +68,12 @@
                 {#each io.inputs as i, index}
                     <div class="d-flex justify-content-start">
                         <p
-                            on:click={() => click(i)}
+                            on:click="{() => click(i)}"
                             class="text-light cursor-pointer"
-                            style="background-color: {
-                            color
-                            .clone()
-                            .setAlpha(Object.is(active, i) ? 0.5 : 1)
-                            .toString()
-                            };"
+                            style="background-color: {color
+                                .clone()
+                                .setAlpha(Object.is(active, i) ? 0.5 : 1)
+                                .toString()};"
                         >
                             {capitalize(i.name)}
                         </p>
@@ -89,12 +86,12 @@
                 {#each io.outputs as o, index}
                     <div class="d-flex justify-content-end">
                         <p
-                            on:click={() => click(o)}
+                            on:click="{() => click(o)}"
                             class="text-light cursor-pointer"
                             style="background-color: {color
-                            .clone()
+                                .clone()
                                 .setAlpha(Object.is(active, o) ? 0.5 : 1)
-                            .toString()};"
+                                .toString()};"
                         >
                             {capitalize(o.name)}
                         </p>
@@ -105,18 +102,19 @@
     </div>
 </div>
 
-
 <style>
-    p {
-        font-size: 12px;
-        margin: 5px 0px;
-        padding: 2px 5px;
-        width: min-content;
-        white-space: nowrap;
-    }
+p {
+    font-size: 12px;
+    margin: 5px 0px;
+    padding: 2px 5px;
+    width: min-content;
+    white-space: nowrap;
+}
 
-    .container-fluid, .row, .col-6 {
-        padding: 0 !important;
-        margin: 0 !important;
-    }
+.container-fluid,
+.row,
+.col-6 {
+    padding: 0 !important;
+    margin: 0 !important;
+}
 </style>
