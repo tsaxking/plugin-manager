@@ -1,6 +1,6 @@
 {
     "scripts": {
-        "build:ts": "ts-node scripts/esbuild.ts",
+        "build": "ts-node scripts/esbuild.ts",
         "dev": "npm run build:ts"
     },
     "dependencies": {
