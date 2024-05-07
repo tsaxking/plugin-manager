@@ -1,7 +1,12 @@
 [package]
-name = "main"
+name = "plugin_manager"
 version = "0.1.0"
 edition = "2021"
+description = "A program to manage live effects for performances"
+license = "Copyright"
+repository = "https://github.com/tsaxking/plugin-manager"
+keywords = ["Audio", "Effects", "Performance"]
+categories = ["multimedia"]
 
 [dependencies]
 tauri = { version = "1.6.2", features = ["custom-protocol"] }
