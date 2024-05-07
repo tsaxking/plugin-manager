@@ -100,6 +100,10 @@ export class Input extends IOEmitter<InputEvents> {
     get index() {
         return this.io.inputs.indexOf(this);
     }
+
+    isConnected(output: Output) {
+        return  output.isConnected(this);
+    }
 }
 
 export class Output extends IOEmitter<OutputEvents> {
@@ -158,6 +162,10 @@ export class Output extends IOEmitter<OutputEvents> {
 
     get index() {
         return this.io.outputs.indexOf(this);
+    }
+
+    isConnected(input: Input) {
+        return this.connections.includes(input);
     }
 }
 

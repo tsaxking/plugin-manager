@@ -21,6 +21,7 @@ type GlobalEvents = {
     'destroy': RackItem;
     'move': RackItem;
     'update': RackItem;
+    'new': RackItem;
 }
 
 export class RackItem {
@@ -138,6 +139,7 @@ export class RackItem {
         this._note = note;
 
         RackItem.items.push(this);
+        RackItem.emit('new', this);
     }
 
     get note() {

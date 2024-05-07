@@ -16,9 +16,18 @@
     const click = (io: Input | Output) => {
         if (Cable.state) {
             if (Cable.state instanceof Output && io instanceof Input) {
-                Cable.state.connect(io);
+                if (Cable.state.isConnected(io)) {
+                    Cable.state.disconnect(io);
+                } else {
+                    Cable.state.connect(io);
+                
+                }
             } else if (Cable.state instanceof Input && io instanceof Output) {
-                io.connect(Cable.state);
+                if (io.isConnected(Cable.state)) {
+                    io.disconnect(Cable.state);
+                } else {
+                    io.connect(Cable.state);
+                }
             } else {
                 console.log('Invalid connection');
             }
