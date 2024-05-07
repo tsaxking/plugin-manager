@@ -1,7 +1,4 @@
-#[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}", name)
-}
+use plugin_manager::commands::*;
 
 fn main() {
     tauri::Builder::default()
