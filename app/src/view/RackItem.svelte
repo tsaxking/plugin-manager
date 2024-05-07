@@ -2,7 +2,7 @@
 import { RackItem } from "../model/rack-item";
     import IO from "./IO.svelte";
 
-    type BootstrapColor = 'primary' | 'secondary' | 'success' | 'danger' | 'info' | 'light' | 'dark' | 'warning';
+    type BootstrapColor = 'primary' | 'secondary' | 'success' | 'danger' | 'info' | 'dark' | 'warning';
 
     export let item: RackItem;
     export let display: 'io' | 'control' = 'io';
@@ -26,7 +26,7 @@ import { RackItem } from "../model/rack-item";
         console.log('dropped');
     };
 
-    let textColor: BootstrapColor = (() => {
+    let textColor: 'light' | 'dark' = (() => {
         switch (color) {
             case 'primary':
             case 'secondary':

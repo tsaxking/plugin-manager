@@ -13,7 +13,7 @@ export class Instrument extends RackItem {
             name,
             RackItem.getAvailablePoint(),
             8,
-            'light',
+            'primary',
             'MIDI Controller',
             {
                 audio: [[], []],

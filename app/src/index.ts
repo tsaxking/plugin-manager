@@ -52,13 +52,18 @@ interact('.rack-item').draggable({
             const item = RackItem.items.find(i => i.id === id);
             if (item) {
                 const cables = item.cables;
-                for (const c of cables) {
+                for (const i in cables) {
+                    const c = cables[i];
                     const delta = new Point(event.dx, event.dy);
                     if (Object.is(c.input.rackItem, item)) {
-                        c.input.point = c.input.point.add(delta);
+                        if (cables.filter((_c, _i) => Object.is(_c.input.point, c.input.point) && _i > +i).length === 0) {
+                            c.input.point = c.input.point.add(delta);
+                        }
                     }
                     if (Object.is(c.output.rackItem, item)) {
-                        c.output.point = c.output.point.add(delta);
+                        if (cables.filter((_c, _i) => Object.is(_c.output.point, c.output.point) && _i > +i).length === 0) {
+                            c.output.point = c.output.point.add(delta);
+                        }
                     }
                     c.build();
                 }

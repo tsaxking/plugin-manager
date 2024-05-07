@@ -20,7 +20,6 @@
                     Cable.state.disconnect(io);
                 } else {
                     Cable.state.connect(io);
-                
                 }
             } else if (Cable.state instanceof Input && io instanceof Output) {
                 if (io.isConnected(Cable.state)) {

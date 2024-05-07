@@ -84,7 +84,7 @@ export class RackItem {
             note: string;
             point: Point2D;
             width: number;
-            color: 'primary' | 'secondary' | 'success' | 'danger' | 'info' | 'light' | 'dark' | 'warning';
+            color: 'primary' | 'secondary' | 'success' | 'danger' | 'info' | 'dark' | 'warning';
             title: string;
             io: io;
             routing: {
@@ -132,7 +132,7 @@ export class RackItem {
         note: string,
         point: Point2D,
         public width: number,
-        public color: 'primary' | 'secondary' | 'success' | 'danger' | 'info' | 'light' | 'dark' | 'warning',
+        public color: 'primary' | 'secondary' | 'success' | 'danger' | 'info' | 'dark' | 'warning',
         public readonly title: string,
         io: io,
     ) {
