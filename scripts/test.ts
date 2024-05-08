@@ -3,6 +3,7 @@ import test from 'test';
 import { Rack } from '../app/src/model/state';
 import { Processors } from '../app/src/model/items/processors';
 import { Random } from '../app/src/utils/math';
+import { capitalize, toCamelCase, toSnakeCase, fromCamelCase,fromSnakeCase, abbreviate, toByteString, cost, fmtNumber } from '../app/src/utils/text';
 
 test('Build Rack Model', () => {
     const rack = new Rack();
@@ -100,4 +101,17 @@ test('Build Rack Model', () => {
     rack2.deserialize(str);
 
     assert.deepStrictEqual(rack, rack2);
+});
+
+test('Text', () => {
+    assert.strictEqual(capitalize('hello world'), 'Hello World');
+    assert.strictEqual(toCamelCase('hello world'), 'helloWorld');
+    assert.strictEqual(toSnakeCase('hello world'), 'hello_world');
+    assert.strictEqual(fromCamelCase('helloWorld'), 'hello world');
+    assert.strictEqual(fromSnakeCase('hello_world'), 'hello world');
+    assert.strictEqual(abbreviate('hello world', 5), 'he...');
+    assert.strictEqual(toByteString(1024), '1.00 KB');
+    assert.strictEqual(cost(1000), '$1,000.00');
+    assert.strictEqual(fmtNumber(1000), '1,000');
+    assert.strictEqual(fmtNumber(1000.12), '1,000.12');
 });
