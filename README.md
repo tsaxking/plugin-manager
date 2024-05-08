@@ -1,8 +1,8 @@
 # Plugin Manager
 
-![Front End](https://github.com/github/docs/actions/workflows/ts.yml/badge.svg)
+![Front End](https://github.com/tsaxking/plugin-manager/actions/workflows/ts.yml/badge.svg)
 
-![Back End](https://github.com/github/docs/actions/workflows/rust.yml/badge.svg)
+![Back End](https://github.com/tsaxking/plugin-manager/actions/workflows/rust.yml/badge.svg)
 
 ## Dependencies
 
