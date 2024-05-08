@@ -12,13 +12,16 @@ jobs:
         runs-on: ubuntu-latest
         timeout-minutes: 5
         steps:
-            - name: Backup for some reason
-              run: cd ..
-
             - name: Setup Node.js
               uses: actions/setup-node@v4
               with:
                   node-version: v20.4
+
+            - name: View stuff
+              run: |
+                ls -la
+                cd ../
+                ls -la
 
             - name: Install all dependencies
               run: |
