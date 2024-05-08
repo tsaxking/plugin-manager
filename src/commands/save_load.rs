@@ -44,9 +44,10 @@ pub enum LoadError {
 #[tauri::command]
 pub fn save(filename: String) -> Result<(), SaveError> {
     let file_path = path::Path::new(&filename);
-    let Some(rw_lock) = crate::APP_STATE
-        .get() else {
-        return Err(SaveError::AppStateError(crate::AppStateError::Uninitialized));
+    let Some(rw_lock) = crate::APP_STATE.get() else {
+        return Err(SaveError::AppStateError(
+            crate::AppStateError::Uninitialized,
+        ));
     };
 
     let Ok(guard) = rw_lock.read() else {
@@ -62,9 +63,10 @@ pub fn load(filename: String) -> Result<(), LoadError> {
     let file_path = path::Path::new(&filename);
     let json = fs::read_to_string(file_path)?;
     let state: AppState = serde_json::from_str(&json)?;
-    let Some(rw_lock) = crate::APP_STATE
-        .get() else {
-        return Err(LoadError::AppStateError(crate::AppStateError::Uninitialized));
+    let Some(rw_lock) = crate::APP_STATE.get() else {
+        return Err(LoadError::AppStateError(
+            crate::AppStateError::Uninitialized,
+        ));
     };
     let Ok(mut guard) = rw_lock.write() else {
         return Err(LoadError::AppStateError(crate::AppStateError::Poisoned));
