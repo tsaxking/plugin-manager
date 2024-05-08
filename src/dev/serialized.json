@@ -1,0 +1,1 @@
+[{"id": "KJexCx5B0UzH4ovi","note": "Keystation 88 Pro","point": [0,0],"width": 8,"color": "light","title": "MIDI Controller","io": {"audio": {"input": [],"output": []},"midi": {"input": ["MIDI In"],"output": ["MIDI Out"]},"control": {"input": [],"output": []}},"routing": {"audio": [],"midi": [],"control": []}}]
