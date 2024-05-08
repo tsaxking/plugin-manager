@@ -7,8 +7,84 @@ on:
         branches: [main]
 
 jobs:
-    test:
-        name: Test Suite
+    prettier_check:
+        name: Prettify
+        runs-on: ubuntu-latest
+        timeout-minutes: 5
+        steps:
+            - name: Checkout sources
+              uses: actions/checkout@v4
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: v20.4
+
+            - name: Install all dependencies
+              run: |
+                  npm i
+
+            - name: Run Prettier
+              run: npx prettier . --check
+
+    linter_check:
+        name: Lint
+        runs-on: ubuntu-latest
+        timeout-minutes: 5
+        steps:
+            - name: Checkout sources
+              uses: actions/checkout@v4
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: v20.4
+
+            - name: Install all dependencies
+              run: |
+                  npm i
+
+            - name: Run ESLint
+              run: npx eslint **/*.ts --fix
+
+    typescript_check:
+      name: TypeScript
+      runs-on: ubuntu-latest
+      timeout-minutes: 5
+      steps:
+          - name: Checkout sources
+            uses: actions/checkout@v4
+          - name: Setup Node.js
+            uses: actions/setup-node@v4
+            with:
+                node-version: v20.4
+
+          - name: Install all dependencies
+            run: |
+                npm i
+
+          - name: Run ESLint
+            run: tsc
+
+    build: 
+        name: Build
+        runs-on: ubuntu-latest
+        timeout-minutes: 5
+        steps:
+            - name: Checkout sources
+              uses: actions/checkout@v4
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: v20.4
+
+            - name: Install all dependencies
+              run: |
+                  npm i
+
+            - name: Build
+              run: npm run build check
+
+    tests:
+        name: Tests
         runs-on: ubuntu-latest
         timeout-minutes: 5
         steps:
@@ -24,4 +100,4 @@ jobs:
                   npm i
 
             - name: Run tests
-              run: sh ./scripts/fmt-lint-check.sh
+              run: npm test
