@@ -31,4 +31,3 @@ pub struct Routing<'a> {
     midi: &'a [&'a str],
     control: &'a [&'a str],
 }
-
