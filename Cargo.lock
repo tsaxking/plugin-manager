@@ -2319,6 +2319,7 @@ dependencies = [
 name = "plugin_manager"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "diff",
  "fundsp",
  "rodio",
@@ -2327,6 +2328,7 @@ dependencies = [
  "serde_path_to_error",
  "tauri",
  "tauri-build",
+ "thiserror",
 ]
 
 [[package]]
