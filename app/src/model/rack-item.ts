@@ -4,7 +4,6 @@ import { Point2D } from '../utils/calcs/linear-algebra/point';
 import { IO, io } from './io';
 import { Color } from '../utils/color';
 import { abbreviate } from '../utils/text';
-import { Cable } from './cable';
 import { Rack } from './state';
 
 export const colors = {
@@ -165,18 +164,18 @@ export class RackItem {
             color: this.color,
             title: this.title,
             io: {
-                audio: [
-                    this.io.audio.inputs.map(i => i.name),
-                    this.io.audio.outputs.map(o => o.name),
-                ],
-                midi: [
-                    this.io.midi.inputs.map(i => i.name),
-                    this.io.midi.outputs.map(o => o.name),
-                ],
-                control: [
-                    this.io.control.inputs.map(i => i.name),
-                    this.io.control.outputs.map(o => o.name),
-                ],
+                audio: {
+                    inputs: this.io.audio.inputs.map(i => i.name),
+                    outputs: this.io.audio.outputs.map(o => o.name),
+                },
+                midi: {
+                    inputs: this.io.midi.inputs.map(i => i.name),
+                    outputs: this.io.midi.outputs.map(o => o.name),
+                },
+                control: {
+                    inputs: this.io.control.inputs.map(i => i.name),
+                    outputs: this.io.control.outputs.map(o => o.name),
+                },
             },
             routing: {
                 audio: this.io.audio.serialize(),
@@ -185,15 +184,4 @@ export class RackItem {
             },
         };
     }
-
-    get cables() {
-        const cables = Cable.all;
-        return cables.filter(
-            c =>
-                Object.is(c.input.rackItem, this) ||
-                Object.is(c.output.rackItem, this)
-        );
-    }
 }
-
-Object.assign(window, { RackItem });

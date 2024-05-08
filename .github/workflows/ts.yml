@@ -12,17 +12,16 @@ jobs:
         runs-on: ubuntu-latest
         timeout-minutes: 5
         steps:
+            - name: Checkout sources
+              uses: actions/checkout@v4
             - name: Setup Node.js
               uses: actions/setup-node@v4
               with:
                   node-version: v20.4
 
-            # - name: Install all dependencies
-            #   run: |
-            #     ls -lsa
-            #     npm i
-            #     npm i --save-dev --force prettier-plugin-svelte prettier @typescript-eslint/parser @typescript-eslint/eslint-plugin@5.33.0 eslint typescript prettier-plugin-svelte svelte
-            #     npm i -g eslint prettier svelte
+            - name: Install all dependencies
+              run: |
+                  npm i
 
-            # - name: Run tests
-            #   run: sh ./scripts/fmt-lint-check.sh
+            - name: Run tests
+              run: sh ./scripts/fmt-lint-check.sh

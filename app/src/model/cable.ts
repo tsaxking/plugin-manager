@@ -10,6 +10,14 @@ type Events = {
 };
 
 export class Cable {
+    public static fromRackItem(item: RackItem) {
+        return Cable.all.filter(
+            c =>
+                Object.is(c.input.rackItem, item) ||
+                Object.is(c.output.rackItem, item)
+        );
+    }
+
     public static all: Cable[] = [];
 
     private static _state: Input | Output | null = null;

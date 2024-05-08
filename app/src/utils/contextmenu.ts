@@ -10,7 +10,7 @@ export type ContextMenuOptions = (
           name: string;
           action: (e: MouseEvent) => void;
           text: string;
-        //   class: string;
+          //   class: string;
       }
     | null
     | string
@@ -28,19 +28,13 @@ const rightClickContextMenu = (e: MouseEvent, el: HTMLDivElement) => {
         y: e.clientY,
     };
 
-    const {
-        width,
-        height,
-        top,
-        left,
-    } = el.getBoundingClientRect();
+    const { width, height, top, left } = el.getBoundingClientRect();
 
     return {
         x: pos.x + width > browser.w ? pos.x - width : pos.x,
         y: pos.y + height > browser.h ? pos.y - height : pos.y,
-    }
-}
-
+    };
+};
 
 /**
  * Adds a context menu to the target
@@ -61,7 +55,13 @@ export const contextmenu = (
     body.classList.add('card-body', 'p-0', 'border-0', 'rounded');
     el.appendChild(body);
     const list = create('ul');
-    list.classList.add('list-group', 'list-group-flush', 'border-0', 'p-0', 'rounded');
+    list.classList.add(
+        'list-group',
+        'list-group-flush',
+        'border-0',
+        'p-0',
+        'rounded'
+    );
     body.appendChild(list);
     for (const o of options) {
         const li = create('li');
@@ -79,7 +79,13 @@ export const contextmenu = (
             list.appendChild(li);
         } else {
             const button = create('button');
-            button.classList.add('btn', 'border-0', 'text-start', 'w-100', 'p-0');
+            button.classList.add(
+                'btn',
+                'border-0',
+                'text-start',
+                'w-100',
+                'p-0'
+            );
             // const i = create('i');
             // i.classList.add(...o.class.split(' '), 'me-2');
             // button.appendChild(i);
@@ -107,10 +113,10 @@ export const contextmenu = (
         const rm = () => {
             el.remove();
             document.removeEventListener('click', rm);
-        }
+        };
 
         document.addEventListener('click', rm);
-    }
+    };
 
     target.addEventListener('contextmenu', fn);
 };
