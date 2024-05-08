@@ -24,7 +24,14 @@ jobs:
         name: Test Suite
         runs-on: ubuntu-latest
         timeout-minutes: 30
-        container: shakesbeare/rust-ci-container
+        container:
+            image: shakesbeare/rust-ci-container
+            volumes: 
+              ~/.cargo/bin/
+              ~/.cargo/registry/index/
+              ~/.cargo/registry/cache/
+              ~/.cargo/git/db/
+              target/
         steps:
             - name: Checkout sources
               uses: actions/checkout@v4
