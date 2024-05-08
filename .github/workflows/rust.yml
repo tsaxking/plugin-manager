@@ -36,7 +36,7 @@ jobs:
             - name: Install Dependencies
               run: sudo apt-get update; sudo apt-get install --no-install-recommends libgtk-3-dev libsoup2.4 javascriptcoregtk-4.0 webkit2gtk-4.0 libasound2-dev
             - name: Run Tests
-              run: cargo nt && cargo t --doc
+              run: cargo-nextest nextest run && cargo t --doc
 
     # Run cargo clippy -- -D warnings
     clippy_check:
