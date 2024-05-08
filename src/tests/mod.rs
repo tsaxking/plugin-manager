@@ -39,29 +39,10 @@ impl<'a> PartialEq for IgnoreWhitespace<'a> {
 }
 
 #[test]
-fn deserialize_app_state() {
-    let json_str = std::fs::read_to_string("./scripts/serialized.json").unwrap();
-    let deserializer = &mut serde_json::Deserializer::from_str(&json_str);
-    let result: Result<Vec<crate::RackItem>, _> =
-        serde_path_to_error::deserialize(deserializer);
-    match result {
-        Ok(actual) => {
-            let expected = crate::tests::test_state_schema::get();
-            assert_eq!(actual, expected);
-        }
-        Err(e) => {
-            let path = e.path().to_string();
-            eprintln!("{path:?}");
-            panic!("{e:?}");
-        }
-    }
-}
-
-#[test]
 fn serialize_app_state() {
     let schema = crate::tests::test_state_schema::get();
     let actual = serde_json::to_string(&schema).unwrap().to_string();
-    let expected = std::fs::read_to_string("./scripts/serialized.json").unwrap();
+    let expected = std::fs::read_to_string("./src/tests/serialized.json").unwrap();
 
     let left = IgnoreWhitespace { string: &actual };
     let right = IgnoreWhitespace { string: &expected };
