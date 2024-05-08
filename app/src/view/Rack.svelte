@@ -11,16 +11,20 @@ export let rack: Rack;
 
 $: Rack.display = display;
 
-let items: RackItem[] = rack.items;
+let items: RackItem[] = [];
+
+$: console.log(items);
 
 let cableTarget: HTMLDivElement;
 
 onMount(() => {
-    items = rack.items;
     Cable.setTarget(cableTarget);
 });
 
 RackItem.on('new', () => {
+    items = rack.items;
+});
+RackItem.on('destroy', () => {
     items = rack.items;
 });
 </script>
@@ -28,7 +32,9 @@ RackItem.on('new', () => {
 <div class="position-relative" bind:this="{cableTarget}">
     <RackImage x="{200}" y="{3}" />
 
-    {#each items as item}
-        <FacePlate {item} bind:display />
-    {/each}
+    <!-- {#if items.length} -->
+        {#each items as item}
+            <FacePlate bind:item={item} bind:display={display} />
+        {/each}
+    <!-- {/if} -->
 </div>

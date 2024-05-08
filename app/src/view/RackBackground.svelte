@@ -1,9 +1,27 @@
 <script lang="ts">
+import { onMount } from "svelte";
+import { contextmenu } from "../utils/contextmenu";
+
 export let x = 1;
 export let y = 1;
+
+let me: HTMLElement;
+
+onMount(() => {
+    contextmenu([
+        {
+            name: 'New',
+            action: () => {
+                console.log('new');
+            },
+            text: 'New',
+            // class: 'fa fa-plus'
+        }
+    ], me);
+});
 </script>
 
-<div class="position-absolute">
+<div class="position-absolute" bind:this={me}>
     {#each Array.from({ length: y }) as _, yIndex}
         <div class="ws-nowrap">
             {#each Array.from({ length: x }) as _, xIndex}
