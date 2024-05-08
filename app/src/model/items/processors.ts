@@ -3,7 +3,7 @@ import { RackItem } from '../rack-item';
 import { Rack } from '../state';
 import { Random } from '../../utils/math';
 
-const getId = (id: string, name: string) => id + '|' + name.toLowerCase();
+const getId = (id: string, name: string) => id + ':' + name.toLowerCase();
 
 export class Processors {
     // ▄▀▄ █ █ █▀▄ █ ▄▀▄
@@ -23,9 +23,18 @@ export class Processors {
             'dark',
             'Audio Output',
             {
-                audio: [inputs, []],
-                midi: [[], []],
-                control: [[], []],
+                audio: {
+                    inputs,
+                    outputs: []
+                },
+                midi: {
+                    inputs: [],
+                    outputs: []
+                },
+                control: {
+                    inputs: [],
+                    outputs: []
+                },
             }
         );
     }
@@ -45,9 +54,18 @@ export class Processors {
             'dark',
             'Audio Source',
             {
-                audio: [[], outputs],
-                midi: [[], []],
-                control: [[], []],
+                audio: {
+                    inputs: [],
+                    outputs
+                },
+                midi: {
+                    inputs: [],
+                    outputs: []
+                },
+                control: {
+                    inputs: [],
+                    outputs: []
+                },
             }
         );
     }
@@ -67,14 +85,18 @@ export class Processors {
             'primary',
             'Compressor',
             {
-                audio: stereo
-                    ? [
-                          ['L', 'R'],
-                          ['L', 'R'],
-                      ]
-                    : [['In'], ['Out']],
-                midi: [[], []],
-                control: [[], []],
+                audio: {
+                    inputs: stereo ? ['L', 'R'] : ['In'],
+                    outputs: stereo ? ['L', 'R'] : ['Out']
+                },
+                midi: {
+                    inputs: [],
+                    outputs: []
+                },
+                control: {
+                    inputs: [],
+                    outputs: []
+                },
             }
         );
     }
@@ -89,14 +111,18 @@ export class Processors {
             'primary',
             'EQ',
             {
-                audio: stereo
-                    ? [
-                          ['L', 'R'],
-                          ['L', 'R'],
-                      ]
-                    : [['In'], ['Out']],
-                midi: [[], []],
-                control: [[], []],
+                audio: {
+                    inputs: stereo ? ['L', 'R'] : ['In'],
+                    outputs: stereo ? ['L', 'R'] : ['Out']
+                },
+                midi: {
+                    inputs: [],
+                    outputs: []
+                },
+                control: {
+                    inputs: [],
+                    outputs: []
+                },
             }
         );
     }
@@ -111,14 +137,18 @@ export class Processors {
             'primary',
             'Gain',
             {
-                audio: stereo
-                    ? [
-                          ['L', 'R'],
-                          ['L', 'R'],
-                      ]
-                    : [['In'], ['Out']],
-                midi: [[], []],
-                control: [[], []],
+                audio: {
+                    inputs: stereo ? ['L', 'R'] : ['In'],
+                    outputs: stereo ? ['L', 'R'] : ['Out']
+                },
+                midi: {
+                    inputs: [],
+                    outputs: []
+                },
+                control: {
+                    inputs: [],
+                    outputs: []
+                },
             }
         );
     }
@@ -133,14 +163,18 @@ export class Processors {
             'primary',
             'Gate',
             {
-                audio: stereo
-                    ? [
-                          ['L', 'R'],
-                          ['L', 'R'],
-                      ]
-                    : [['In'], ['Out']],
-                midi: [[], []],
-                control: [[], []],
+                audio: {
+                    inputs: stereo ? ['L', 'R'] : ['In'],
+                    outputs: stereo ? ['L', 'R'] : ['Out']
+                },
+                midi: {
+                    inputs: [],
+                    outputs: []
+                },
+                control: {
+                    inputs: [],
+                    outputs: []
+                },
             }
         );
     }
@@ -160,14 +194,18 @@ export class Processors {
             'primary',
             'Limiter',
             {
-                audio: stereo
-                    ? [
-                          ['L', 'R'],
-                          ['L', 'R'],
-                      ]
-                    : [['In'], ['Out']],
-                midi: [[], []],
-                control: [[], []],
+                audio: {
+                    inputs: stereo ? ['L', 'R'] : ['In'],
+                    outputs: stereo ? ['L', 'R'] : ['Out']
+                },
+                midi: {
+                    inputs: [],
+                    outputs: []
+                },
+                control: {
+                    inputs: [],
+                    outputs: []
+                },
             }
         );
     }
@@ -182,14 +220,18 @@ export class Processors {
             'primary',
             'Reverb',
             {
-                audio: stereo
-                    ? [
-                          ['L', 'R'],
-                          ['L', 'R'],
-                      ]
-                    : [['In'], ['Out']],
-                midi: [[], []],
-                control: [[], []],
+                audio: {
+                    inputs: stereo ? ['L', 'R'] : ['In'],
+                    outputs: stereo ? ['L', 'R'] : ['Out']
+                },
+                midi: {
+                    inputs: [],
+                    outputs: []
+                },
+                control: {
+                    inputs: [],
+                    outputs: []
+                },
             }
         );
     }
@@ -204,14 +246,18 @@ export class Processors {
             'primary',
             'Delay',
             {
-                audio: stereo
-                    ? [
-                          ['L', 'R'],
-                          ['L', 'R'],
-                      ]
-                    : [['In'], ['Out']],
-                midi: [[], []],
-                control: [[], []],
+                audio: {
+                    inputs: stereo ? ['L', 'R'] : ['In'],
+                    outputs: stereo ? ['L', 'R'] : ['Out']
+                },
+                midi: {
+                    inputs: [],
+                    outputs: []
+                },
+                control: {
+                    inputs: [],
+                    outputs: []
+                },
             }
         );
     }
@@ -226,14 +272,18 @@ export class Processors {
             'primary',
             'Filter',
             {
-                audio: stereo
-                    ? [
-                          ['L', 'R'],
-                          ['L', 'R'],
-                      ]
-                    : [['In'], ['Out']],
-                midi: [[], []],
-                control: [[], []],
+                audio: {
+                    inputs: stereo ? ['L', 'R'] : ['In'],
+                    outputs: stereo ? ['L', 'R'] : ['Out']
+                },
+                midi: {
+                    inputs: [],
+                    outputs: []
+                },
+                control: {
+                    inputs: [],
+                    outputs: []
+                },
             }
         );
     }
@@ -257,9 +307,18 @@ export class Processors {
             'success',
             'Instrument',
             {
-                audio: [[], []],
-                midi: [inputs, outputs],
-                control: [[], []],
+                audio: {
+                    inputs: [],
+                    outputs: []
+                },
+                midi:  {
+                    inputs,
+                    outputs,
+                },
+                control: {
+                    inputs: [],
+                    outputs: []
+                },
             }
         );
     }
@@ -279,9 +338,18 @@ export class Processors {
             'warning',
             'Oscillator',
             {
-                audio: [[], ['Out']],
-                midi: [[], []],
-                control: [inputs, []],
+                audio: {
+                    inputs: [],
+                    outputs: ['Out']
+                },
+                midi: {
+                    inputs: [],
+                    outputs: []
+                },
+                control: {
+                    inputs,
+                    outputs: []
+                },
             }
         );
     }
@@ -302,9 +370,18 @@ export class Processors {
             'info',
             'Sequencer',
             {
-                audio: [[], []],
-                midi: [inputs, outputs],
-                control: [[], []],
+                audio: {
+                    inputs: [],
+                    outputs: []
+                },
+                midi: {
+                    inputs,
+                    outputs,
+                },
+                control: {
+                    inputs: [],
+                    outputs: []
+                },
             }
         );
     }
@@ -341,9 +418,18 @@ export class Processors {
             'danger',
             'MIDI Controller',
             {
-                audio: [[], []],
-                midi: [inputs, []],
-                control: [[], outputs],
+                audio: {
+                    inputs: [],
+                    outputs: []
+                },
+                midi: {
+                    inputs,
+                    outputs: [],
+                },
+                control: {
+                    inputs: [],
+                    outputs,
+                },
             }
         );
     }
@@ -358,9 +444,18 @@ export class Processors {
             'danger',
             'Random',
             {
-                audio: [[], []],
-                midi: [['In'], []],
-                control: [[], ['Random']],
+                audio: {
+                    inputs: [],
+                    outputs: []
+                },
+                midi: {
+                    inputs: ['In'],
+                    outputs: []
+                },
+                control: {
+                    inputs: [],
+                    outputs: ['Random']
+                },
             }
         );
     }
@@ -375,9 +470,18 @@ export class Processors {
             'danger',
             'LFO',
             {
-                audio: [[], []],
-                midi: [[], []],
-                control: [[], ['LFO']],
+                audio: {
+                    inputs: [],
+                    outputs: []
+                },
+                midi: {
+                    inputs: [],
+                    outputs: []
+                },
+                control: {
+                    inputs: [],
+                    outputs: ['LFO']
+                },
             }
         );
     }
@@ -397,10 +501,28 @@ export class Processors {
             'danger',
             'Duplicator',
             {
-                audio: type === 'audio' ? [['In'], ['1', '2']] : [[], []],
-                midi: type === 'midi' ? [['In'], ['1', '2']] : [[], []],
+                audio: type === 'audio' ? {
+                    inputs: ['In'],
+                    outputs: ['1', '2']
+                } : {
+                    inputs: [],
+                    outputs: []
+                },
+                midi: type === 'midi' ? {
+                    inputs: ['In'],
+                    outputs: ['1', '2']
+                } : {
+                    inputs: [],
+                    outputs: []
+                },
                 control:
-                    type === 'controller' ? [['In'], ['1', '2']] : [[], []],
+                    type === 'controller' ? {
+                        inputs: ['In'],
+                        outputs: ['1', '2']
+                    } : {
+                    inputs: [],
+                    outputs: []
+                },
             }
         );
     }
