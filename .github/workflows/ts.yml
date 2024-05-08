@@ -12,6 +12,9 @@ jobs:
         runs-on: ubuntu-latest
         timeout-minutes: 5
         steps:
+            - name: Backup for some reason
+              run: cd ..
+
             - name: Setup Node.js
               uses: actions/setup-node@v4
               with:
