@@ -2,9 +2,9 @@ name: TS CI
 
 on:
     push:
-        branches: [2024-5-8-TK-TSUnitTesting]
+        branches: [main]
     pull_request:
-        branches: [2024-5-8-TK-TSUnitTesting]
+        branches: [main]
 
 jobs:
     test:
@@ -21,7 +21,7 @@ jobs:
 
             - name: Install all dependencies
               run: |
-                npm i
+                  npm i
 
             - name: Run tests
               run: sh ./scripts/fmt-lint-check.sh
