@@ -83,9 +83,9 @@ export class RackItem {
         [this.x, this.y] = point;
 
         this.io = {
-            midi: new IO('midi', ...io.midi, this),
-            audio: new IO('audio', ...io.audio, this),
-            control: new IO('control', ...io.control, this),
+            midi: new IO('midi', io.midi, this),
+            audio: new IO('audio', io.audio, this),
+            control: new IO('control', io.control, this),
         };
         this._note = note;
 

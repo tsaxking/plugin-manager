@@ -6,10 +6,15 @@ import { Rack } from './state';
 
 const { max } = Math;
 
+type ioObject = {
+    inputs: string[];
+    outputs: string[];
+}
+
 export type io = {
-    midi: [string[], string[]];
-    audio: [string[], string[]];
-    control: [string[], string[]];
+    midi: ioObject;
+    audio: ioObject;
+    control: ioObject;
 };
 
 type InputEvents = {
@@ -242,26 +247,24 @@ export class IO extends IOEmitter<IOEvents> {
 
     constructor(
         public readonly type: 'midi' | 'audio' | 'control',
-        inputs: string[],
-        outputs: string[],
+        io: ioObject,
         public readonly rackItem: RackItem
     ) {
         super();
-        this.inputs = inputs.map(i => new Input(type, this, i));
-        this.outputs = outputs.map(o => new Output(type, this, o));
+        this.inputs = io.inputs.map(i => new Input(type, this, i));
+        this.outputs = io.outputs.map(o => new Output(type, this, o));
     }
 
     serialize() {
-        return this.outputs.map(o =>
-            o.connections.map(i => i.rackItem.id + ':' + i.index)
+        return this.outputs.flatMap(o =>
+            o.connections.map(i => i.rackItem.id +':' + o.index + ':' + i.index)
         );
     }
 
     deserialize(rack: Rack, data: string[][]) {
-        for (const outputIndex in data) {
-            const output = data[outputIndex];
+        for (const output of data) {
             for (const connection of output) {
-                const [id, inputIndex] = connection.split(':');
+                const [id,,outputIndex, inputIndex] = connection.split(':');
                 const output =
                     this.rackItem.io[this.type].outputs[+outputIndex];
                 const input = rack.items.find(i => i.id === id)?.io[this.type]
