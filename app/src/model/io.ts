@@ -9,7 +9,7 @@ const { max } = Math;
 type ioObject = {
     inputs: string[];
     outputs: string[];
-}
+};
 
 export type io = {
     midi: ioObject;
@@ -257,23 +257,23 @@ export class IO extends IOEmitter<IOEvents> {
 
     serialize() {
         return this.outputs.flatMap(o =>
-            o.connections.map(i => i.rackItem.id +':' + o.index + ':' + i.index)
+            o.connections.map(
+                i => i.rackItem.id + ':' + o.index + ':' + i.index
+            )
         );
     }
 
-    deserialize(rack: Rack, data: string[][]) {
-        for (const output of data) {
-            for (const connection of output) {
-                const [id,,outputIndex, inputIndex] = connection.split(':');
-                const output =
-                    this.rackItem.io[this.type].outputs[+outputIndex];
-                const input = rack.items.find(i => i.id === id)?.io[this.type]
-                    .inputs[+inputIndex];
-                if (output && input) {
-                    output.connect(input);
-                } else {
-                    console.warn('Unable to connect IOs: ', output, input);
-                }
+    deserialize(rack: Rack, data: string[]) {
+        for (const connection of data) {
+            const [id, title, outputIndex, inputIndex] = connection.split(':');
+            const output = this.rackItem.io[this.type].outputs[+outputIndex];
+            const input = rack.items.find(i => i.id === id + ':' + title)?.io[
+                this.type
+            ].inputs[+inputIndex];
+            if (output && input) {
+                output.connect(input);
+            } else {
+                console.warn('Unable to connect IOs: ', output, input);
             }
         }
     }

@@ -41,11 +41,11 @@ function rightClickContextMenu(e: MouseEvent) {
     showMenu = true;
     browser = {
         w: window.innerWidth,
-        h: window.innerHeight
+        h: window.innerHeight,
     };
     pos = {
         x: e.clientX,
-        y: e.clientY
+        y: e.clientY,
     };
     // If bottom part of context menu will be displayed
     // after right-click, then change the position of the
@@ -68,7 +68,7 @@ function getContextMenuDimension(node: HTMLElement) {
     let width = node.offsetWidth;
     menu = {
         h: height,
-        w: width
+        w: width,
     };
 }
 
@@ -98,8 +98,8 @@ export let menuItems: ContextMenuOptions = [];
                             <button
                                 on:click="{item.action}"
                                 class="border-0 btn btn-dark w-100 text-start"
-                                ><i class="{item.class}"
-                                ></i>{item.text}</button>
+                                ><i></i>{item.text}</button
+                            >
                         </li>
                     {/if}
                 {/each}

@@ -67,12 +67,10 @@ export class Rack {
     }
 
     serialize() {
-        console.log('Serializing...');
         return JSON.stringify(this.items.map(i => i.serialize()));
     }
 
     deserialize(data: string) {
-        console.log('Deserializing...');
         const items = JSON.parse(data) as unknown[];
         if (!Array.isArray(items)) throw new Error('Invalid data');
         if (items.some(i => typeof i !== 'object'))
@@ -94,9 +92,9 @@ export class Rack {
             title: string;
             io: io;
             routing: {
-                audio: string[][];
-                midi: string[][];
-                control: string[][];
+                audio: string[];
+                midi: string[];
+                control: string[];
             };
         }[];
 

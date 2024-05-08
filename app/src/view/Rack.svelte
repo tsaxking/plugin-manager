@@ -33,8 +33,8 @@ RackItem.on('destroy', () => {
     <RackImage x="{200}" y="{3}" />
 
     <!-- {#if items.length} -->
-        {#each items as item}
-            <FacePlate bind:item={item} bind:display={display} />
-        {/each}
+    {#each items as item}
+        <FacePlate bind:item bind:display />
+    {/each}
     <!-- {/if} -->
 </div>

@@ -32,7 +32,10 @@ declare function create<K extends keyof HTMLElementDeprecatedTagNameMap>(
  * @param {?*} [attrs]
  * @returns {HTMLElement}
  */
-declare function create(tag: string, attrs?: Record<string, string>): HTMLElement;
+declare function create(
+    tag: string,
+    attrs?: Record<string, string>
+): HTMLElement;
 /**
  * Creates an element with the specified html.
  * @date 1/21/2024 - 8:39:51 PM
@@ -41,7 +44,10 @@ declare function create(tag: string, attrs?: Record<string, string>): HTMLElemen
  * @param {?*} [attrs]
  * @returns {HTMLElement}
  */
-declare function create(html: string, attrs?: Record<string, string>): HTMLElement;
+declare function create(
+    html: string,
+    attrs?: Record<string, string>
+): HTMLElement;
 
 /**
  * Creates an element with the specified html, returning all children as an array

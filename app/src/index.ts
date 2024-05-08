@@ -66,7 +66,7 @@ interact('.rack-item').draggable({
             const id = event.target.id.split('_')[1];
             const item = rack.items.find(i => i.id === id);
             if (item) {
-                const cables = item.cables;
+                const cables = Cable.fromRackItem(item);
                 for (const i in cables) {
                     const c = cables[i];
                     const delta = new Point(event.dx, event.dy);

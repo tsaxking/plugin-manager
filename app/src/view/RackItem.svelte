@@ -20,16 +20,19 @@ export let display: 'io' | 'control' = 'io';
 let me: HTMLElement;
 
 onMount(() => {
-    contextmenu([
-        {
-            name: 'Remove',
-            action: () => {
-                item.destroy();
+    contextmenu(
+        [
+            {
+                name: 'Remove',
+                action: () => {
+                    item.destroy();
+                },
+                text: 'Remove',
             },
-            text: 'Remove'
-        }
-    ], me);
-})
+        ],
+        me
+    );
+});
 
 let title = item.title;
 let note = item.note;
@@ -40,11 +43,11 @@ let units = item.width;
 
 $: {
     title = item.title;
-note = item.note;
-color = item.color;
-x = item.x;
-y = item.y;
-units = item.width;
+    note = item.note;
+    color = item.color;
+    x = item.x;
+    y = item.y;
+    units = item.width;
 }
 
 type Drag = (e: DragEvent) => void;
@@ -83,7 +86,7 @@ item.on('move', ({ x: X, y: Y }) => {
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
-    bind:this={me}
+    bind:this="{me}"
     id="ri_{item.id}"
     draggable
     class="rack-item"
