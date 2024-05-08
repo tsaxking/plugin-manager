@@ -1,4 +1,4 @@
-name: CI
+name: Back End CI
 
 on:
     push:
