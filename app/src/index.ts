@@ -63,7 +63,7 @@ interact('.rack-item').draggable({
             target.setAttribute('data-x', `${x}`);
             target.setAttribute('data-y', `${y}`);
 
-            const id = event.target.id.split('-')[1];
+            const id = event.target.id.split('_')[1];
             const item = rack.items.find(i => i.id === id);
             if (item) {
                 const cables = item.cables;
@@ -101,7 +101,9 @@ interact('.rack-item').draggable({
         },
         end: event => {
             const target: HTMLDivElement = event.target;
-            const id = target.id.split('-')[1];
+            const id = target.id.split('_')[1];
+            // console.log(id);
+            // console.log(rack.items.map(c => c.id));
             const item = rack.items.find(i => i.id === id);
             if (item) {
                 const startX = parseFloat(
@@ -131,6 +133,8 @@ interact('.rack-item').draggable({
                 // });
 
                 item.moveTo(item.x + dx2, item.y + dy2);
+            } else {
+                console.error('Item not found');
             }
             target.style.zIndex = target.getAttribute('data-z') || '0';
             target.setAttribute('data-x', '0');
