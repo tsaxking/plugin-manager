@@ -4,6 +4,7 @@ import { Rack } from '../app/src/model/state';
 import { Processors } from '../app/src/model/items/processors';
 import { Random } from '../app/src/utils/math';
 import { capitalize, toCamelCase, toSnakeCase, fromCamelCase,fromSnakeCase, abbreviate, toByteString, cost, fmtNumber } from '../app/src/utils/text';
+import { time, time24, date, dateTime, fullDate, fullDateTime, fullDateTime24 } from '../app/src/utils/clock';
 
 test('Build Rack Model', () => {
     const rack = new Rack();
@@ -114,4 +115,16 @@ test('Text', () => {
     assert.strictEqual(cost(1000), '$1,000.00');
     assert.strictEqual(fmtNumber(1000), '1,000');
     assert.strictEqual(fmtNumber(1000.12), '1,000.12');
+});
+
+test('Date', () => {
+    const d = new Date('2021-01-01T00:00:00Z');
+
+    assert.strictEqual(time(d), '12:00 AM');
+    assert.strictEqual(time24(d), '00:00');
+    assert.strictEqual(date(d), '01/01/2021');
+    assert.strictEqual(dateTime(d), '01/01/2021 12:00 AM');
+    assert.strictEqual(fullDate(d), 'January 1, 2021');
+    assert.strictEqual(fullDateTime(d), 'January 1, 2021 12:00 AM');
+    assert.strictEqual(fullDateTime24(d), 'January 1, 2021 00:00');
 });
