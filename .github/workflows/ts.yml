@@ -19,9 +19,9 @@ jobs:
 
             - name: View stuff
               run: |
-                ls -la
+                ls -lsa
                 cd ../
-                ls -la
+                ls -lsa
 
             - name: Install all dependencies
               run: |
