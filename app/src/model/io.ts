@@ -116,12 +116,16 @@ export class Input extends IOEmitter<InputEvents> {
         return output.isConnected(this);
     }
 
-    get connections() {
-        return this.io.rackItem.rack.items.filter(rackItem => {
-            return rackItem.io[this.type].outputs.some(output =>
-                output.connections.some(input => input === this)
-            );
+    get connections(): Output[] {
+        return this.io.rackItem.rack.items.flatMap(i => {
+            return i.io[this.type].outputs.filter(o => o.isConnected(this));
         });
+    }
+
+    disconnectAll() {
+        for (const output of this.connections) {
+            output.disconnect(this);
+        }
     }
 }
 
@@ -204,6 +208,12 @@ export class Output extends IOEmitter<OutputEvents> {
     isConnected(input: Input) {
         return this.connections.includes(input);
     }
+
+    disconnectAll() {
+        for (const input of this.connections) {
+            this.disconnect(input);
+        }
+    }
 }
 
 export class IO extends IOEmitter<IOEvents> {
@@ -262,6 +272,15 @@ export class IO extends IOEmitter<IOEvents> {
                     console.warn('Unable to connect IOs: ', output, input);
                 }
             }
+        }
+    }
+
+    destroy() {
+        for (const input of this.inputs) {
+            input.disconnectAll();
+        }
+        for (const output of this.outputs) {
+            output.disconnectAll();
         }
     }
 }

@@ -1,6 +1,8 @@
 <script lang="ts">
+import { onMount } from 'svelte';
 import { RackItem } from '../model/rack-item';
 import IO from './IO.svelte';
+import { contextmenu } from '../utils/contextmenu';
 
 type BootstrapColor =
     | 'primary'
@@ -12,7 +14,22 @@ type BootstrapColor =
     | 'warning';
 
 export let item: RackItem;
+console.log(item);
 export let display: 'io' | 'control' = 'io';
+
+let me: HTMLElement;
+
+onMount(() => {
+    contextmenu([
+        {
+            name: 'Remove',
+            action: () => {
+                item.destroy();
+            },
+            text: 'Remove'
+        }
+    ], me);
+})
 
 let title = item.title;
 let note = item.note;
@@ -57,6 +74,7 @@ item.on('move', ({ x: X, y: Y }) => {
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
+    bind:this={me}
     id="ri-{item.id}"
     draggable
     class="rack-item"

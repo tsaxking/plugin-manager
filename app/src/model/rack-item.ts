@@ -128,8 +128,11 @@ export class RackItem {
     destroy() {
         const index = this.rack.items.indexOf(this);
         if (index !== -1) {
-            this.rack.items.splice(index, 1);
-            this.emit('destroy', undefined);
+            this.io.audio.destroy();
+            this.io.midi.destroy();
+            this.io.control.destroy();
+            this.rack.items = this.rack.items.filter(i => i !== this);
+            RackItem.emit('destroy', this);
         }
     }
 
