@@ -3,8 +3,18 @@ name: Front End CI
 on:
     push:
         branches: [main]
+        paths:
+          - 'app/**'
+          - 'package.json'
+          - 'package-lock.json'
+          - 'scripts/**'
     pull_request:
         branches: [main]
+        paths:
+          - 'app/**'
+          - 'package.json'
+          - 'package-lock.json'
+          - 'scripts/**'
 
 jobs:
     prettier_check:
