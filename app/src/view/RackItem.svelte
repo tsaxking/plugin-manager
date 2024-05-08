@@ -38,6 +38,15 @@ let x = item.x;
 let y = item.y;
 let units = item.width;
 
+$: {
+    title = item.title;
+note = item.note;
+color = item.color;
+x = item.x;
+y = item.y;
+units = item.width;
+}
+
 type Drag = (e: DragEvent) => void;
 
 export let dragstart: Drag = e => {
@@ -66,7 +75,7 @@ let textColor: 'light' | 'dark' = (() => {
 })();
 
 item.on('move', ({ x: X, y: Y }) => {
-    console.log('move', X, Y);
+    // console.log('move', X, Y);
     x: x = X;
     y = Y;
 });

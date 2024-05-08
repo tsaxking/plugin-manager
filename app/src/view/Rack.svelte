@@ -32,7 +32,9 @@ RackItem.on('destroy', () => {
 <div class="position-relative" bind:this="{cableTarget}">
     <RackImage x="{200}" y="{3}" />
 
-    {#each items as item}
-        <FacePlate bind:item bind:display />
-    {/each}
+    <!-- {#if items.length} -->
+        {#each items as item}
+            <FacePlate bind:item={item} bind:display={display} />
+        {/each}
+    <!-- {/if} -->
 </div>
