@@ -1,5 +1,9 @@
 # Plugin Manager
 
+![Front End](https://github.com/github/docs/actions/workflows/ts.yml/badge.svg)
+
+![Back End](https://github.com/github/docs/actions/workflows/rust.yml/badge.svg)
+
 ## Dependencies
 
 -   [Rustup](https://rustup.rs/)
