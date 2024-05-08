@@ -12,16 +12,12 @@ jobs:
         runs-on: ubuntu-latest
         timeout-minutes: 5
         steps:
+            - name: Checkout sources
+              uses: actions/checkout@v4
             - name: Setup Node.js
               uses: actions/setup-node@v4
               with:
                   node-version: v20.4
-
-            - name: View stuff
-              run: |
-                ls -lsa
-                cd ../
-                ls -lsa
 
             - name: Install all dependencies
               run: |
