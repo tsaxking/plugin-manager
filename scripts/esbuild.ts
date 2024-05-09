@@ -7,7 +7,7 @@ import { BuildOptions } from 'esbuild';
 
 const args = process.argv.map(a => a.toLowerCase());
 
-const options: BuildOptions = {
+export const options: BuildOptions = {
     entryPoints: ['./app/src/index.ts'],
     bundle: true,
     outdir: './app/dist',

@@ -7,6 +7,7 @@
         "lint": "npx eslint **/*.ts --fix"
     },
     "dependencies": {
+        "@bahmutov/cypress-esbuild-preprocessor": "^2.2.0",
         "bootstrap": "^5.3.3",
         "esbuild-plugin-tailwindcss": "^1.2.0",
         "esbuild-sass-plugin": "^3.2.0",
@@ -24,6 +25,7 @@
         "@tauri-apps/cli": "^1.5.12",
         "@types/fuzzy-search": "^2.1.5",
         "@types/jquery": "^3.5.29",
+        "cypress": "^13.9.0",
         "esbuild": "^0.20.2",
         "esbuild-server": "^0.3.0",
         "eslint": "^8.57.0",
