@@ -26,6 +26,19 @@ const dropdowns: Dropdown[] = [
             { title: 'Control', action: () => (display = 'control') },
         ],
     },
+    {
+        title: 'Actions',
+        dropdown: [
+            {
+                title: 'Play',
+                action: () => rack.play(),
+            },
+            {
+                title: 'Stop',
+                action: () => rack.stop()
+            }
+        ]
+    }
 ];
 
 const replace = (str: string, obj: Record<string, string>): string => {
