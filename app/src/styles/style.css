@@ -8,3 +8,22 @@
     --bs-info: #1690a8;
     /* --bs-light: #bababa; */
 }
+
+.modal {
+    --bs-modal-header-padding: 0.5rem;
+    --bs-modal-padding: 0.5rem;
+    /* --bs-modal-footer-gap: 0px; */
+}
+
+.modal-content {
+    border: none !important;
+    /* border-radius: 2px !important; */
+}
+
+.modal-footer * {
+    /* margin: 0; */
+}
+
+.modal-footer .btn {
+    padding: 0.25rem 0.5rem;
+}
