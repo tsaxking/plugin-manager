@@ -11,6 +11,7 @@ pub mod commands;
 use std::sync;
 
 pub static APP_STATE: sync::OnceLock<sync::RwLock<AppState>> = sync::OnceLock::new();
+pub static PLAY_TX: sync::OnceLock<sync::Mutex<sync::mpsc::Sender<usize>>> = sync::OnceLock::new();
 
 #[derive(thiserror::Error, serde::Serialize, Debug)]
 pub enum AppStateError {
@@ -127,4 +128,10 @@ pub fn init_app_state(state: AppState) {
     APP_STATE
         .set(sync::RwLock::new(state))
         .expect("Critical Error: Could not set APP_STATE");
+}
+
+pub fn init_play_tx(tx: sync::mpsc::Sender<usize>) {
+    PLAY_TX
+        .set(sync::Mutex::new(tx))
+        .expect("Critical Error: Could not set PLAY_TX");
 }
