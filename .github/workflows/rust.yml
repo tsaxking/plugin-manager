@@ -31,15 +31,8 @@ jobs:
             - name: Checkout sources
               uses: actions/checkout@v4
             - name: Cache
-              uses: actions/cache@v3
-            - uses: Swatinem/rust-cache@v2
+              uses: Swatinem/rust-cache@v2
               with:
-                  path: |
-                      ~/.cargo/bin/
-                      ~/.cargo/registry/index/
-                      ~/.cargo/registry/cache/
-                      ~/.cargo/git/db/
-                      target/
                   key: ${{ runner.os }}-cargo-test-${{ hashFiles('**/Cargo.toml') }}
             - name: Install cargo-nextest
               run: curl -LsSf https://get.nexte.st/latest/linux | tar zxf - -C ${CARGO_HOME:-~/.cargo}/bin
@@ -57,15 +50,9 @@ jobs:
             - name: Checkout sources
               uses: actions/checkout@v4
             - name: Cache
-              uses: actions/cache@v3
+              uses: Swatinem/rust-cache@v2
               with:
-                  path: |
-                      ~/.cargo/bin/
-                      ~/.cargo/registry/index/
-                      ~/.cargo/registry/cache/
-                      ~/.cargo/git/db/
-                      target/
-                  key: ${{ runner.os }}-cargo-clippy-${{ hashFiles('**/Cargo.toml') }}
+                  key: ${{ runner.os }}-cargo-test-${{ hashFiles('**/Cargo.toml') }}
             - name: Run clippy
               run: cargo clippy -- -D warnings
 
