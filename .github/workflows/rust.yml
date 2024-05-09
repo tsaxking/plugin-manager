@@ -39,8 +39,6 @@ jobs:
                       ~/.cargo/git/db/
                       target/
                   key: ${{ runner.os }}-cargo-test-${{ hashFiles('**/Cargo.toml') }}
-            - name: Install nightly toolchain
-              uses: dtolnay/rust-toolchain@nightly
             - name: Install cargo-nextest
               run: curl -LsSf https://get.nexte.st/latest/linux | tar zxf - -C ${CARGO_HOME:-~/.cargo}/bin
             - name: Run Tests
@@ -66,10 +64,6 @@ jobs:
                       ~/.cargo/git/db/
                       target/
                   key: ${{ runner.os }}-cargo-clippy-${{ hashFiles('**/Cargo.toml') }}
-            - name: Install nightly toolchain
-              uses: dtolnay/rust-toolchain@nightly
-              with:
-                  components: clippy
             - name: Run clippy
               run: cargo clippy -- -D warnings
 
@@ -81,9 +75,5 @@ jobs:
         steps:
             - name: Checkout sources
               uses: actions/checkout@v4
-            - name: Install nightly toolchain
-              uses: dtolnay/rust-toolchain@nightly
-              with:
-                  components: rustfmt
             - name: Run cargo fmt
               run: cargo fmt --all -- --check
