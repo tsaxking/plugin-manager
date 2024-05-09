@@ -1,7 +1,9 @@
 use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
 use fundsp::hacker::*;
 use plugin_manager::commands;
+use std::io::Write;
 use std::sync::mpsc;
+use std::thread;
 
 fn main() -> anyhow::Result<()> {
     plugin_manager::init_app_state(vec![]);
@@ -15,27 +17,43 @@ fn main() -> anyhow::Result<()> {
     let (tx, rx): (mpsc::Sender<usize>, mpsc::Receiver<usize>) = mpsc::channel();
     plugin_manager::init_play_tx(tx);
 
-    let handle = std::thread::spawn(move || {
-        let stream = match config.sample_format() {
-            cpal::SampleFormat::F32 => {
-                make_stream::<f32>(&device, &config.clone().into()).unwrap()
+    let thread_handles = [
+        // Audio Thread
+        thread::spawn(move || {
+            let stream = match config.sample_format() {
+                cpal::SampleFormat::F32 => {
+                    make_stream::<f32>(&device, &config.clone().into()).unwrap()
+                }
+                cpal::SampleFormat::I16 => {
+                    make_stream::<i16>(&device, &config.clone().into()).unwrap()
+                }
+                cpal::SampleFormat::U16 => {
+                    make_stream::<u16>(&device, &config.clone().into()).unwrap()
+                }
+                _ => panic!("Unsupported format"),
+            };
+            loop {
+                stream.play().unwrap();
+                rx.recv().unwrap();
+                stream.pause().unwrap();
+                rx.recv().unwrap();
             }
-            cpal::SampleFormat::I16 => {
-                make_stream::<i16>(&device, &config.clone().into()).unwrap()
-            }
-            cpal::SampleFormat::U16 => {
-                make_stream::<u16>(&device, &config.clone().into()).unwrap()
-            }
-            _ => panic!("Unsupported format"),
-        };
+        }),
+        // CLI thread
+        thread::spawn(move || {
+            let mut stdout = std::io::stdout();
+            loop {
+                use plugin_manager::console;
 
-        loop {
-            rx.recv().unwrap();
-            stream.play().unwrap();
-            rx.recv().unwrap();
-            stream.pause().unwrap();
-        }
-    });
+                let mut buf: String = Default::default();
+                write!(stdout, "❯ ").unwrap();
+                stdout.flush().unwrap();
+                std::io::stdin().read_line(&mut buf).unwrap();
+                let response = console::read_command(&buf);
+                writeln!(stdout, "{}", response).unwrap();
+            }
+        }),
+    ];
 
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
@@ -44,9 +62,12 @@ fn main() -> anyhow::Result<()> {
             commands::save_load::save,
             commands::save_load::load,
         ])
-        .run(tauri::generate_context!())?;
+        .run(tauri::generate_context!())
+        .unwrap();
 
-    handle.join().unwrap();
+    for handle in thread_handles.into_iter() {
+        handle.join().unwrap();
+    }
 
     Ok(())
 }

@@ -7,6 +7,7 @@
 mod dev;
 
 pub mod commands;
+pub mod console;
 
 use std::sync;
 
