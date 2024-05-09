@@ -1,14 +1,14 @@
 use std::{iter::Peekable, slice::Iter};
 
-#[derive(Debug, PartialEq, Eq, Clone, Copy)]
-pub enum Token<'a> {
+#[derive(Debug, PartialEq, Eq, Clone)]
+pub enum Token {
     GreetToken,
     TogglePlayback,
     Save,
     Load,
     Help,
     EOL,
-    String(&'a str),
+    String(String),
 }
 
 #[derive(Debug)]
@@ -22,9 +22,23 @@ pub enum AstNode {
     SyntaxError(String),
 }
 
-impl<'a> From<&'a str> for Token<'a> {
+impl<'a> From<&'a str> for Token {
     fn from(value: &'a str) -> Self {
         match value {
+            "greet" => Token::GreetToken,
+            "toggle_playback" => Token::TogglePlayback,
+            "save" => Token::Save,
+            "load" => Token::Load,
+            "help" => Token::Help,
+            "\n" => Token::EOL,
+            _ => Token::String(value.to_string()),
+        }
+    }
+}
+
+impl From<String> for Token {
+    fn from(value: String) -> Self {
+        match value.as_str() {
             "greet" => Token::GreetToken,
             "toggle_playback" => Token::TogglePlayback,
             "save" => Token::Save,
@@ -37,23 +51,52 @@ impl<'a> From<&'a str> for Token<'a> {
 }
 
 fn lex(input: &str) -> Vec<Token> {
-    input
-        .split(|c: char| c == ' ' || c == ';' || c == '\n')
-        .filter(|s| !s.is_empty())
-        .map(|s| s.into())
-        .collect::<Vec<Token>>()
+    let mut input = input.chars().peekable();
+    let mut out = vec![];
+    while let Some(c) = input.peek() {
+        let token = match c {
+            &'"' => {
+                let mut lexeme = String::new();
+                input.next(); // pass over the "
+                while let Some(c) = input.peek() {
+                    if c == &'"' {
+                        input.next();
+                        break;
+                    }
+                    lexeme.push(*c);
+                    input.next();
+                }
+                Token::from(lexeme)
+            }
+            _ => {
+                let mut lexeme = String::new();
+                while let Some(c) = input.peek() {
+                    if c == &' ' || c == &';' || c == &'\n' {
+                        input.next();
+                        break;
+                    }
+                    lexeme.push(*c);
+                    input.next();
+                }
+                Token::from(lexeme)
+            }
+        };
+        out.push(token);
+    }
+
+    out
 }
 
 fn assert_peek<'a>(
-    input: &'a mut Peekable<Iter<'a, Token<'a>>>,
+    input: &'a mut Peekable<Iter<'a, Token>>,
     expected: Token,
-) -> Option<Token<'a>> {
+) -> Option<Token> {
     if let Some(actual) = input.peek() {
         if **actual == expected {
             input.next();
             return None;
         } else {
-            return Some(**actual);
+            return Some((*actual).clone());
         }
     } else if expected == Token::EOL {
         return None;
@@ -80,7 +123,7 @@ fn parse(input: Vec<Token>) -> AstNode {
     }
 }
 
-fn parse_save_load<'a>(input: &'a mut Peekable<Iter<'a, Token<'a>>>) -> AstNode {
+fn parse_save_load<'a>(input: &'a mut Peekable<Iter<'a, Token>>) -> AstNode {
     let save_load_tok = input.next().unwrap();
     let next = input.next();
     if next.is_none() {
@@ -105,7 +148,7 @@ fn parse_save_load<'a>(input: &'a mut Peekable<Iter<'a, Token<'a>>>) -> AstNode 
 }
 
 fn parse_no_subcommands<'a>(
-    input: &'a mut Peekable<Iter<'a, Token<'a>>>,
+    input: &'a mut Peekable<Iter<'a, Token>>,
     expected_node: AstNode,
 ) -> AstNode {
     // should have the greet token and then nothing else
