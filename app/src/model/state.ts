@@ -1,6 +1,10 @@
 import { Point2D } from '../utils/calcs/linear-algebra/point';
+import { attemptAsync } from '../utils/check';
+import { prompt } from '../utils/prompt';
 import { io } from './io';
 import { RackItem } from './rack-item';
+import { invoke } from '@tauri-apps/api';
+
 
 export class Rack {
     private static _display: 'io' | 'control' = 'io';
@@ -44,16 +48,24 @@ export class Rack {
 
     save() {
         const str = this.serialize();
-        console.log(str);
+        invoke('save', {
+            data: str
+        });
     }
 
-    load() {
-        console.log('Clearing items...');
-        const serialized = this.serialize();
-        this.items = [];
-        // console.log('loading');
-        const items = this.deserialize(serialized);
-        console.log('Loaded', items);
+    async load() {
+        return attemptAsync(async () => {
+            const filename = await prompt('Enter filename');
+            if (!filename) return;
+            await invoke('load', {
+                data: filename
+            });
+    
+            const data = await invoke('get_effects_state');
+            if (typeof data !== 'string') throw new Error('Invalid data');
+    
+            this.deserialize(data);
+        });
     }
 
     perform() {
@@ -132,10 +144,10 @@ export class Rack {
 
     // These are temporary methods to be used for testing purposes
     play() {
-
+        invoke('toggle_playback');
     }
 
     stop() {
-
+        invoke('toggle_playback');
     }
 }
