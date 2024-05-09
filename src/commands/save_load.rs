@@ -93,7 +93,7 @@ mod tests {
     fn test_load() {
         crate::init_app_state(crate::dev::test_state_schema::get());
         let base_dir = std::env::temp_dir();
-        let filename = "./save_file.json";
+        let filename = "./load_file.json";
         let full_path = base_dir.join(filename).to_str().unwrap().to_string();
         save(full_path.clone()).unwrap();
         load(full_path).unwrap();
