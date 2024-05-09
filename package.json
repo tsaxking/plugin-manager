@@ -2,7 +2,9 @@
     "scripts": {
         "build": "ts-node scripts/esbuild.ts",
         "dev": "npm run build watch",
-        "test": "ts-node scripts/test.ts"
+        "format": "prettier ./app/ --write",
+        "test": "ts-node scripts/test.ts",
+        "lint": "npx eslint **/*.ts --fix"
     },
     "dependencies": {
         "bootstrap": "^5.3.3",
