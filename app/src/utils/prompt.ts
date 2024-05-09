@@ -7,7 +7,7 @@ import * as bootstrap from 'bootstrap';
  * @returns {*}
  */
 export const alert = (message: string) => {
-    return new Promise<void>((res) => {
+    return new Promise<void>(res => {
         const div = create(`
         <div class="modal fade" tabindex="-1" data-bs-backdrop="static">
         <div class="modal-dialog">
@@ -27,9 +27,9 @@ export const alert = (message: string) => {
       </div>
         `);
         document.body.append(div);
-    
+
         const modal = new bootstrap.Modal(div);
-    
+
         modal.show();
 
         div.addEventListener('hidden.bs.modal', () => {
@@ -46,7 +46,7 @@ export const alert = (message: string) => {
  * @returns {*}
  */
 export const confirm = (message: string) => {
-    return new Promise<boolean>((res) => {
+    return new Promise<boolean>(res => {
         const div = create(`
             <div class="modal fade" tabindex="-1" data-bs-backdrop="static">
             <div class="modal-dialog">
@@ -73,7 +73,6 @@ export const confirm = (message: string) => {
             resolved = true;
             res(data);
         };
-
 
         document.body.append(div);
 
@@ -105,10 +104,13 @@ export const confirm = (message: string) => {
  * }>} [options]
  * @returns {*}
  */
-export const prompt = (message: string, options?: Partial<{
-    datalist: string[]
-}>) => {
-    return new Promise<string|null>((res) => {
+export const prompt = (
+    message: string,
+    options?: Partial<{
+        datalist: string[];
+    }>
+) => {
+    return new Promise<string | null>(res => {
         const div = create(`
             <div class="modal fade" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
             <div class="modal-dialog">
@@ -139,7 +141,7 @@ export const prompt = (message: string, options?: Partial<{
 
         if (options?.datalist) {
             const datalist = create(`<datalist id="datalist"></datalist>`);
-            options.datalist.forEach((item) => {
+            options.datalist.forEach(item => {
                 const option = create(`<option value="${item}"></option>`);
                 datalist.append(option);
             });
@@ -147,7 +149,7 @@ export const prompt = (message: string, options?: Partial<{
             input.after(datalist);
         }
 
-        input.addEventListener('keyup', (e) => {
+        input.addEventListener('keyup', e => {
             switch (e.key) {
                 case 'Enter':
                     resolve(input.value);
@@ -161,7 +163,7 @@ export const prompt = (message: string, options?: Partial<{
         });
 
         let resolved = false;
-        const resolve = (data: string|null) => {
+        const resolve = (data: string | null) => {
             if (resolved) return;
             resolved = true;
             res(data);
@@ -193,8 +195,11 @@ export const prompt = (message: string, options?: Partial<{
  * @param {string[]} options
  * @returns {Promise<number|null>}
  */
-export const select = (message: string, options: string[]): Promise<number|null> => {
-    return new Promise<number|null>((res) => {
+export const select = (
+    message: string,
+    options: string[]
+): Promise<number | null> => {
+    return new Promise<number | null>(res => {
         const div = create(`
             <div class="modal fade" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
             <div class="modal-dialog">
@@ -230,7 +235,7 @@ export const select = (message: string, options: string[]): Promise<number|null>
         select.focus();
 
         let resolved = false;
-        const resolve = (data: number|null) => {
+        const resolve = (data: number | null) => {
             if (resolved) return;
             resolved = true;
             res(data);
@@ -263,8 +268,12 @@ export const select = (message: string, options: string[]): Promise<number|null>
  * @param {string} b
  * @returns {Promise<string|null>}
  */
-export const choose = (message: string, a: string, b: string): Promise<string|null> => {
-    return new Promise<string|null>((res) => {
+export const choose = (
+    message: string,
+    a: string,
+    b: string
+): Promise<string | null> => {
+    return new Promise<string | null>(res => {
         const div = create(`
             <div class="modal fade" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
             <div class="modal-dialog">
@@ -281,13 +290,13 @@ export const choose = (message: string, a: string, b: string): Promise<string|nu
                     <button type="button" class="btn btn-secondary b" data-bs-dismiss="modal">${b}</button>
                 </div>
                 `);
-        
+
         document.body.append(div);
 
         const modal = new bootstrap.Modal(div);
 
         let resolved = false;
-        const resolve = (data: string|null) => {
+        const resolve = (data: string | null) => {
             if (resolved) return;
             resolved = true;
             res(data);
@@ -310,4 +319,4 @@ export const choose = (message: string, a: string, b: string): Promise<string|nu
 
         modal.show();
     });
-}
+};
