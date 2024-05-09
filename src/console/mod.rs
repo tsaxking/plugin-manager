@@ -127,7 +127,13 @@ fn evaluate(input: AstNode) -> String {
         AstNode::Help => {
             let mut output = String::new();
             output.push_str("\nAvailable commands: \n");
-            for cmd in ["help", "greet", "toggle_playback", "save <filename", "load <filename>"] {
+            for cmd in [
+                "help",
+                "greet",
+                "toggle_playback",
+                "save <filename",
+                "load <filename>",
+            ] {
                 let text = format!(":: {}\n", cmd);
                 output.push_str(&text);
             }
