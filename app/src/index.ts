@@ -16,6 +16,7 @@ import interact from 'interactjs';
 import { RackItem } from './model/rack-item';
 import { Point } from './utils/calcs/linear-algebra/point';
 import { Rack } from './model/state';
+import { sleep } from './utils/sleep';
 
 const rack = new Rack();
 
@@ -25,6 +26,27 @@ new Index({
         rack,
     },
 });
+
+let stop = () => {};
+const FPS = 30;
+
+const loop = (() => {
+    let animating = false;
+    const doLoop = (fn: () => void) => {
+        const stop = () => (animating = false);
+        if (animating) return stop;
+        animating = true;
+        const run = async () => {
+            if (!animating) return;
+            fn();
+            await sleep(1000 / FPS);
+            requestAnimationFrame(run);
+        };
+        requestAnimationFrame(run);
+        return stop;
+    };
+    return doLoop;
+})();
 
 interact('.rack-item').draggable({
     // inertia: true,
@@ -41,8 +63,10 @@ interact('.rack-item').draggable({
             const prevX = parseFloat(target.getAttribute('data-x') || '0');
             const prevY = parseFloat(target.getAttribute('data-y') || '0');
             let x: number =
+                // const x: number =
                 parseFloat(target.getAttribute('data-x') || '0') + event.dx;
             let y: number =
+                // const y: number =
                 parseFloat(target.getAttribute('data-y') || '0') + event.dy;
 
             // for some reason, the y value jumps 380px on the last event
@@ -56,48 +80,46 @@ interact('.rack-item').draggable({
                 y = prevY;
             }
 
-            // console.log({ x, y, prevX, prevY });
-
-            target.style.transform = `translate(${x}px, ${y}px)`;
+            // target.style.transform = `translate(${x}px, ${y}px)`;
 
             target.setAttribute('data-x', `${x}`);
             target.setAttribute('data-y', `${y}`);
 
-            const id = event.target.id.split('_')[1];
-            const item = rack.items.find(i => i.id === id);
-            if (item) {
-                const cables = Cable.fromRackItem(item);
-                for (const i in cables) {
-                    const c = cables[i];
-                    const delta = new Point(event.dx, event.dy);
-                    if (Object.is(c.input.rackItem, item)) {
-                        if (
-                            cables.filter(
-                                (_c, _i) =>
-                                    Object.is(_c.input.point, c.input.point) &&
-                                    _i > +i
-                            ).length === 0
-                        ) {
-                            c.input.point = c.input.point.add(delta);
-                        }
-                    }
-                    if (Object.is(c.output.rackItem, item)) {
-                        if (
-                            cables.filter(
-                                (_c, _i) =>
-                                    Object.is(
-                                        _c.output.point,
-                                        c.output.point
-                                    ) && _i > +i
-                            ).length === 0
-                        ) {
-                            c.output.point = c.output.point.add(delta);
-                        }
-                    }
-                    c.build();
-                }
-                Cable.view(rack.items, false);
-            }
+            // const id = event.target.id.split('_')[1];
+            // const item = rack.items.find(i => i.id === id);
+            // if (item) {
+            //     const cables = Cable.fromRackItem(item);
+            //     for (const i in cables) {
+            //         const c = cables[i];
+            //         const delta = new Point(event.dx, event.dy);
+            //         if (Object.is(c.input.rackItem, item)) {
+            //             if (
+            //                 cables.filter(
+            //                     (_c, _i) =>
+            //                         Object.is(_c.input.point, c.input.point) &&
+            //                         _i > +i
+            //                 ).length === 0
+            //             ) {
+            //                 c.input.point = c.input.point.add(delta);
+            //             }
+            //         }
+            //         if (Object.is(c.output.rackItem, item)) {
+            //             if (
+            //                 cables.filter(
+            //                     (_c, _i) =>
+            //                         Object.is(
+            //                             _c.output.point,
+            //                             c.output.point
+            //                         ) && _i > +i
+            //                 ).length === 0
+            //             ) {
+            //                 c.output.point = c.output.point.add(delta);
+            //             }
+            //         }
+            //         c.build();
+            //     }
+            //     Cable.view(rack.items, false);
+            // }
         },
         end: event => {
             const target: HTMLDivElement = event.target;
@@ -142,6 +164,8 @@ interact('.rack-item').draggable({
 
             target.style.transform = `translate(0px, 0px)`;
             Cable.view(rack.items, true);
+
+            stop();
         },
         start: event => {
             const target: HTMLDivElement = event.target;
@@ -152,10 +176,58 @@ interact('.rack-item').draggable({
             const centerX = rect.left + rect.width / 2;
             const centerY = rect.top + rect.height / 2;
 
-            target.setAttribute('data-x', '0');
-            target.setAttribute('data-y', '0');
-            target.setAttribute('data-start-x', `${centerX}`);
-            target.setAttribute('data-start-y', `${centerY}`);
+            const center = new Point(centerX, centerY);
+
+            const id = event.target.id.split('_')[1];
+            const item = rack.items.find(i => i.id === id);
+
+            // let prev = new Point(centerX, centerY);
+            stop = loop(() => {
+                const dx = parseFloat(target.getAttribute('data-x') || '0');
+                const dy = parseFloat(target.getAttribute('data-y') || '0');
+                const delta = new Point(dx, dy);
+                // prev = new Point(
+                //     dx,
+                //     dy
+                // );
+
+                target.style.transform = `translate(${delta.x}px, ${delta.y}px)`;
+                // const x = centerX + dx;
+                // const y = centerY + dy;
+                if (item) {
+                    const cables = Cable.fromRackItem(item);
+                    for (const i in cables) {
+                        const c = cables[i];
+                        if (Object.is(c.input.rackItem, item)) {
+                            if (
+                                cables.filter(
+                                    (_c, _i) =>
+                                        Object.is(
+                                            _c.input.point,
+                                            c.input.point
+                                        ) && _i > +i
+                                ).length === 0
+                            ) {
+                                c.input.point = c.input.update().add(delta);
+                            }
+                        }
+                        if (Object.is(c.output.rackItem, item)) {
+                            if (
+                                cables.filter(
+                                    (_c, _i) =>
+                                        Object.is(
+                                            _c.output.point,
+                                            c.output.point
+                                        ) && _i > +i
+                                ).length === 0
+                            ) {
+                                c.output.point = c.output.update().add(delta);
+                            }
+                        }
+                        c.build();
+                    }
+                }
+            });
         },
     },
 });

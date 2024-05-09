@@ -118,5 +118,5 @@ export const contextmenu = (
         document.addEventListener('click', rm);
     };
 
-    target.addEventListener('contextmenu', fn);
+    // target.addEventListener('contextmenu', fn);
 };
