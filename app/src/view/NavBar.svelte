@@ -35,10 +35,10 @@ const dropdowns: Dropdown[] = [
             },
             {
                 title: 'Stop',
-                action: () => rack.stop()
-            }
-        ]
-    }
+                action: () => rack.stop(),
+            },
+        ],
+    },
 ];
 
 const replace = (str: string, obj: Record<string, string>): string => {

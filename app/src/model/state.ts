@@ -125,17 +125,8 @@ export class Rack {
         return generated;
     }
 
-
-
-
-
-
     // These are temporary methods to be used for testing purposes
-    play() {
+    play() {}
 
-    }
-
-    stop() {
-
-    }
+    stop() {}
 }
