@@ -96,6 +96,7 @@ mod tests {
         let filename = "./save_file.json";
         let full_path = base_dir.join(filename).to_str().unwrap().to_string();
         save(full_path.clone()).unwrap();
+        eprintln!("{:?}", std::fs::read_to_string(&full_path));
         load(full_path).unwrap();
     }
 }
