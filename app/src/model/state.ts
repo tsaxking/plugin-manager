@@ -143,11 +143,7 @@ export class Rack {
 
 
     // These are temporary methods to be used for testing purposes
-    play() {
-        invoke('toggle_playback');
-    }
-
-    stop() {
+    toggle() {
         invoke('toggle_playback');
     }
 }

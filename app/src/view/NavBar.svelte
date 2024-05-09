@@ -30,12 +30,8 @@ const dropdowns: Dropdown[] = [
         title: 'Actions',
         dropdown: [
             {
-                title: 'Play',
-                action: () => rack.play(),
-            },
-            {
-                title: 'Stop',
-                action: () => rack.stop()
+                title: 'Toggle',
+                action: () => rack.toggle(),
             }
         ]
     }
