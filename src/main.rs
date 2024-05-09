@@ -2,7 +2,6 @@ use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
 use fundsp::hacker::*;
 use plugin_manager::commands;
 use std::io::Write;
-use std::os::fd::{AsRawFd, FromRawFd};
 use std::sync::mpsc;
 use std::thread;
 
@@ -17,7 +16,6 @@ fn main() -> anyhow::Result<()> {
 
     let (tx, rx): (mpsc::Sender<usize>, mpsc::Receiver<usize>) = mpsc::channel();
     plugin_manager::init_play_tx(tx);
-    let stdout = std::io::stdout().as_raw_fd();
 
     let thread_handles = [
         // Audio Thread
@@ -43,13 +41,13 @@ fn main() -> anyhow::Result<()> {
         }),
         // CLI thread
         thread::spawn(move || {
-            let mut stdout = unsafe { std::fs::File::from_raw_fd(stdout) };
-
+            let mut stdout = std::io::stdout();
             loop {
                 use plugin_manager::console;
 
                 let mut buf: String = Default::default();
                 write!(stdout, "❯ ").unwrap();
+                stdout.flush().unwrap();
                 std::io::stdin().read_line(&mut buf).unwrap();
                 let response = console::read_command(&buf);
                 writeln!(stdout, "{}", response).unwrap();
