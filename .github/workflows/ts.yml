@@ -4,17 +4,17 @@ on:
     push:
         branches: [main]
         paths:
-          - 'app/**'
-          - 'package.json'
-          - 'package-lock.json'
-          - 'scripts/**'
+            - 'app/**'
+            - 'package.json'
+            - 'package-lock.json'
+            - 'scripts/**'
     pull_request:
         branches: [main]
         paths:
-          - 'app/**'
-          - 'package.json'
-          - 'package-lock.json'
-          - 'scripts/**'
+            - 'app/**'
+            - 'package.json'
+            - 'package-lock.json'
+            - 'scripts/**'
 
 jobs:
     prettier_check:
@@ -56,25 +56,25 @@ jobs:
               run: npx eslint **/*.ts --fix
 
     typescript_check:
-      name: TypeScript
-      runs-on: ubuntu-latest
-      timeout-minutes: 5
-      steps:
-          - name: Checkout sources
-            uses: actions/checkout@v4
-          - name: Setup Node.js
-            uses: actions/setup-node@v4
-            with:
-                node-version: v20.4
+        name: TypeScript
+        runs-on: ubuntu-latest
+        timeout-minutes: 5
+        steps:
+            - name: Checkout sources
+              uses: actions/checkout@v4
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: v20.4
 
-          - name: Install all dependencies
-            run: |
-                npm i
+            - name: Install all dependencies
+              run: |
+                  npm i
 
-          - name: Run ESLint
-            run: tsc
+            - name: Run ESLint
+              run: tsc
 
-    build: 
+    build:
         name: Build
         runs-on: ubuntu-latest
         timeout-minutes: 5
