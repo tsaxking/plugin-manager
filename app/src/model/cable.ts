@@ -1,9 +1,10 @@
-import { getCatenaryPathSVG } from '../utils/calcs/linear-algebra/catenary';
+// import { getCatenaryPathSVG } from '../utils/calcs/linear-algebra/catenary';
 import { Input, Output } from './io';
 import { RackItem } from './rack-item';
 import { colors } from './rack-item';
 import { EventEmitter } from '../utils/event-emitter';
 import { Rack } from './state';
+import { Vector } from '../utils/calcs/linear-algebra/vector';
 
 type Events = {
     change: Input | Output | null;
@@ -115,21 +116,24 @@ export class Cable {
     }
 
     build() {
-        this.svg.innerHTML = ''; // clear the svg
-        const pathStr = getCatenaryPathSVG(
-            this.input.point,
-            this.output.point,
-            0.75
-        );
-        const path = document.createElementNS(
-            'http://www.w3.org/2000/svg',
-            'path'
-        );
-        path.setAttribute('d', pathStr);
-        path.style.stroke = colors[this.type].toString();
-        path.style.strokeWidth = '5';
-        path.style.fill = 'none';
-        this.svg.appendChild(path);
+        let path = this.svg.querySelector('path');
+        if (!path) {
+            path = document.createElementNS(
+                'http://www.w3.org/2000/svg',
+                'path'
+            );
+            this.svg.appendChild(path);
+            path.style.stroke = colors[this.type].toString();
+            path.style.strokeWidth = '3';
+            path.style.fill = 'none';
+        }
+
+        const from = this.output.point;
+        const to = this.input.point;
+
+        const line = `M ${from.x} ${from.y} L ${to.x} ${to.y}`;
+
+        path.setAttribute('d', line);
         return this.svg;
     }
 }
