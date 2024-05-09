@@ -40,6 +40,7 @@ fn main() -> anyhow::Result<()> {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
             commands::get_effects_state,
+            commands::toggle_playback,
             commands::save_load::save,
             commands::save_load::load,
         ])
