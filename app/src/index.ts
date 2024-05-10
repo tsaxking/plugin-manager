@@ -281,7 +281,7 @@ reverb.io.audio.outputs[0].connect(output.io.audio.inputs[0]);
 reverb.io.audio.outputs[1].connect(output.io.audio.inputs[1]);
 
 IO.on('change', () => Cable.view(rack.items, true));
-RackItem.on('display', () => Cable.view(rack.items, true));
+Rack.on('display', () => Cable.view(rack.items, true));
 RackItem.on('move', () => Cable.view(rack.items, true));
 RackItem.on('destroy', () => Cable.view(rack.items, true));
 Cable.view(rack.items, true);

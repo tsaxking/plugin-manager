@@ -1,15 +1,35 @@
 import { Point2D } from '../utils/calcs/linear-algebra/point';
+import { EventEmitter } from '../utils/event-emitter';
 import { io } from './io';
 import { RackItem } from './rack-item';
 
+type Events = {
+    'display': 'io' | 'control';
+    'perform': boolean;
+}
+
 export class Rack {
+    private static readonly emitter = new EventEmitter<keyof Events>();
+
+    public static on<K extends keyof Events>(event: K, listener: (data: Events[K]) => void) {
+        Rack.emitter.on(event, listener);
+    }
+
+    public static off<K extends keyof Events>(event: K, listener: (data: Events[K]) => void) {
+        Rack.emitter.off(event, listener);
+    }
+
+    private static emit<K extends keyof Events>(event: K, data: Events[K]) {
+        Rack.emitter.emit(event, data);
+    }
+
     private static _display: 'io' | 'control' = 'io';
     public static get display() {
         return this._display;
     }
     public static set display(value: 'io' | 'control') {
         this._display = value;
-        RackItem.emit('display', value);
+        Rack.emit('display', value);
     }
     public performing = false;
 
@@ -59,9 +79,11 @@ export class Rack {
     perform() {
         this.performing = !this.performing;
         if (this.performing) {
-            console.log('Start');
+            console.log('Started performance mode');
+            Rack.emit('perform', true);
         } else {
-            console.log('Stop');
+            console.log('Stopped performance mode');
+            Rack.emit('perform', false);
         }
         return this.performing;
     }
