@@ -1,49 +1,75 @@
 <script lang="ts">
+import { onMount } from 'svelte';
 import { Rack } from '../model/state';
 
-export let display: 'io' | 'control' = 'io';
+export let display: 'io' | 'control' = Rack.display;
 export let rack: Rack;
-let performing = false;
+
+let performing = rack.performing;
 
 type Dropdown = {
     title: string;
     dropdown: { title: string; action: () => void }[];
 };
 
-const dropdowns: Dropdown[] = [
-    {
-        title: 'File',
-        dropdown: [
-            { title: 'Save', action: () => rack.save() },
-            { title: 'Load', action: () => rack.load() },
-            { title: ':perform', action: () => (performing = rack.perform()) },
-        ],
-    },
-    {
-        title: 'Rack (:display)',
-        dropdown: [
-            { title: 'IO', action: () => (display = 'io') },
-            { title: 'Control', action: () => (display = 'control') },
-        ],
-    },
-    {
-        title: 'Actions',
-        dropdown: [
-            {
-                title: 'Play',
-                action: () => rack.play(),
-            },
-            {
-                title: 'Stop',
-                action: () => rack.stop(),
-            },
-        ],
-    },
-];
+let dropdowns: Dropdown[] = [];
 
-const replace = (str: string, obj: Record<string, string>): string => {
-    return str.replace(/:(\w+)/g, (match, key) => obj[key] || match);
+const setDropdowns = () => {
+    dropdowns = [
+        {
+            title: 'File',
+            dropdown: [
+                { title: 'Save', action: () => rack.save() },
+                { title: 'Load', action: () => rack.load() },
+            ],
+        },
+        {
+            title: 'Rack',
+            dropdown: [
+                {
+                    title: display === 'io' ? 'Control' : 'IO',
+                    action: () => {
+                        Rack.display = display === 'io' ? 'control' : 'io';
+                    },
+                },
+                {
+                    title: performing
+                        ? 'Stop Performance Mode'
+                        : 'Start Performance Mode',
+                    action: () => rack.perform(),
+                },
+            ],
+        },
+        {
+            title: 'Actions',
+            dropdown: [
+                {
+                    title: 'Play',
+                    action: () => rack.play(),
+                },
+                {
+                    title: 'Stop',
+                    action: () => rack.stop(),
+                },
+            ],
+        },
+    ];
 };
+
+onMount(() => {
+    setDropdowns();
+    return () => {};
+});
+
+Rack.on('display', () => {
+    display = Rack.display;
+    setDropdowns();
+});
+
+Rack.on('perform', p => {
+    performing = rack.performing;
+    setDropdowns();
+});
 </script>
 
 <nav class="nav">
@@ -55,17 +81,18 @@ const replace = (str: string, obj: Record<string, string>): string => {
                     type="button"
                     data-bs-toggle="dropdown"
                     aria-expanded="false"
+                    href="#"
+                    on:click|preventDefault
                 >
-                    {replace(dropdown.title, { display })}
+                    {dropdown.title}
                 </a>
                 <ul class="dropdown-menu">
                     {#each dropdown.dropdown as item, j}
                         <li>
-                            <a class="dropdown-item" on:click="{item.action}"
-                                >{replace(item.title, {
-                                    display,
-                                    perform: performing ? 'Stop' : 'Start',
-                                })}</a
+                            <a
+                                class="dropdown-item"
+                                on:click|preventDefault="{item.action}"
+                                href="#">{item.title}</a
                             >
                         </li>
                     {/each}
