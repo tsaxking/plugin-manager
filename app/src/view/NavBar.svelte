@@ -7,7 +7,6 @@ export let rack: Rack;
 
 let performing = rack.performing;
 
-
 type Dropdown = {
     title: string;
     dropdown: { title: string; action: () => void }[];
@@ -17,56 +16,57 @@ let dropdowns: Dropdown[] = [];
 
 const setDropdowns = () => {
     dropdowns = [
-    {
-        title: 'File',
-        dropdown: [
-            { title: 'Save', action: () => rack.save() },
-            { title: 'Load', action: () => rack.load() },
-        ],
-    },
-    {
-        title: 'Rack',
-        dropdown: [
-            {
-                title: display === 'io' ? 'Control' : 'IO',
-                action: () => {
-                    Rack.display = display === 'io' ? 'control' : 'io';
-                }
-            },
-            {
-                title: performing ? 'Stop Performance Mode' : 'Start Performance Mode',
-                action: () => rack.perform()
-             },
-        ],
-    },
-    {
-        title: 'Actions',
-        dropdown: [
-            {
-                title: 'Play',
-                action: () => rack.play(),
-            },
-            {
-                title: 'Stop',
-                action: () => rack.stop(),
-            },
-        ],
-    },
-];
-}
+        {
+            title: 'File',
+            dropdown: [
+                { title: 'Save', action: () => rack.save() },
+                { title: 'Load', action: () => rack.load() },
+            ],
+        },
+        {
+            title: 'Rack',
+            dropdown: [
+                {
+                    title: display === 'io' ? 'Control' : 'IO',
+                    action: () => {
+                        Rack.display = display === 'io' ? 'control' : 'io';
+                    },
+                },
+                {
+                    title: performing
+                        ? 'Stop Performance Mode'
+                        : 'Start Performance Mode',
+                    action: () => rack.perform(),
+                },
+            ],
+        },
+        {
+            title: 'Actions',
+            dropdown: [
+                {
+                    title: 'Play',
+                    action: () => rack.play(),
+                },
+                {
+                    title: 'Stop',
+                    action: () => rack.stop(),
+                },
+            ],
+        },
+    ];
+};
 
 onMount(() => {
     setDropdowns();
-    return () => {}
-})
-
+    return () => {};
+});
 
 Rack.on('display', () => {
     display = Rack.display;
     setDropdowns();
 });
 
-Rack.on('perform', (p) => {
+Rack.on('perform', p => {
     performing = rack.performing;
     setDropdowns();
 });
@@ -89,9 +89,10 @@ Rack.on('perform', (p) => {
                 <ul class="dropdown-menu">
                     {#each dropdown.dropdown as item, j}
                         <li>
-                            <a class="dropdown-item" on:click|preventDefault="{item.action}"
-                                href="#"
-                                >{item.title}</a
+                            <a
+                                class="dropdown-item"
+                                on:click|preventDefault="{item.action}"
+                                href="#">{item.title}</a
                             >
                         </li>
                     {/each}

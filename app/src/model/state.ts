@@ -4,18 +4,24 @@ import { io } from './io';
 import { RackItem } from './rack-item';
 
 type Events = {
-    'display': 'io' | 'control';
-    'perform': boolean;
-}
+    display: 'io' | 'control';
+    perform: boolean;
+};
 
 export class Rack {
     private static readonly emitter = new EventEmitter<keyof Events>();
 
-    public static on<K extends keyof Events>(event: K, listener: (data: Events[K]) => void) {
+    public static on<K extends keyof Events>(
+        event: K,
+        listener: (data: Events[K]) => void
+    ) {
         Rack.emitter.on(event, listener);
     }
 
-    public static off<K extends keyof Events>(event: K, listener: (data: Events[K]) => void) {
+    public static off<K extends keyof Events>(
+        event: K,
+        listener: (data: Events[K]) => void
+    ) {
         Rack.emitter.off(event, listener);
     }
 
