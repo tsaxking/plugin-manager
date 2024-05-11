@@ -37,7 +37,7 @@ jobs:
             - name: Install cargo-nextest
               run: curl -LsSf https://get.nexte.st/latest/linux | tar zxf - -C ${CARGO_HOME:-~/.cargo}/bin
             - name: Run Tests
-              run: cargo-nextest nextest run && cargo t --doc
+              run: cargo-nextest nextest run  --all&& cargo t --doc --all
 
     # Run cargo clippy -- -D warnings
     clippy_check:
@@ -53,8 +53,10 @@ jobs:
               uses: Swatinem/rust-cache@v2
               with:
                   key: ${{ runner.os }}-cargo-test-${{ hashFiles('**/Cargo.toml') }}
-            - name: Run clippy
-              run: cargo clippy -- -D warnings
+            - name: Run clippy (ruckus_lib)
+              run: cargo clippy --manifest-path ruckus_lib/Cargo.toml-- -D warnings
+            - name: Run clippy (ruckus)
+              run: cargo clippy --manifest-path ruckus/Cargo.toml-- -D warnings
 
     # Run cargo fmt --all -- --check
     format:

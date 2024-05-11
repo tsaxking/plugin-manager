@@ -1,12 +1,12 @@
 use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
 use fundsp::hacker::*;
-use plugin_manager::commands;
+use ruckus_lib::commands;
 use std::io::Write;
 use std::sync::mpsc;
 use std::thread;
 
 fn main() -> anyhow::Result<()> {
-    plugin_manager::init_app_state(vec![]);
+    ruckus_lib::init_app_state(vec![]);
 
     let host = cpal::default_host();
     let device = host
@@ -15,7 +15,7 @@ fn main() -> anyhow::Result<()> {
     let config = device.default_output_config().unwrap();
 
     let (tx, rx): (mpsc::Sender<usize>, mpsc::Receiver<usize>) = mpsc::channel();
-    plugin_manager::init_play_tx(tx);
+    ruckus_lib::init_play_tx(tx);
 
     let thread_handles = [
         // Audio Thread
@@ -42,7 +42,7 @@ fn main() -> anyhow::Result<()> {
         // CLI thread
         #[cfg(debug_assertions)]
         thread::spawn(move || {
-            use plugin_manager::console;
+            use ruckus_lib::console;
             let mut stdout = std::io::stdout();
             let cli = console::commands();
             loop {

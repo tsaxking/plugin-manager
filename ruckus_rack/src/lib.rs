@@ -1,17 +1,8 @@
-#![warn(clippy::all)]
-#![warn(clippy::cargo)]
-#![warn(unsafe_code)]
-#![allow(clippy::needless_return, clippy::multiple_crate_versions)]
-
-#[cfg(test)]
-mod dev;
-
 #[cfg(debug_assertions)]
-pub mod console;
-
-pub mod commands;
+pub mod dev;
 
 use std::sync;
+
 
 pub static APP_STATE: sync::OnceLock<sync::RwLock<AppState>> = sync::OnceLock::new();
 pub static PLAY_TX: sync::OnceLock<sync::Mutex<sync::mpsc::Sender<usize>>> =
@@ -33,38 +24,50 @@ pub enum AppStateError {
     },
 }
 
-type AppState = Vec<RackItem>;
+pub type AppState = Vec<RackItem>;
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct RackItem {
-    id: String,
-    note: String,
-    point: (u8, u8),
-    width: u8,
-    color: String,
-    title: String,
-    io: Io,
-    routing: Routing,
+    pub id: String,
+    pub note: String,
+    pub point: (u8, u8),
+    pub width: u8,
+    pub color: String,
+    pub title: String,
+    pub io: Io,
+    pub routing: Routing,
 }
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct Io {
-    audio: IoInner,
-    midi: IoInner,
-    control: IoInner,
+    pub audio: IoInner,
+    pub midi: IoInner,
+    pub control: IoInner,
 }
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct IoInner {
-    input: Vec<String>,
-    output: Vec<String>,
+    pub input: Vec<String>,
+    pub output: Vec<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct Routing {
-    audio: Vec<String>,
-    midi: Vec<String>,
-    control: Vec<String>,
+    pub audio: Vec<String>,
+    pub midi: Vec<String>,
+    pub control: Vec<String>,
+}
+
+pub fn init_app_state(state: AppState) {
+    APP_STATE
+        .set(sync::RwLock::new(state))
+        .expect("Critical Error: Could not set APP_STATE");
+}
+
+pub fn init_play_tx(tx: sync::mpsc::Sender<usize>) {
+    PLAY_TX
+        .set(sync::Mutex::new(tx))
+        .expect("Critical Error: Could not set PLAY_TX");
 }
 
 mod tests {
@@ -126,16 +129,4 @@ mod tests {
         let expected = crate::dev::test_state_schema::get();
         assert_eq!(actual, expected);
     }
-}
-
-pub fn init_app_state(state: AppState) {
-    APP_STATE
-        .set(sync::RwLock::new(state))
-        .expect("Critical Error: Could not set APP_STATE");
-}
-
-pub fn init_play_tx(tx: sync::mpsc::Sender<usize>) {
-    PLAY_TX
-        .set(sync::Mutex::new(tx))
-        .expect("Critical Error: Could not set PLAY_TX");
 }
