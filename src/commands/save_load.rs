@@ -51,7 +51,9 @@ pub fn save(filename: String) -> Result<(), SaveError> {
     };
 
     let Ok(guard) = rw_lock.read() else {
-        return Err(SaveError::AppStateError(ruckus_rack::AppStateError::Poisoned));
+        return Err(SaveError::AppStateError(
+            ruckus_rack::AppStateError::Poisoned,
+        ));
     };
     let json = serde_json::to_string(&guard.to_vec())?;
     fs::write(file_path, json)?;
@@ -69,7 +71,9 @@ pub fn load(filename: String) -> Result<(), LoadError> {
         ));
     };
     let Ok(mut guard) = rw_lock.write() else {
-        return Err(LoadError::AppStateError(ruckus_rack::AppStateError::Poisoned));
+        return Err(LoadError::AppStateError(
+            ruckus_rack::AppStateError::Poisoned,
+        ));
     };
     *guard = state;
 
