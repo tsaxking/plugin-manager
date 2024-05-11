@@ -1,5 +1,5 @@
 [package]
-name = "ruckus_lib"
+name = "ruckus"
 version = "0.1.0"
 edition = "2021"
 

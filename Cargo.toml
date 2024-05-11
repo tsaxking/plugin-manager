@@ -1,11 +1,10 @@
 [workspace]
 resolver = "2"
 members = [
-    "ruckus",
-    "ruckus_lib",
-    "ruckus_rack",
+    "ruckus_app",
+    "crates/*",
 ]
 default-members = [
-    "ruckus",
+    "ruckus_app",
 ]
 
