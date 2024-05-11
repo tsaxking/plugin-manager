@@ -21,8 +21,9 @@ impl Cli {
     }
 
     pub fn run(&self, string: &String) -> Option<String> {
-        let regex = Regex::new(r#"\s+(?=([^"]*"[^"]*")*[^"]*$)"#).expect("Invalid Regex");
-        let mut split = regex.split(string);
+        // let regex = Regex::new(r#"\s+(?=([^"]*"[^"]*")*[^"]*$)"#).expect("Invalid Regex");
+        // let mut split = regex.split(string);
+        let mut split = string.split_whitespace();
 
         let cmd: &str = split.next()?;
         let args: Vec<&str> = split.collect();
