@@ -10,4 +10,4 @@ serde_json = "1.0.117"
 thiserror = "1.0.60"
 
 [lib]
-crate-type = ["rlib", "dylib"]
+crate-type = ["dylib"]
