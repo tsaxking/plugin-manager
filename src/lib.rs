@@ -6,7 +6,6 @@
 #[cfg(test)]
 mod dev;
 
-
 #[cfg(debug_assertions)]
 pub mod console;
 
