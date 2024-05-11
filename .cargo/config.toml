@@ -1,5 +1,2 @@
 [alias]
 lint = "clippy --manifest-path Cargo.toml -- -D warnings"
-
-[build]
-rustflags = ["-C", "prefer-dynamic"]
