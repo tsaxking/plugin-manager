@@ -1,5 +1,5 @@
 [package]
-name = "ruckus_rack"
+name = "pm_rack"
 version = "0.1.0"
 edition = "2021"
 

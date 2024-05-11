@@ -2284,6 +2284,33 @@ dependencies = [
 ]
 
 [[package]]
+name = "pm"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "cpal",
+ "diff",
+ "fundsp",
+ "pm_rack",
+ "serde",
+ "serde_json",
+ "serde_path_to_error",
+ "tauri",
+ "tauri-build",
+ "thiserror",
+]
+
+[[package]]
+name = "pm_rack"
+version = "0.1.0"
+dependencies = [
+ "fundsp",
+ "serde",
+ "serde_json",
+ "thiserror",
+]
+
+[[package]]
 name = "png"
 version = "0.17.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2573,33 +2600,6 @@ name = "rsor"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "501026fd03b73546d8327e45399bce64785a15ed1dd7662ef92d3460d963bf18"
-
-[[package]]
-name = "ruckus"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "cpal",
- "diff",
- "fundsp",
- "ruckus_rack",
- "serde",
- "serde_json",
- "serde_path_to_error",
- "tauri",
- "tauri-build",
- "thiserror",
-]
-
-[[package]]
-name = "ruckus_rack"
-version = "0.1.0"
-dependencies = [
- "fundsp",
- "serde",
- "serde_json",
- "thiserror",
-]
 
 [[package]]
 name = "rustc-demangle"

@@ -8,5 +8,5 @@ pub mod console;
 pub mod commands;
 
 pub mod rack {
-    pub use ruckus_rack::*;
+    pub use pm_rack::*;
 }

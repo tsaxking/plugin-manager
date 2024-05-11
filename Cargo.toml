@@ -5,14 +5,14 @@ members = [
 ]
 
 [package]
-name = "ruckus"
+name = "pm"
 version = "0.1.0"
 edition = "2021"
 license = "Copyright"
 repository = "https://github.com/tsaxking/plugin-manager"
 
 [dependencies]
-ruckus_rack = { path = "./crates/ruckus_rack" }
+pm_rack = { path = "./crates/pm_rack" }
 anyhow = "1.0.83"
 cpal = "0.15.3"
 fundsp = "0.17.1"
