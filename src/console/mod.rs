@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use regex::Regex;
 
 type F = &'static dyn Fn(Vec<&str>) -> String;
 
