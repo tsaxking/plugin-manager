@@ -3,7 +3,6 @@ pub mod dev;
 
 use std::sync;
 
-
 pub static APP_STATE: sync::OnceLock<sync::RwLock<AppState>> = sync::OnceLock::new();
 pub static PLAY_TX: sync::OnceLock<sync::Mutex<sync::mpsc::Sender<usize>>> =
     sync::OnceLock::new();

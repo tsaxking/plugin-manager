@@ -7,6 +7,6 @@ pub mod console;
 
 pub mod commands;
 
-pub use ruckus_rack::*;
-
-
+pub mod rack {
+    pub use ruckus_rack::*;
+}
