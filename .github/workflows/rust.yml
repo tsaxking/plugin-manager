@@ -37,7 +37,7 @@ jobs:
             - name: Install cargo-nextest
               run: curl -LsSf https://get.nexte.st/latest/linux | tar zxf - -C ${CARGO_HOME:-~/.cargo}/bin
             - name: Run Tests
-              run: cargo-nextest nextest run  --all && cargo t --doc --all
+              run: RUSTFLAGS="-C prefer-dynamic" cargo-nextest nextest run  --all && cargo t --doc --all
 
     # Run cargo clippy -- -D warnings
     clippy_check:
