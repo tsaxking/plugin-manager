@@ -37,7 +37,7 @@ jobs:
             - name: Install cargo-nextest
               run: curl -LsSf https://get.nexte.st/latest/linux | tar zxf - -C ${CARGO_HOME:-~/.cargo}/bin
             - name: Run Tests
-              run: cargo-nextest nextest run && cargo t --doc
+              run: cargo-nextest nextest run  --all && cargo t --doc --all
 
     # Run cargo clippy -- -D warnings
     clippy_check:
@@ -54,7 +54,7 @@ jobs:
               with:
                   key: ${{ runner.os }}-cargo-test-${{ hashFiles('**/Cargo.toml') }}
             - name: Run clippy
-              run: cargo clippy -- -D warnings
+              run: cargo lint
 
     # Run cargo fmt --all -- --check
     format:

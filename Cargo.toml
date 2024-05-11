@@ -1,14 +1,18 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/*",
+]
+
 [package]
-name = "plugin_manager"
+name = "pm"
 version = "0.1.0"
 edition = "2021"
-description = "A program to manage live effects for performances"
 license = "Copyright"
 repository = "https://github.com/tsaxking/plugin-manager"
-keywords = ["Audio", "Effects", "Performance"]
-categories = ["multimedia"]
 
 [dependencies]
+pm_rack = { path = "./crates/pm_rack" }
 anyhow = "1.0.83"
 cpal = "0.15.3"
 fundsp = "0.17.1"
@@ -23,3 +27,4 @@ tauri-build = { version = "1.5.1", features = [] }
 [dev-dependencies]
 diff = "0.1.13"
 serde_path_to_error = "0.1.16"
+
