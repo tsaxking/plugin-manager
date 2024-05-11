@@ -41,15 +41,15 @@ fn main() -> anyhow::Result<()> {
         }),
         // CLI thread
         thread::spawn(move || {
+            use plugin_manager::console;
             let mut stdout = std::io::stdout();
+            let cli = console::commands();
             loop {
-                use plugin_manager::console;
-
                 let mut buf: String = Default::default();
                 write!(stdout, "❯ ").unwrap();
                 stdout.flush().unwrap();
                 std::io::stdin().read_line(&mut buf).unwrap();
-                let response = console::read_command(&buf);
+                let response = cli.run(&buf).unwrap_or(String::from("Did not receive valid command"));
                 writeln!(stdout, "{}", response).unwrap();
             }
         }),
