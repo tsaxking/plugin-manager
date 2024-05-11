@@ -40,6 +40,7 @@ fn main() -> anyhow::Result<()> {
             }
         }),
         // CLI thread
+        #[cfg(debug_assertions)]
         thread::spawn(move || {
             let mut stdout = std::io::stdout();
             loop {
