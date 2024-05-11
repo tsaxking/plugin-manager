@@ -1,173 +1,42 @@
-use std::{iter::Peekable, slice::Iter};
+use std::collections::HashMap;
 
-#[derive(Debug, PartialEq, Eq, Clone)]
-pub enum Token {
-    GreetToken,
-    TogglePlayback,
-    Save,
-    Load,
-    Help,
-    EOL,
-    String(String),
+type F = &'static dyn Fn(Vec<&str>) -> String;
+#[derive(Default)]
+pub struct Cli {
+    commands: HashMap<String, F>,
 }
 
-#[derive(Debug)]
-pub enum AstNode {
-    Greet,
-    TogglePlayback,
-    Save { path: String },
-    Load { path: String },
-    Help,
-    NoOp,
-    SyntaxError(String),
-}
-
-impl<'a> From<&'a str> for Token {
-    fn from(value: &'a str) -> Self {
-        match value {
-            "greet" => Token::GreetToken,
-            "toggle_playback" => Token::TogglePlayback,
-            "save" => Token::Save,
-            "load" => Token::Load,
-            "help" => Token::Help,
-            "\n" => Token::EOL,
-            _ => Token::String(value.to_string()),
+impl Cli {
+    pub fn new() -> Self {
+        Cli {
+            commands: HashMap::new(),
         }
     }
-}
 
-impl From<String> for Token {
-    fn from(value: String) -> Self {
-        match value.as_str() {
-            "greet" => Token::GreetToken,
-            "toggle_playback" => Token::TogglePlayback,
-            "save" => Token::Save,
-            "load" => Token::Load,
-            "help" => Token::Help,
-            "\n" => Token::EOL,
-            _ => Token::String(value),
-        }
+    pub fn add(mut self, name: String, f: F) -> Self {
+        self.commands.insert(name, f);
+        self
+    }
+
+    pub fn run(&self, string: &str) -> Option<String> {
+        // let regex = Regex::new(r#"\s+(?=([^"]*"[^"]*")*[^"]*$)"#).expect("Invalid Regex");
+        // let mut split = regex.split(string);
+        let mut split = string.split_whitespace();
+
+        let cmd: &str = split.next()?;
+        let args: Vec<&str> = split.collect();
+
+        let action = self.commands.get(cmd)?;
+        Some(action(args))
     }
 }
 
-fn lex(input: &str) -> Vec<Token> {
-    let mut input = input.chars().peekable();
-    let mut out = vec![];
-    while let Some(c) = input.peek() {
-        let token = match c {
-            &'"' => {
-                let mut lexeme = String::new();
-                input.next(); // pass over the "
-                while let Some(c) = input.peek() {
-                    if c == &'"' {
-                        input.next();
-                        break;
-                    }
-                    lexeme.push(*c);
-                    input.next();
-                }
-                Token::from(lexeme)
-            }
-            _ => {
-                let mut lexeme = String::new();
-                while let Some(c) = input.peek() {
-                    if c == &' ' || c == &';' || c == &'\n' {
-                        input.next();
-                        break;
-                    }
-                    lexeme.push(*c);
-                    input.next();
-                }
-                Token::from(lexeme)
-            }
-        };
-        out.push(token);
-    }
+pub fn commands() -> Cli {
+    let cli = Cli::new();
 
-    out
-}
-
-fn assert_peek<'a>(
-    input: &'a mut Peekable<Iter<'a, Token>>,
-    expected: Token,
-) -> Option<Token> {
-    if let Some(actual) = input.peek() {
-        if **actual == expected {
-            input.next();
-            return None;
-        } else {
-            return Some((*actual).clone());
-        }
-    } else if expected == Token::EOL {
-        return None;
-    } else {
-        return Some(Token::EOL);
-    }
-}
-
-fn parse(input: Vec<Token>) -> AstNode {
-    let mut tokens = input.iter().peekable();
-    let tok = tokens.peek();
-    if tok.is_none() {
-        return AstNode::NoOp;
-    }
-    match tok.unwrap() {
-        Token::GreetToken => parse_no_subcommands(&mut tokens, AstNode::Greet),
-        Token::TogglePlayback => {
-            parse_no_subcommands(&mut tokens, AstNode::TogglePlayback)
-        }
-        Token::Help => parse_no_subcommands(&mut tokens, AstNode::Help),
-        Token::Save => parse_save_load(&mut tokens),
-        Token::Load => parse_save_load(&mut tokens),
-        t => AstNode::SyntaxError(format!("Unexpected {:?}", t)),
-    }
-}
-
-fn parse_save_load<'a>(input: &'a mut Peekable<Iter<'a, Token>>) -> AstNode {
-    let save_load_tok = input.next().unwrap();
-    let next = input.next();
-    if next.is_none() {
-        return AstNode::SyntaxError(
-            "Expected `<cmd> <path: String>`, found \"\"".to_string(),
-        );
-    }
-    let next = next.unwrap();
-    if let Token::String(s) = next {
-        match save_load_tok {
-            Token::Save => AstNode::Save {
-                path: s.to_string(),
-            },
-            Token::Load => AstNode::Load {
-                path: s.to_string(),
-            },
-            _ => unreachable!(),
-        }
-    } else {
-        AstNode::SyntaxError("Expected `<cmd> <path: String>`, found \"\"".to_string())
-    }
-}
-
-fn parse_no_subcommands<'a>(
-    input: &'a mut Peekable<Iter<'a, Token>>,
-    expected_node: AstNode,
-) -> AstNode {
-    // should have the greet token and then nothing else
-    let _greet_tok = input.next().unwrap();
-    let next = assert_peek(input, Token::EOL);
-    if next.is_some() {
-        return AstNode::SyntaxError(format!("Expected (), found {:?}", next));
-    }
-    expected_node
-}
-
-fn evaluate(input: AstNode) -> String {
-    match input {
-        AstNode::Greet => "Hello, World!".to_string(),
-        AstNode::TogglePlayback => {
-            crate::commands::toggle_playback().unwrap();
-            "Playback toggled".to_string()
-        }
-        AstNode::Help => {
+    cli.add(String::from("ping"), &|_| String::from("pong"))
+        .add(String::from("echo"), &|args: Vec<&str>| args.join(" "))
+        .add(String::from("help"), &|_| {
             let mut output = String::new();
             output.push_str("\nAvailable commands: \n");
             for cmd in [
@@ -181,22 +50,21 @@ fn evaluate(input: AstNode) -> String {
                 output.push_str(&text);
             }
             output
-        }
-        AstNode::Save { path } => {
+        })
+        .add(String::from("greet"), &|_| String::from("Hello World"))
+        .add(String::from("save"), &|args| {
+            let path = args.join(" ");
             crate::commands::save_load::save(path.clone()).unwrap();
             format!("Saving APP_STATE to {}", path)
-        }
-        AstNode::Load { path } => {
+        })
+        .add(String::from("load"), &|args| {
+            let path = args.join(" ");
             crate::commands::save_load::load(path.clone()).unwrap();
             format!("Loading APP_STATE from {}", path)
-        }
-        AstNode::NoOp => String::new(),
-        AstNode::SyntaxError(e) => e,
-    }
-}
-
-pub fn read_command(input: &str) -> String {
-    let tokens = lex(input);
-    let ast = parse(tokens);
-    evaluate(ast)
+        })
+        .add(String::from("toggle_play"), &|_| {
+            crate::commands::toggle_playback().unwrap();
+            "Playback toggled".to_string()
+        })
+        .add(String::from(""), &|_| String::new())
 }
