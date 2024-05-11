@@ -49,7 +49,9 @@ fn main() -> anyhow::Result<()> {
                 write!(stdout, "❯ ").unwrap();
                 stdout.flush().unwrap();
                 std::io::stdin().read_line(&mut buf).unwrap();
-                let response = cli.run(&buf).unwrap_or(String::from("Did not receive valid command"));
+                let response = cli
+                    .run(&buf)
+                    .unwrap_or(String::from("Did not receive valid command"));
                 writeln!(stdout, "{}", response).unwrap();
             }
         }),

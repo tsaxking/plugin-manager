@@ -1,8 +1,7 @@
 use std::collections::HashMap;
 
 type F = &'static dyn Fn(Vec<&str>) -> String;
-
-
+#[derive(Default)]
 pub struct Cli {
     commands: HashMap<String, F>,
 }
@@ -19,7 +18,7 @@ impl Cli {
         self
     }
 
-    pub fn run(&self, string: &String) -> Option<String> {
+    pub fn run(&self, string: &str) -> Option<String> {
         // let regex = Regex::new(r#"\s+(?=([^"]*"[^"]*")*[^"]*$)"#).expect("Invalid Regex");
         // let mut split = regex.split(string);
         let mut split = string.split_whitespace();
@@ -32,20 +31,9 @@ impl Cli {
     }
 }
 
-
 pub fn commands() -> Cli {
     let cli = Cli::new();
 
-    cli.add(
-        String::from("ping"),
-        &|_: Vec<&str>| {
-            String::from("pong")
-        }
-    )
-    .add(
-        String::from("echo"),
-        &|args: Vec<&str>| {
-            args.join(" ")
-        }
-    )
+    cli.add(String::from("ping"), &|_: Vec<&str>| String::from("pong"))
+        .add(String::from("echo"), &|args: Vec<&str>| args.join(" "))
 }
