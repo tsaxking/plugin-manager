@@ -21,11 +21,11 @@ impl Cli {
     }
 
     pub fn run(&self, string: &String) -> Option<String> {
-        let r = Regex::new(r#"\s+(?=([^"]*"[^"]*")*[^"]*$)"#).expect("Invalid Regex");
-        let v: Vec<&str> = string.split(r);
+        let regex = Regex::new(r#"\s+(?=([^"]*"[^"]*")*[^"]*$)"#).expect("Invalid Regex");
+        let mut split = regex.split(string);
 
-        let cmd: &str = v.next()?;
-        let args: Vec<&str> = v.collect();
+        let cmd: &str = split.next()?;
+        let args: Vec<&str> = split.collect();
 
         let action = self.commands.get(cmd)?;
         Some(action(args))
