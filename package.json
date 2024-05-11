@@ -2,7 +2,7 @@
     "scripts": {
         "build": "ts-node scripts/esbuild.ts",
         "dev": "npm run build watch",
-        "format": "prettier ./app/ --write",
+        "format": "prettier ./ui/ --write",
         "test": "ts-node scripts/test.ts",
         "lint": "npx eslint **/*.ts --fix"
     },
