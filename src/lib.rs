@@ -6,8 +6,10 @@
 #[cfg(test)]
 mod dev;
 
-pub mod commands;
+#[cfg(debug_assertions)]
 pub mod console;
+
+pub mod commands;
 
 use std::sync;
 
