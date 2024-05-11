@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use regex::Regex;
 
 type F = &'static dyn Fn(Vec<&str>) -> String;
 
@@ -20,9 +21,10 @@ impl Cli {
     }
 
     pub fn run(&self, string: &String) -> Option<String> {
-        let mut v = string.split_whitespace();
+        let r = Regex::new(r#"\s+(?=([^"]*"[^"]*")*[^"]*$)"#).expect("Invalid Regex");
+        let v: Vec<&str> = string.split(r);
 
-        let cmd = v.next()?;
+        let cmd: &str = v.next()?;
         let args: Vec<&str> = v.collect();
 
         let action = self.commands.get(cmd)?;
@@ -35,9 +37,15 @@ pub fn commands() -> Cli {
     let cli = Cli::new();
 
     cli.add(
-        String::from("Test"),
+        String::from("ping"),
         &|_: Vec<&str>| {
-            String::from("Hi")
+            String::from("pong")
+        }
+    )
+    .add(
+        String::from("echo"),
+        &|args: Vec<&str>| {
+            args.join(" ")
         }
     )
 }
