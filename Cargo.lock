@@ -2578,22 +2578,11 @@ checksum = "501026fd03b73546d8327e45399bce64785a15ed1dd7662ef92d3460d963bf18"
 name = "ruckus"
 version = "0.1.0"
 dependencies = [
- "ruckus_rack",
- "serde",
- "serde_json",
- "tauri",
- "thiserror",
-]
-
-[[package]]
-name = "ruckus_app"
-version = "0.1.0"
-dependencies = [
  "anyhow",
  "cpal",
  "diff",
  "fundsp",
- "ruckus",
+ "ruckus_rack",
  "serde",
  "serde_json",
  "serde_path_to_error",

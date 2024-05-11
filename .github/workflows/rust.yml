@@ -53,10 +53,8 @@ jobs:
               uses: Swatinem/rust-cache@v2
               with:
                   key: ${{ runner.os }}-cargo-test-${{ hashFiles('**/Cargo.toml') }}
-            - name: Run clippy (ruckus_lib)
-              run: cargo clippy --manifest-path ruckus_lib/Cargo.toml -- -D warnings
-            - name: Run clippy (ruckus)
-              run: cargo clippy --manifest-path ruckus/Cargo.toml -- -D warnings
+            - name: Run clippy
+              run: cargo clippy --manifest-path Cargo.toml -- -D warnings
 
     # Run cargo fmt --all -- --check
     format:
