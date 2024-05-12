@@ -260,7 +260,7 @@ impl<const I: usize, const O: usize> IoComponent<I, O> {
         for _ in 0..I {
             i_buf.push(InputPort {
                 name: "PORT NAME".into(),
-                state: InputPortState::Connected,
+                state: InputPortState::Disconnected,
             });
         }
 
