@@ -6,7 +6,10 @@ use std::sync::mpsc;
 use std::thread;
 
 fn main() -> anyhow::Result<()> {
-    pm::rack::init_app_state(vec![]);
+    pm::rack::init_rack(pm::rack::Rack::default());
+    let ri = pm::rack::ExampleRackItem::default();
+    let json = serde_json::to_string_pretty(&ri).unwrap();
+    println!("{}", json);
 
     let host = cpal::default_host();
     let device = host
@@ -15,7 +18,7 @@ fn main() -> anyhow::Result<()> {
     let config = device.default_output_config().unwrap();
 
     let (tx, rx): (mpsc::Sender<usize>, mpsc::Receiver<usize>) = mpsc::channel();
-    pm::rack::init_play_tx(tx);
+    pm::init_play_tx(tx);
 
     let thread_handles = [
         // Audio Thread
