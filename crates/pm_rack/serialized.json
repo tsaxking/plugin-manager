@@ -1,57 +1,53 @@
 {
-  metadata: {
-    id: SELF,
-    note: SELFNOTE,
-    point: [
-      0,
-      0
-    ],
-    width: 8,
-    color: SELF COLOR
-  },
-  audio: {
-    inputs: [
-      {
-        name: PORT NAME,
-        state: Connected
-      }
-    ],
-    outputs: [
-      {
-        name: PORT NAME,
-        state: {
-          Connected: OTHER
-        }
-      }
-    ]
-  },
-  midi: {
-    inputs: [
-      {
-        name: PORT NAME,
-        state: Connected
-      }
-    ],
-    outputs: [
-      {
-        name: PORT NAME,
-        state: Disconnected
-      }
-    ]
-  },
-  control: {
-    inputs: [
-      {
-        name: PORT NAME,
-        state: Connected
-      }
-    ],
-    outputs: [
-      {
-        name: PORT NAME,
-        state: Disconnected
-      }
-    ]
-  }
+    "metadata": {
+        "id": "SELF",
+        "note": "SELFNOTE",
+        "point": [0, 0],
+        "width": 8,
+        "color": "SELF COLOR"
+    },
+    "audio": {
+        "inputs": [
+            {
+                "name": "PORT NAME",
+                "state": "Disconnected"
+            }
+        ],
+        "outputs": [
+            {
+                "name": "PORT NAME",
+                "state": {
+                    "Connected": "OTHER"
+                }
+            }
+        ]
+    },
+    "midi": {
+        "inputs": [
+            {
+                "name": "PORT NAME",
+                "state": "Disconnected"
+            }
+        ],
+        "outputs": [
+            {
+                "name": "PORT NAME",
+                "state": "Disconnected"
+            }
+        ]
+    },
+    "control": {
+        "inputs": [
+            {
+                "name": "PORT NAME",
+                "state": "Disconnected"
+            }
+        ],
+        "outputs": [
+            {
+                "name": "PORT NAME",
+                "state": "Disconnected"
+            }
+        ]
+    }
 }
-
