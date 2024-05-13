@@ -10,6 +10,7 @@ version = "0.1.0"
 edition = "2021"
 license = "Copyright"
 repository = "https://github.com/tsaxking/plugin-manager"
+default-run = "pm"
 
 [[bin]]
 name = "output_json"
