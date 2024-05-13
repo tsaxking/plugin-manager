@@ -17,11 +17,8 @@
             {
                 "name": "PORT NAME",
                 "state": {
-                    "Connected": "OTHER",
-                    "item": {
-                        "id": "SOMETHING",
-                        "input": "PORT INDEX"
-                    }
+                    "id": "SOMETHING",
+                    "input": "PORT INDEX"
                 }
             }
         ]

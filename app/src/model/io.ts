@@ -6,16 +6,6 @@ import { Rack } from './state';
 
 const { max } = Math;
 
-// type ioObject = {
-//     inputs: string[];
-//     outputs: string[];
-// };
-
-// export type io = {
-//     midi: ioObject;
-//     audio: ioObject;
-//     control: ioObject;
-// };
 
 export type ioState = {
     id: string;
@@ -24,12 +14,19 @@ export type ioState = {
 
 export type SerializedState = {
     name: string;
-    state?: ioState;
 };
 
+export type InputSerializedState = SerializedState & {
+    state: "Disconnected" | "Connected";
+}
+
+export type OutputSerializedState = SerializedState & {
+    state: "Disconnected" | ioState;
+}
+
 export type SerializedIO = {
-    inputs: SerializedState[];
-    outputs: SerializedState[];
+    inputs: InputSerializedState[];
+    outputs: OutputSerializedState[];
 }
 
 type InputEvents = {
@@ -74,7 +71,7 @@ export class Input extends IOEmitter<InputEvents> {
     constructor(
         public readonly type: 'midi' | 'audio' | 'control',
         public readonly io: IO,
-        state: SerializedState
+        state: InputSerializedState
     ) {
         super();
         this.name = state.name;
@@ -117,6 +114,10 @@ export class Input extends IOEmitter<InputEvents> {
         return this.io.rackItem;
     }
 
+    get rack() {
+        return this.rackItem.rack;
+    }
+
     get index() {
         return this.io.inputs.indexOf(this);
     }
@@ -126,7 +127,7 @@ export class Input extends IOEmitter<InputEvents> {
     }
 
     get connections(): Output[] {
-        return this.io.rackItem.rack.items.flatMap(i => {
+        return this.rack.items.flatMap(i => {
             return i.io[this.type].outputs.filter(o => o.isConnected(this));
         });
     }
@@ -146,15 +147,18 @@ export class Output extends IOEmitter<OutputEvents> {
     constructor(
         public readonly type: 'midi' | 'audio' | 'control',
         public readonly io: IO,
-        state: SerializedState
+        state: OutputSerializedState
     ) {
         super();
         this.name = state.name;
-        const r = this.io.rackItem.rack.items.find(i => i.id === state.state?.id);
-        if (r) {
-            const input = r.io[this.type].inputs[state.state?.index || -1]; // should always give an input
-            if (input) {
-                this.connect(input);
+        const s = state.state;
+        if (s !== 'Disconnected') {
+            const r = this.io.rackItem.rack.items.find(i => i.id === s.id);
+            if (r) {
+                const input = r.io[this.type].inputs[s.index]; // should always give an input
+                if (input) {
+                    this.connect(input);
+                }
             }
         }
     }
@@ -272,17 +276,14 @@ export class IO extends IOEmitter<IOEvents> {
         return {
             inputs: this.inputs.map(i => ({
                 name: i.name,
-                state: i.connections[0] ? {
-                    id: i.connections[0].rackItem.id,
-                    index: i.connections[0].index
-                } : undefined
+                state: i.connections.length ? 'Connected' : 'Disconnected'
             })),
             outputs: this.outputs.map(o => ({
                 name: o.name,
                 state: o.connections[0] ? {
                     id: o.connections[0].rackItem.id,
                     index: o.connections[0].index
-                } : undefined
+                } : 'Disconnected'
             }))
         }
     }
