@@ -80,16 +80,34 @@ test('Build Rack Model', () => {
 
         Processors.plugin(rack1, id(), 'Plugin', {
             audio: {
-                inputs: ['left', 'right'].map(i => ({ name: i, state: 'Disconnected'})),
-                outputs: ['left', 'right'].map(i => ({ name: i, state: 'Disconnected'})),
+                inputs: ['left', 'right'].map(i => ({
+                    name: i,
+                    state: 'Disconnected',
+                })),
+                outputs: ['left', 'right'].map(i => ({
+                    name: i,
+                    state: 'Disconnected',
+                })),
             },
             midi: {
-                inputs: ['MIDI In'].map(i => ({ name: i, state: 'Disconnected'})),
-                outputs: ['MIDI Out'].map(i => ({ name: i, state: 'Disconnected'})),
+                inputs: ['MIDI In'].map(i => ({
+                    name: i,
+                    state: 'Disconnected',
+                })),
+                outputs: ['MIDI Out'].map(i => ({
+                    name: i,
+                    state: 'Disconnected',
+                })),
             },
             control: {
-                inputs: ['Control In'].map(i => ({ name: i, state: 'Disconnected'})),
-                outputs: ['Control Out'].map(i => ({ name: i, state: 'Disconnected'})),
+                inputs: ['Control In'].map(i => ({
+                    name: i,
+                    state: 'Disconnected',
+                })),
+                outputs: ['Control Out'].map(i => ({
+                    name: i,
+                    state: 'Disconnected',
+                })),
             },
         });
 
