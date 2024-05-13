@@ -1,5 +1,6 @@
 import assert from 'assert';
 import test from 'test';
+import { execSync } from 'child_process';
 import { Rack } from '../app/src/model/state';
 import { Processors } from '../app/src/model/items/processors';
 import { $Math, Random } from '../app/src/utils/math';
@@ -198,6 +199,12 @@ test('Statistics', () => {
     // assert(close(zScore(arr, 5), 0));
     // assert(close(correlation([1, 2, 3], [3, 2, 1]), -1));
     // assert(close(covariance([1, 2, 3], [3, 2, 1]), -1));
+});
+
+test('Deserialize Json', () => {
+    const res = execSync('cargo json').toString();
+    const rack = new Rack();
+    rack.deserialize(res);
 });
 
 // test('Linear Algebra', () => {});
