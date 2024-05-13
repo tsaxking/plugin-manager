@@ -1,2 +1,3 @@
 [alias]
 lint = "clippy --manifest-path Cargo.toml -- -D warnings"
+json = "run --bin output_json"

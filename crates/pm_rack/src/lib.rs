@@ -8,6 +8,7 @@ use std::{collections::HashMap, sync::Arc};
 
 #[derive(Default, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Rack {
+    #[serde(flatten)]
     pub items: HashMap<Arc<str>, Box<dyn RackItem>>,
 }
 
@@ -48,7 +49,10 @@ pub trait IoPort {
 #[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 /// Represents the state of a given Output port
 pub enum OutputPortState {
-    Connected(Arc<str>),
+    Connected {
+        id: Arc<str>,
+        index: usize,
+    },
     Disconnected,
 }
 
@@ -75,14 +79,14 @@ impl IoPort for OutputPort {
     fn is_connected(&self) -> bool {
         match self.state {
             OutputPortState::Disconnected => false,
-            OutputPortState::Connected(_) => true,
+            OutputPortState::Connected{ .. } => true,
         }
     }
 
     fn is_disconnected(&self) -> bool {
         match self.state {
             OutputPortState::Disconnected => true,
-            OutputPortState::Connected(_) => false,
+            OutputPortState::Connected { .. } => false,
         }
     }
 }
@@ -326,7 +330,10 @@ impl Default for ExampleRackItem {
 
         s.audio.outputs[0] = OutputPort {
             name: "PORT NAME".into(),
-            state: OutputPortState::Connected("OTHER".into()),
+            state: OutputPortState::Connected {
+                id: "OTHER".into(), 
+                index: usize::MAX,
+            }
         };
         s
     }
@@ -345,7 +352,10 @@ impl RackItem for ExampleRackItem {
 
     fn connect_output(&mut self, output: RackOutput, target: ConnectionTarget) {
         self.audio.outputs[output.id].state =
-            OutputPortState::Connected(target.rack_item_id.clone());
+            OutputPortState::Connected {
+                id: target.rack_item_id.clone(),
+                index: target.id,
+    };
         let mut lock_guard = RACK.get().unwrap().lock().unwrap();
         let other = lock_guard.items.get_mut(&*target.rack_item_id).unwrap();
         other.accept_connection(output.kind, target.id);

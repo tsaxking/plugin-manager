@@ -11,6 +11,11 @@ edition = "2021"
 license = "Copyright"
 repository = "https://github.com/tsaxking/plugin-manager"
 
+[[bin]]
+name = "output_json"
+test = false
+bench = false
+
 [dependencies]
 pm_rack = { path = "./crates/pm_rack" }
 anyhow = "1.0.83"
