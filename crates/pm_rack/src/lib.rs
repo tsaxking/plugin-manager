@@ -49,10 +49,7 @@ pub trait IoPort {
 #[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 /// Represents the state of a given Output port
 pub enum OutputPortState {
-    Connected {
-        id: Arc<str>,
-        index: usize,
-    },
+    Connected { id: Arc<str>, index: usize },
     Disconnected,
 }
 
@@ -79,7 +76,7 @@ impl IoPort for OutputPort {
     fn is_connected(&self) -> bool {
         match self.state {
             OutputPortState::Disconnected => false,
-            OutputPortState::Connected{ .. } => true,
+            OutputPortState::Connected { .. } => true,
         }
     }
 
@@ -331,9 +328,9 @@ impl Default for ExampleRackItem {
         s.audio.outputs[0] = OutputPort {
             name: "PORT NAME".into(),
             state: OutputPortState::Connected {
-                id: "OTHER".into(), 
+                id: "OTHER".into(),
                 index: usize::MAX,
-            }
+            },
         };
         s
     }
@@ -351,11 +348,10 @@ impl RackItem for ExampleRackItem {
     }
 
     fn connect_output(&mut self, output: RackOutput, target: ConnectionTarget) {
-        self.audio.outputs[output.id].state =
-            OutputPortState::Connected {
-                id: target.rack_item_id.clone(),
-                index: target.id,
-    };
+        self.audio.outputs[output.id].state = OutputPortState::Connected {
+            id: target.rack_item_id.clone(),
+            index: target.id,
+        };
         let mut lock_guard = RACK.get().unwrap().lock().unwrap();
         let other = lock_guard.items.get_mut(&*target.rack_item_id).unwrap();
         other.accept_connection(output.kind, target.id);
