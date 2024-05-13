@@ -1,6 +1,6 @@
 import assert from 'assert';
 import test from 'test';
-import { execSync } from 'child_process';
+import { readFileSync } from 'fs';
 import { Rack } from '../app/src/model/state';
 import { Processors } from '../app/src/model/items/processors';
 import { $Math, Random } from '../app/src/utils/math';
@@ -202,7 +202,7 @@ test('Statistics', () => {
 });
 
 test('Deserialize Json', () => {
-    const res = execSync('cargo json').toString();
+    const res = readFileSync("crates/pm_rack/serialized.json").toString();
     const rack = new Rack();
     rack.deserialize(res);
 });

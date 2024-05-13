@@ -13,6 +13,7 @@ repository = "https://github.com/tsaxking/plugin-manager"
 
 [[bin]]
 name = "output_json"
+bulid = "src/output_json_build.rs"
 test = false
 bench = false
 

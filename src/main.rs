@@ -7,9 +7,6 @@ use std::thread;
 
 fn main() -> anyhow::Result<()> {
     pm::rack::init_rack(pm::rack::Rack::default());
-    let ri = pm::rack::ExampleRackItem::default();
-    let json = serde_json::to_string_pretty(&ri).unwrap();
-    println!("{}", json);
 
     let host = cpal::default_host();
     let device = host
