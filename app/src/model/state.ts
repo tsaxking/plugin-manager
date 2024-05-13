@@ -1,10 +1,15 @@
 import { Point2D } from '../utils/calcs/linear-algebra/point';
+import { attempt } from '../utils/check';
 import { EventEmitter } from '../utils/event-emitter';
 import { RackItem, SerializedRackItem } from './rack-item';
 
 type Events = {
     display: 'io' | 'control';
     perform: boolean;
+};
+
+type SerializedRack = {
+    [key: string]: SerializedRackItem;
 };
 
 export class Rack {
@@ -94,19 +99,24 @@ export class Rack {
     }
 
     serialize() {
-        return JSON.stringify(this.items.map(i => i.serialize()));
+        return JSON.stringify(
+            this.items.reduce((a, i) => {
+                a[i.id] = i.serialize();
+                return a;
+            }, {} as SerializedRack)
+        );
     }
 
     deserialize(data: string) {
-        const rackItems = JSON.parse(data) as SerializedRackItem[];
-        if (!Array.isArray(rackItems)) throw new Error('Invalid data');
-        if (rackItems.some(i => typeof i !== 'object'))
-            throw new Error('Invalid data');
-        this.items = [];
+        return attempt(() => {
+            const rackItems = JSON.parse(data) as SerializedRack;
 
-        const generated = rackItems.map(s => new RackItem(this, s));
-
-        return generated;
+            this.items = [];
+            const generated = Object.values(rackItems).map(
+                s => new RackItem(this, s)
+            );
+            return generated;
+        });
     }
 
     // These are temporary methods to be used for testing purposes
