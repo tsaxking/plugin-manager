@@ -1,11 +1,15 @@
 import { Point2D } from '../utils/calcs/linear-algebra/point';
+import { attempt } from '../utils/check';
 import { EventEmitter } from '../utils/event-emitter';
-import { io } from './io';
-import { RackItem } from './rack-item';
+import { RackItem, SerializedRackItem } from './rack-item';
 
 type Events = {
     display: 'io' | 'control';
     perform: boolean;
+};
+
+type SerializedRack = {
+    [key: string]: SerializedRackItem;
 };
 
 export class Rack {
@@ -95,62 +99,24 @@ export class Rack {
     }
 
     serialize() {
-        return JSON.stringify(this.items.map(i => i.serialize()));
+        return JSON.stringify(
+            this.items.reduce((a, i) => {
+                a[i.id] = i.serialize();
+                return a;
+            }, {} as SerializedRack)
+        );
     }
 
     deserialize(data: string) {
-        const items = JSON.parse(data) as unknown[];
-        if (!Array.isArray(items)) throw new Error('Invalid data');
-        if (items.some(i => typeof i !== 'object'))
-            throw new Error('Invalid data');
-        // if (items.some(i => (i as { id: string }).id)) throw new Error('Invalid data');
-        const rackItems = items as {
-            id: string;
-            note: string;
-            point: Point2D;
-            width: number;
-            color:
-                | 'primary'
-                | 'secondary'
-                | 'success'
-                | 'danger'
-                | 'info'
-                | 'dark'
-                | 'warning';
-            title: string;
-            io: io;
-            routing: {
-                audio: string[];
-                midi: string[];
-                control: string[];
-            };
-        }[];
+        return attempt(() => {
+            const rackItems = JSON.parse(data) as SerializedRack;
 
-        this.items = [];
-
-        const generated = rackItems.map(
-            i =>
-                new RackItem(
-                    this,
-                    i.id,
-                    i.note,
-                    i.point,
-                    i.width,
-                    i.color,
-                    i.title,
-                    i.io
-                )
-        );
-
-        for (const g of generated) {
-            const item = rackItems.find(i => i.id === g.id);
-            if (!item) throw new Error('Invalid data'); // should never happen
-            g.io.audio.deserialize(this, item.routing.audio);
-            g.io.midi.deserialize(this, item.routing.midi);
-            g.io.control.deserialize(this, item.routing.control);
-        }
-
-        return generated;
+            this.items = [];
+            const generated = Object.values(rackItems).map(
+                s => new RackItem(this, s)
+            );
+            return generated;
+        });
     }
 
     // These are temporary methods to be used for testing purposes

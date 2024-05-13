@@ -1,23 +1,23 @@
 pub mod save_load;
 
 #[tauri::command]
-pub fn get_effects_state() -> Result<String, pm_rack::AppStateError> {
-    let Some(rw_lock) = pm_rack::APP_STATE.get() else {
-        return Err(pm_rack::AppStateError::Uninitialized);
+pub fn get_effects_state() -> Result<String, crate::rack::RackError> {
+    let Some(rw_lock) = crate::rack::RACK.get() else {
+        return Err(crate::rack::RackError::Uninitialized);
     };
-    let Ok(guard) = rw_lock.read() else {
-        return Err(pm_rack::AppStateError::Poisoned);
+    let Ok(guard) = rw_lock.lock() else {
+        return Err(crate::rack::RackError::Poisoned);
     };
     Ok(serde_json::to_string(&*guard)?)
 }
 
 #[tauri::command]
-pub fn toggle_playback() -> Result<(), pm_rack::AppStateError> {
-    let Some(mutex) = pm_rack::PLAY_TX.get() else {
-        return Err(pm_rack::AppStateError::Uninitialized);
+pub fn toggle_playback() -> Result<(), crate::rack::RackError> {
+    let Some(mutex) = crate::PLAY_TX.get() else {
+        return Err(crate::rack::RackError::Uninitialized);
     };
     let Ok(guard) = mutex.lock() else {
-        return Err(pm_rack::AppStateError::Poisoned);
+        return Err(crate::rack::RackError::Poisoned);
     };
     guard.send(0).unwrap();
     Ok(())

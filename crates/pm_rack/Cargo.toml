@@ -5,6 +5,9 @@ edition = "2021"
 
 [dependencies]
 fundsp = "0.17.1"
-serde = { version = "1.0.201", features = ["derive"] }
+pm_utils = { version = "0.1.0", path = "../pm_utils" }
+serde = { version = "1.0.201", features = ["derive", "rc"] }
+serde_arrays = "0.1.0"
 serde_json = "1.0.117"
 thiserror = "1.0.60"
+typetag = "0.2.16"

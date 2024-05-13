@@ -1,10 +1,25 @@
 import { attempt } from '../utils/check';
 import { EventEmitter } from '../utils/event-emitter';
 import { Point2D } from '../utils/calcs/linear-algebra/point';
-import { IO, io } from './io';
+import { IO, SerializedIO } from './io';
 import { Color } from '../utils/color';
 import { abbreviate } from '../utils/text';
 import { Rack } from './state';
+
+export type SerializedRackItem = {
+    type: string;
+    metadata: {
+        id: string;
+        note: string;
+        point: Point2D;
+        width: number;
+        color: string;
+    };
+
+    audio?: SerializedIO;
+    midi?: SerializedIO;
+    control?: SerializedIO;
+};
 
 export const colors = {
     audio: Color.fromHex('#425df5'),
@@ -58,35 +73,36 @@ export class RackItem {
         audio: IO;
         control: IO;
     };
-
+    public readonly id: string;
+    public color: string;
+    public width: number;
+    public type: string;
     private readonly _note: string;
 
     constructor(
         public readonly rack: Rack,
-        public readonly id: string,
-        note: string,
-        point: Point2D,
-        public width: number,
-        public color:
-            | 'primary'
-            | 'secondary'
-            | 'success'
-            | 'danger'
-            | 'info'
-            | 'dark'
-            | 'warning',
-        public readonly title: string,
-        io: io
+        serialized: SerializedRackItem
     ) {
-        if (this.width < 8) throw new Error('Invalid width');
-        [this.x, this.y] = point;
-
+        this.id = serialized.metadata.id;
+        this.color = serialized.metadata.color;
+        this.width = serialized.metadata.width;
+        this.type = serialized.type;
         this.io = {
-            midi: new IO('midi', io.midi, this),
-            audio: new IO('audio', io.audio, this),
-            control: new IO('control', io.control, this),
+            midi: new IO('midi', serialized.midi, this),
+            audio: new IO('audio', serialized.audio, this),
+            control: new IO('control', serialized.control, this),
         };
-        this._note = note;
+        [this.x, this.y] = serialized.metadata.point;
+        this._note = serialized.metadata.note;
+
+        if (this.width < 8) throw new Error('Invalid width');
+
+        // this.io = {
+        //     midi: new IO('midi', io.midi, this),
+        //     audio: new IO('audio', io.audio, this),
+        //     control: new IO('control', io.control, this),
+        // };
+        // this._note = note;
 
         rack.items.push(this);
         RackItem.emit('new', this);
@@ -155,33 +171,19 @@ export class RackItem {
 
     update() {}
 
-    serialize() {
+    serialize(): SerializedRackItem {
         return {
-            id: this.id,
-            note: this._note,
-            point: [this.x, this.y] as Point2D,
-            width: this.width,
-            color: this.color,
-            title: this.title,
-            io: {
-                audio: {
-                    inputs: this.io.audio.inputs.map(i => i.name),
-                    outputs: this.io.audio.outputs.map(o => o.name),
-                },
-                midi: {
-                    inputs: this.io.midi.inputs.map(i => i.name),
-                    outputs: this.io.midi.outputs.map(o => o.name),
-                },
-                control: {
-                    inputs: this.io.control.inputs.map(i => i.name),
-                    outputs: this.io.control.outputs.map(o => o.name),
-                },
+            type: this.type,
+            metadata: {
+                id: this.id,
+                note: this._note,
+                point: [this.x, this.y],
+                width: this.width,
+                color: this.color,
             },
-            routing: {
-                audio: this.io.audio.serialize(),
-                midi: this.io.midi.serialize(),
-                control: this.io.control.serialize(),
-            },
+            audio: this.io.audio?.serialize(),
+            midi: this.io.midi?.serialize(),
+            control: this.io.control?.serialize(),
         };
     }
 }
