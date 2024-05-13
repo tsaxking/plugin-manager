@@ -6,8 +6,6 @@ import { Color } from '../utils/color';
 import { abbreviate } from '../utils/text';
 import { Rack } from './state';
 
-
-
 export type SerializedRackItem = {
     type: string;
     metadata: {
@@ -21,7 +19,7 @@ export type SerializedRackItem = {
     audio?: SerializedIO;
     midi?: SerializedIO;
     control?: SerializedIO;
-}
+};
 
 export const colors = {
     audio: Color.fromHex('#425df5'),
@@ -85,19 +83,17 @@ export class RackItem {
         public readonly rack: Rack,
         serialized: SerializedRackItem
     ) {
-    this.id = serialized.metadata.id;
-    this.color = serialized.metadata.color;
-    this.width = serialized.metadata.width;
-    this.type = serialized.type;
-    this.io = {
-        midi: new IO('midi', serialized.midi, this),
-        audio: new IO('audio', serialized.audio, this),
-        control: new IO('control', serialized.control, this),
-    };
-    [this.x, this.y] = serialized.metadata.point;
-    this._note = serialized.metadata.note;
-
-
+        this.id = serialized.metadata.id;
+        this.color = serialized.metadata.color;
+        this.width = serialized.metadata.width;
+        this.type = serialized.type;
+        this.io = {
+            midi: new IO('midi', serialized.midi, this),
+            audio: new IO('audio', serialized.audio, this),
+            control: new IO('control', serialized.control, this),
+        };
+        [this.x, this.y] = serialized.metadata.point;
+        this._note = serialized.metadata.note;
 
         if (this.width < 8) throw new Error('Invalid width');
 

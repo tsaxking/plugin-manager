@@ -102,17 +102,9 @@ export class Rack {
         if (!Array.isArray(rackItems)) throw new Error('Invalid data');
         if (rackItems.some(i => typeof i !== 'object'))
             throw new Error('Invalid data');
-        // if (items.some(i => (i as { id: string }).id)) throw new Error('Invalid data');
-
         this.items = [];
 
-        const generated = rackItems.map(
-            i =>
-                new RackItem(
-                    this,
-                    i
-                )
-        );
+        const generated = rackItems.map(s => new RackItem(this, s));
 
         return generated;
     }

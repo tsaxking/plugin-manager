@@ -6,28 +6,33 @@ import { Rack } from './state';
 
 const { max } = Math;
 
-
 export type ioState = {
     id: string;
     index: number;
-}
+};
 
 export type SerializedState = {
     name: string;
 };
 
 export type InputSerializedState = SerializedState & {
-    state: "Disconnected" | "Connected";
-}
+    state: 'Disconnected' | 'Connected';
+};
 
 export type OutputSerializedState = SerializedState & {
-    state: "Disconnected" | ioState;
-}
+    state: 'Disconnected' | ioState;
+};
 
 export type SerializedIO = {
     inputs: InputSerializedState[];
     outputs: OutputSerializedState[];
-}
+};
+
+export type ioObject = {
+    audio?: SerializedIO;
+    midi?: SerializedIO;
+    control?: SerializedIO;
+};
 
 type InputEvents = {
     connect: Output;
@@ -276,16 +281,18 @@ export class IO extends IOEmitter<IOEvents> {
         return {
             inputs: this.inputs.map(i => ({
                 name: i.name,
-                state: i.connections.length ? 'Connected' : 'Disconnected'
+                state: i.connections.length ? 'Connected' : 'Disconnected',
             })),
             outputs: this.outputs.map(o => ({
                 name: o.name,
-                state: o.connections[0] ? {
-                    id: o.connections[0].rackItem.id,
-                    index: o.connections[0].index
-                } : 'Disconnected'
-            }))
-        }
+                state: o.connections[0]
+                    ? {
+                          id: o.connections[0].rackItem.id,
+                          index: o.connections[0].index,
+                      }
+                    : 'Disconnected',
+            })),
+        };
     }
 
     deserialize(rack: Rack, data: string[]) {

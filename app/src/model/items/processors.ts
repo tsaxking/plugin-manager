@@ -1,7 +1,7 @@
-import { io } from '../io';
 import { RackItem } from '../rack-item';
 import { Rack } from '../state';
 import { Random } from '../../utils/math';
+import { ioObject } from '../io';
 
 const getId = (id: string, name: string) => id + ':' + name.toLowerCase();
 
@@ -14,29 +14,20 @@ export class Processors {
         name: string,
         inputs: string[]
     ) {
-        return new RackItem(
-            rack,
-            getId(id, 'audio-output'),
-            name,
-            rack.getAvailablePoint(),
-            8,
-            'dark',
-            'Audio Output',
-            {
-                audio: {
-                    inputs,
-                    outputs: [],
-                },
-                midi: {
-                    inputs: [],
-                    outputs: [],
-                },
-                control: {
-                    inputs: [],
-                    outputs: [],
-                },
-            }
-        );
+        return new RackItem(rack, {
+            type: 'audio-output',
+            metadata: {
+                id: getId(id, 'audio-output'),
+                note: name,
+                point: rack.getAvailablePoint(),
+                width: 8,
+                color: 'primary',
+            },
+            audio: {
+                inputs: inputs.map(i => ({ name: i, state: 'Disconnected' })),
+                outputs: [],
+            },
+        });
     }
 
     public static audioSource(
@@ -45,29 +36,20 @@ export class Processors {
         name: string,
         outputs: string[]
     ) {
-        return new RackItem(
-            rack,
-            getId(id, 'audio-source'),
-            name,
-            rack.getAvailablePoint(),
-            8,
-            'dark',
-            'Audio Source',
-            {
-                audio: {
-                    inputs: [],
-                    outputs,
-                },
-                midi: {
-                    inputs: [],
-                    outputs: [],
-                },
-                control: {
-                    inputs: [],
-                    outputs: [],
-                },
-            }
-        );
+        return new RackItem(rack, {
+            type: 'audio-source',
+            metadata: {
+                id: getId(id, 'audio-source'),
+                note: name,
+                point: rack.getAvailablePoint(),
+                width: 8,
+                color: 'primary',
+            },
+            audio: {
+                inputs: [],
+                outputs: outputs.map(o => ({ name: o, state: 'Disconnected' })),
+            },
+        });
     }
 
     public static compressor(
@@ -76,107 +58,231 @@ export class Processors {
         name: string,
         stereo = false
     ) {
-        return new RackItem(
-            rack,
-            getId(id, 'compressor'),
-            name,
-            rack.getAvailablePoint(),
-            8,
-            'primary',
-            'Compressor',
-            {
-                audio: {
-                    inputs: stereo ? ['L', 'R'] : ['In'],
-                    outputs: stereo ? ['L', 'R'] : ['Out'],
-                },
-                midi: {
-                    inputs: [],
-                    outputs: [],
-                },
-                control: {
-                    inputs: [],
-                    outputs: [],
-                },
-            }
-        );
+        return new RackItem(rack, {
+            type: 'compressor',
+            metadata: {
+                id: getId(id, 'compressor'),
+                note: name,
+                point: rack.getAvailablePoint(),
+                width: 8,
+                color: 'primary',
+            },
+            audio: {
+                inputs: stereo
+                    ? [
+                          {
+                              name: 'L',
+                              state: 'Disconnected',
+                          },
+                          {
+                              name: 'R',
+                              state: 'Disconnected',
+                          },
+                      ]
+                    : [
+                          {
+                              name: 'In',
+                              state: 'Disconnected',
+                          },
+                      ],
+                outputs: stereo
+                    ? [
+                          {
+                              name: 'L',
+                              state: 'Disconnected',
+                          },
+                          {
+                              name: 'R',
+                              state: 'Disconnected',
+                          },
+                      ]
+                    : [
+                          {
+                              name: 'Out',
+                              state: 'Disconnected',
+                          },
+                      ],
+            },
+            midi: {
+                inputs: [],
+                outputs: [],
+            },
+            control: {
+                inputs: [],
+                outputs: [],
+            },
+        });
     }
 
     public static eq(rack: Rack, id: string, name: string, stereo = false) {
-        return new RackItem(
-            rack,
-            getId(id, 'eq'),
-            name,
-            rack.getAvailablePoint(),
-            8,
-            'primary',
-            'EQ',
-            {
-                audio: {
-                    inputs: stereo ? ['L', 'R'] : ['In'],
-                    outputs: stereo ? ['L', 'R'] : ['Out'],
-                },
-                midi: {
-                    inputs: [],
-                    outputs: [],
-                },
-                control: {
-                    inputs: [],
-                    outputs: [],
-                },
-            }
-        );
+        return new RackItem(rack, {
+            type: 'eq',
+            metadata: {
+                id: getId(id, 'eq'),
+                note: name,
+                point: rack.getAvailablePoint(),
+                width: 8,
+                color: 'primary',
+            },
+            audio: {
+                inputs: stereo
+                    ? [
+                          {
+                              name: 'L',
+                              state: 'Disconnected',
+                          },
+                          {
+                              name: 'R',
+                              state: 'Disconnected',
+                          },
+                      ]
+                    : [
+                          {
+                              name: 'In',
+                              state: 'Disconnected',
+                          },
+                      ],
+                outputs: stereo
+                    ? [
+                          {
+                              name: 'L',
+                              state: 'Disconnected',
+                          },
+                          {
+                              name: 'R',
+                              state: 'Disconnected',
+                          },
+                      ]
+                    : [
+                          {
+                              name: 'Out',
+                              state: 'Disconnected',
+                          },
+                      ],
+            },
+            midi: {
+                inputs: [],
+                outputs: [],
+            },
+            control: {
+                inputs: [],
+                outputs: [],
+            },
+        });
     }
 
     public static gain(rack: Rack, id: string, name: string, stereo = false) {
-        return new RackItem(
-            rack,
-            getId(id, 'gain'),
-            name,
-            rack.getAvailablePoint(),
-            8,
-            'primary',
-            'Gain',
-            {
-                audio: {
-                    inputs: stereo ? ['L', 'R'] : ['In'],
-                    outputs: stereo ? ['L', 'R'] : ['Out'],
-                },
-                midi: {
-                    inputs: [],
-                    outputs: [],
-                },
-                control: {
-                    inputs: [],
-                    outputs: [],
-                },
-            }
-        );
+        return new RackItem(rack, {
+            type: 'gain',
+            metadata: {
+                id: getId(id, 'gain'),
+                note: name,
+                point: rack.getAvailablePoint(),
+                width: 8,
+                color: 'primary',
+            },
+            audio: {
+                inputs: stereo
+                    ? [
+                          {
+                              name: 'L',
+                              state: 'Disconnected',
+                          },
+                          {
+                              name: 'R',
+                              state: 'Disconnected',
+                          },
+                      ]
+                    : [
+                          {
+                              name: 'In',
+                              state: 'Disconnected',
+                          },
+                      ],
+                outputs: stereo
+                    ? [
+                          {
+                              name: 'L',
+                              state: 'Disconnected',
+                          },
+                          {
+                              name: 'R',
+                              state: 'Disconnected',
+                          },
+                      ]
+                    : [
+                          {
+                              name: 'Out',
+                              state: 'Disconnected',
+                          },
+                      ],
+            },
+            midi: {
+                inputs: [],
+                outputs: [],
+            },
+            control: {
+                inputs: [],
+                outputs: [],
+            },
+        });
     }
 
     public static gate(rack: Rack, id: string, name: string, stereo = false) {
-        return new RackItem(
-            rack,
-            getId(id, 'gate'),
-            name,
-            rack.getAvailablePoint(),
-            8,
-            'primary',
-            'Gate',
-            {
-                audio: {
-                    inputs: stereo ? ['L', 'R'] : ['In'],
-                    outputs: stereo ? ['L', 'R'] : ['Out'],
-                },
-                midi: {
-                    inputs: [],
-                    outputs: [],
-                },
-                control: {
-                    inputs: [],
-                    outputs: [],
-                },
-            }
-        );
+        return new RackItem(rack, {
+            type: 'gate',
+            metadata: {
+                id: getId(id, 'gate'),
+                note: name,
+                point: rack.getAvailablePoint(),
+                width: 8,
+                color: 'primary',
+            },
+            audio: {
+                inputs: stereo
+                    ? [
+                          {
+                              name: 'L',
+                              state: 'Disconnected',
+                          },
+                          {
+                              name: 'R',
+                              state: 'Disconnected',
+                          },
+                      ]
+                    : [
+                          {
+                              name: 'In',
+                              state: 'Disconnected',
+                          },
+                      ],
+                outputs: stereo
+                    ? [
+                          {
+                              name: 'L',
+                              state: 'Disconnected',
+                          },
+                          {
+                              name: 'R',
+                              state: 'Disconnected',
+                          },
+                      ]
+                    : [
+                          {
+                              name: 'Out',
+                              state: 'Disconnected',
+                          },
+                      ],
+            },
+            midi: {
+                inputs: [],
+                outputs: [],
+            },
+            control: {
+                inputs: [],
+                outputs: [],
+            },
+        });
     }
 
     public static limiter(
@@ -185,107 +291,231 @@ export class Processors {
         name: string,
         stereo = false
     ) {
-        return new RackItem(
-            rack,
-            getId(id, 'limiter'),
-            name,
-            rack.getAvailablePoint(),
-            8,
-            'primary',
-            'Limiter',
-            {
-                audio: {
-                    inputs: stereo ? ['L', 'R'] : ['In'],
-                    outputs: stereo ? ['L', 'R'] : ['Out'],
-                },
-                midi: {
-                    inputs: [],
-                    outputs: [],
-                },
-                control: {
-                    inputs: [],
-                    outputs: [],
-                },
-            }
-        );
+        return new RackItem(rack, {
+            type: 'limiter',
+            metadata: {
+                id: getId(id, 'limiter'),
+                note: name,
+                point: rack.getAvailablePoint(),
+                width: 8,
+                color: 'primary',
+            },
+            audio: {
+                inputs: stereo
+                    ? [
+                          {
+                              name: 'L',
+                              state: 'Disconnected',
+                          },
+                          {
+                              name: 'R',
+                              state: 'Disconnected',
+                          },
+                      ]
+                    : [
+                          {
+                              name: 'In',
+                              state: 'Disconnected',
+                          },
+                      ],
+                outputs: stereo
+                    ? [
+                          {
+                              name: 'L',
+                              state: 'Disconnected',
+                          },
+                          {
+                              name: 'R',
+                              state: 'Disconnected',
+                          },
+                      ]
+                    : [
+                          {
+                              name: 'Out',
+                              state: 'Disconnected',
+                          },
+                      ],
+            },
+            midi: {
+                inputs: [],
+                outputs: [],
+            },
+            control: {
+                inputs: [],
+                outputs: [],
+            },
+        });
     }
 
     public static reverb(rack: Rack, id: string, name: string, stereo = false) {
-        return new RackItem(
-            rack,
-            getId(id, 'reverb'),
-            name,
-            rack.getAvailablePoint(),
-            8,
-            'primary',
-            'Reverb',
-            {
-                audio: {
-                    inputs: stereo ? ['L', 'R'] : ['In'],
-                    outputs: stereo ? ['L', 'R'] : ['Out'],
-                },
-                midi: {
-                    inputs: [],
-                    outputs: [],
-                },
-                control: {
-                    inputs: [],
-                    outputs: [],
-                },
-            }
-        );
+        return new RackItem(rack, {
+            type: 'reverb',
+            metadata: {
+                id: getId(id, 'reverb'),
+                note: name,
+                point: rack.getAvailablePoint(),
+                width: 8,
+                color: 'primary',
+            },
+            audio: {
+                inputs: stereo
+                    ? [
+                          {
+                              name: 'L',
+                              state: 'Disconnected',
+                          },
+                          {
+                              name: 'R',
+                              state: 'Disconnected',
+                          },
+                      ]
+                    : [
+                          {
+                              name: 'In',
+                              state: 'Disconnected',
+                          },
+                      ],
+                outputs: stereo
+                    ? [
+                          {
+                              name: 'L',
+                              state: 'Disconnected',
+                          },
+                          {
+                              name: 'R',
+                              state: 'Disconnected',
+                          },
+                      ]
+                    : [
+                          {
+                              name: 'Out',
+                              state: 'Disconnected',
+                          },
+                      ],
+            },
+            midi: {
+                inputs: [],
+                outputs: [],
+            },
+            control: {
+                inputs: [],
+                outputs: [],
+            },
+        });
     }
 
     public static delay(rack: Rack, id: string, name: string, stereo = false) {
-        return new RackItem(
-            rack,
-            getId(id, 'delay'),
-            name,
-            rack.getAvailablePoint(),
-            8,
-            'primary',
-            'Delay',
-            {
-                audio: {
-                    inputs: stereo ? ['L', 'R'] : ['In'],
-                    outputs: stereo ? ['L', 'R'] : ['Out'],
-                },
-                midi: {
-                    inputs: [],
-                    outputs: [],
-                },
-                control: {
-                    inputs: [],
-                    outputs: [],
-                },
-            }
-        );
+        return new RackItem(rack, {
+            type: 'delay',
+            metadata: {
+                id: getId(id, 'delay'),
+                note: name,
+                point: rack.getAvailablePoint(),
+                width: 8,
+                color: 'primary',
+            },
+            audio: {
+                inputs: stereo
+                    ? [
+                          {
+                              name: 'L',
+                              state: 'Disconnected',
+                          },
+                          {
+                              name: 'R',
+                              state: 'Disconnected',
+                          },
+                      ]
+                    : [
+                          {
+                              name: 'In',
+                              state: 'Disconnected',
+                          },
+                      ],
+                outputs: stereo
+                    ? [
+                          {
+                              name: 'L',
+                              state: 'Disconnected',
+                          },
+                          {
+                              name: 'R',
+                              state: 'Disconnected',
+                          },
+                      ]
+                    : [
+                          {
+                              name: 'Out',
+                              state: 'Disconnected',
+                          },
+                      ],
+            },
+            midi: {
+                inputs: [],
+                outputs: [],
+            },
+            control: {
+                inputs: [],
+                outputs: [],
+            },
+        });
     }
 
     public static filter(rack: Rack, id: string, name: string, stereo = false) {
-        return new RackItem(
-            rack,
-            getId(id, 'filter'),
-            name,
-            rack.getAvailablePoint(),
-            8,
-            'primary',
-            'Filter',
-            {
-                audio: {
-                    inputs: stereo ? ['L', 'R'] : ['In'],
-                    outputs: stereo ? ['L', 'R'] : ['Out'],
-                },
-                midi: {
-                    inputs: [],
-                    outputs: [],
-                },
-                control: {
-                    inputs: [],
-                    outputs: [],
-                },
-            }
-        );
+        return new RackItem(rack, {
+            type: 'filter',
+            metadata: {
+                id: getId(id, 'filter'),
+                note: name,
+                point: rack.getAvailablePoint(),
+                width: 8,
+                color: 'primary',
+            },
+            audio: {
+                inputs: stereo
+                    ? [
+                          {
+                              name: 'L',
+                              state: 'Disconnected',
+                          },
+                          {
+                              name: 'R',
+                              state: 'Disconnected',
+                          },
+                      ]
+                    : [
+                          {
+                              name: 'In',
+                              state: 'Disconnected',
+                          },
+                      ],
+                outputs: stereo
+                    ? [
+                          {
+                              name: 'L',
+                              state: 'Disconnected',
+                          },
+                          {
+                              name: 'R',
+                              state: 'Disconnected',
+                          },
+                      ]
+                    : [
+                          {
+                              name: 'Out',
+                              state: 'Disconnected',
+                          },
+                      ],
+            },
+            midi: {
+                inputs: [],
+                outputs: [],
+            },
+            control: {
+                inputs: [],
+                outputs: [],
+            },
+        });
     }
 
     // █▄ ▄█ █ █▀▄ █
@@ -298,29 +528,20 @@ export class Processors {
         inputs: string[],
         outputs: string[]
     ) {
-        return new RackItem(
-            rack,
-            getId(id, 'instrument'),
-            name,
-            rack.getAvailablePoint(),
-            8,
-            'success',
-            'Instrument',
-            {
-                audio: {
-                    inputs: [],
-                    outputs: [],
-                },
-                midi: {
-                    inputs,
-                    outputs,
-                },
-                control: {
-                    inputs: [],
-                    outputs: [],
-                },
-            }
-        );
+        return new RackItem(rack, {
+            type: 'instrument',
+            metadata: {
+                id: getId(id, 'instrument'),
+                note: name,
+                point: rack.getAvailablePoint(),
+                width: 8,
+                color: 'warning',
+            },
+            midi: {
+                inputs: inputs.map(i => ({ name: i, state: 'Disconnected' })),
+                outputs: outputs.map(o => ({ name: o, state: 'Disconnected' })),
+            },
+        });
     }
 
     public static oscillator(
@@ -329,29 +550,24 @@ export class Processors {
         name: string,
         inputs: string[]
     ) {
-        return new RackItem(
-            rack,
-            getId(id, 'oscillator'),
-            name,
-            rack.getAvailablePoint(),
-            8,
-            'warning',
-            'Oscillator',
-            {
-                audio: {
-                    inputs: [],
-                    outputs: ['Out'],
-                },
-                midi: {
-                    inputs: [],
-                    outputs: [],
-                },
-                control: {
-                    inputs,
-                    outputs: [],
-                },
-            }
-        );
+        return new RackItem(rack, {
+            type: 'oscillator',
+            metadata: {
+                id: getId(id, 'oscillator'),
+                note: name,
+                point: rack.getAvailablePoint(),
+                width: 8,
+                color: 'warning',
+            },
+            audio: {
+                inputs: [],
+                outputs: inputs.map(i => ({ name: i, state: 'Disconnected' })),
+            },
+            midi: {
+                inputs: inputs.map(i => ({ name: i, state: 'Disconnected' })),
+                outputs: [],
+            },
+        });
     }
 
     public static sequencer(
@@ -361,42 +577,51 @@ export class Processors {
         inputs: string[],
         outputs: string[]
     ) {
-        return new RackItem(
-            rack,
-            getId(id, 'sequencer'),
-            name,
-            rack.getAvailablePoint(),
-            8,
-            'info',
-            'Sequencer',
-            {
-                audio: {
-                    inputs: [],
-                    outputs: [],
-                },
-                midi: {
-                    inputs,
-                    outputs,
-                },
-                control: {
-                    inputs: [],
-                    outputs: [],
-                },
-            }
-        );
+        return new RackItem(rack, {
+            type: 'sequencer',
+            metadata: {
+                id: getId(id, 'sequencer'),
+                note: name,
+                point: rack.getAvailablePoint(),
+                width: 8,
+                color: 'warning',
+            },
+            midi: {
+                inputs: inputs.map(i => ({ name: i, state: 'Disconnected' })),
+                outputs: outputs.map(o => ({ name: o, state: 'Disconnected' })),
+            },
+        });
     }
 
-    public static plugin(rack: Rack, id: string, name: string, io: io) {
-        return new RackItem(
-            rack,
-            getId(id, 'plugin'),
-            name,
-            rack.getAvailablePoint(),
-            8,
-            'dark',
-            'Plugin',
-            io
-        );
+    public static plugin(rack: Rack, id: string, name: string, io: ioObject) {
+        return new RackItem(rack, {
+            type: 'plugin',
+            metadata: {
+                id: getId(id, 'plugin'),
+                note: name,
+                point: rack.getAvailablePoint(),
+                width: 8,
+                color: 'warning',
+            },
+            audio: io.audio
+                ? {
+                      inputs: io.audio.inputs,
+                      outputs: io.audio.outputs,
+                  }
+                : undefined,
+            midi: io.midi
+                ? {
+                      inputs: io.midi.inputs,
+                      outputs: io.midi.outputs,
+                  }
+                : undefined,
+            control: io.control
+                ? {
+                      inputs: io.control.inputs,
+                      outputs: io.control.outputs,
+                  }
+                : undefined,
+        });
     }
 
     // ▄▀▀ ▄▀▄ █▄ █ ▀█▀ █▀▄ ▄▀▄ █
@@ -409,81 +634,68 @@ export class Processors {
         inputs: string[],
         outputs: string[]
     ) {
-        return new RackItem(
-            rack,
-            getId(id, 'midi-controller'),
-            name,
-            rack.getAvailablePoint(),
-            8,
-            'danger',
-            'MIDI Controller',
-            {
-                audio: {
-                    inputs: [],
-                    outputs: [],
-                },
-                midi: {
-                    inputs,
-                    outputs: [],
-                },
-                control: {
-                    inputs: [],
-                    outputs,
-                },
-            }
-        );
+        return new RackItem(rack, {
+            type: 'midi-controller',
+            metadata: {
+                id: getId(id, 'midi-controller'),
+                note: name,
+                point: rack.getAvailablePoint(),
+                width: 8,
+                color: 'success',
+            },
+            midi: {
+                inputs: inputs.map(i => ({ name: i, state: 'Disconnected' })),
+                outputs: [],
+            },
+            control: {
+                inputs: [],
+                outputs: outputs.map(o => ({ name: o, state: 'Disconnected' })),
+            },
+        });
     }
 
     public static random(rack: Rack, id: string, name: string) {
-        return new RackItem(
-            rack,
-            getId(id, 'random'),
-            name,
-            rack.getAvailablePoint(),
-            8,
-            'danger',
-            'Random',
-            {
-                audio: {
-                    inputs: [],
-                    outputs: [],
-                },
-                midi: {
-                    inputs: ['In'],
-                    outputs: [],
-                },
-                control: {
-                    inputs: [],
-                    outputs: ['Random'],
-                },
-            }
-        );
+        return new RackItem(rack, {
+            type: 'random',
+            metadata: {
+                id: getId(id, 'random'),
+                note: name,
+                point: rack.getAvailablePoint(),
+                width: 8,
+                color: 'success',
+            },
+            control: {
+                inputs: [],
+                outputs: [
+                    {
+                        name: 'Out',
+                        state: 'Disconnected',
+                    },
+                ],
+            },
+        });
     }
 
     public static lfo(rack: Rack, id: string, name: string) {
-        return new RackItem(
-            rack,
-            getId(id, 'lfo'),
-            name,
-            rack.getAvailablePoint(),
-            8,
-            'danger',
-            'LFO',
-            {
-                audio: {
-                    inputs: [],
-                    outputs: [],
-                },
-                midi: {
-                    inputs: [],
-                    outputs: [],
-                },
-                control: {
-                    inputs: [],
-                    outputs: ['LFO'],
-                },
-            }
-        );
+        return new RackItem(rack, {
+            type: 'lfo',
+            metadata: {
+                id: getId(id, 'lfo'),
+                note: name,
+                point: rack.getAvailablePoint(),
+                width: 8,
+                color: 'success',
+            },
+            control: {
+                inputs: [],
+                outputs: [
+                    {
+                        name: 'Out',
+                        state: 'Disconnected',
+                    },
+                ],
+            },
+        });
     }
 
     public static duplicator(
@@ -492,46 +704,78 @@ export class Processors {
         name: string,
         type: 'audio' | 'midi' | 'controller'
     ) {
-        return new RackItem(
-            rack,
-            getId(id, 'duplicator'),
-            name,
-            rack.getAvailablePoint(),
-            8,
-            'danger',
-            'Duplicator',
-            {
-                audio:
-                    type === 'audio'
-                        ? {
-                              inputs: ['In'],
-                              outputs: ['1', '2'],
-                          }
-                        : {
-                              inputs: [],
-                              outputs: [],
-                          },
-                midi:
-                    type === 'midi'
-                        ? {
-                              inputs: ['In'],
-                              outputs: ['1', '2'],
-                          }
-                        : {
-                              inputs: [],
-                              outputs: [],
-                          },
-                control:
-                    type === 'controller'
-                        ? {
-                              inputs: ['In'],
-                              outputs: ['1', '2'],
-                          }
-                        : {
-                              inputs: [],
-                              outputs: [],
-                          },
-            }
-        );
+        return new RackItem(rack, {
+            type: 'duplicator',
+            metadata: {
+                id: getId(id, 'duplicator'),
+                note: name,
+                point: rack.getAvailablePoint(),
+                width: 8,
+                color: 'success',
+            },
+            audio:
+                type === 'audio'
+                    ? {
+                          inputs: [
+                              {
+                                  name: 'In',
+                                  state: 'Disconnected',
+                              },
+                          ],
+                          outputs: [
+                              {
+                                  name: 'Out1',
+                                  state: 'Disconnected',
+                              },
+                              {
+                                  name: 'Out2',
+                                  state: 'Disconnected',
+                              },
+                          ],
+                      }
+                    : undefined,
+            midi:
+                type === 'midi'
+                    ? {
+                          inputs: [
+                              {
+                                  name: 'In',
+                                  state: 'Disconnected',
+                              },
+                          ],
+                          outputs: [
+                              {
+                                  name: 'Out1',
+                                  state: 'Disconnected',
+                              },
+                              {
+                                  name: 'Out2',
+                                  state: 'Disconnected',
+                              },
+                          ],
+                      }
+                    : undefined,
+            control:
+                type === 'controller'
+                    ? {
+                          inputs: [
+                              {
+                                  name: 'In',
+                                  state: 'Disconnected',
+                              },
+                          ],
+                          outputs: [
+                              {
+                                  name: 'Out1',
+                                  state: 'Disconnected',
+                              },
+                              {
+                                  name: 'Out2',
+                                  state: 'Disconnected',
+                              },
+                          ],
+                      }
+                    : undefined,
+        });
     }
 }
