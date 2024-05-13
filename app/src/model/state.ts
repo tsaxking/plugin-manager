@@ -1,7 +1,6 @@
 import { Point2D } from '../utils/calcs/linear-algebra/point';
 import { EventEmitter } from '../utils/event-emitter';
-import { io } from './io';
-import { RackItem } from './rack-item';
+import { RackItem, SerializedRackItem } from './rack-item';
 
 type Events = {
     display: 'io' | 'control';
@@ -99,32 +98,11 @@ export class Rack {
     }
 
     deserialize(data: string) {
-        const items = JSON.parse(data) as unknown[];
-        if (!Array.isArray(items)) throw new Error('Invalid data');
-        if (items.some(i => typeof i !== 'object'))
+        const rackItems = JSON.parse(data) as SerializedRackItem[];
+        if (!Array.isArray(rackItems)) throw new Error('Invalid data');
+        if (rackItems.some(i => typeof i !== 'object'))
             throw new Error('Invalid data');
         // if (items.some(i => (i as { id: string }).id)) throw new Error('Invalid data');
-        const rackItems = items as {
-            id: string;
-            note: string;
-            point: Point2D;
-            width: number;
-            color:
-                | 'primary'
-                | 'secondary'
-                | 'success'
-                | 'danger'
-                | 'info'
-                | 'dark'
-                | 'warning';
-            title: string;
-            io: io;
-            routing: {
-                audio: string[];
-                midi: string[];
-                control: string[];
-            };
-        }[];
 
         this.items = [];
 
@@ -132,23 +110,9 @@ export class Rack {
             i =>
                 new RackItem(
                     this,
-                    i.id,
-                    i.note,
-                    i.point,
-                    i.width,
-                    i.color,
-                    i.title,
-                    i.io
+                    i
                 )
         );
-
-        for (const g of generated) {
-            const item = rackItems.find(i => i.id === g.id);
-            if (!item) throw new Error('Invalid data'); // should never happen
-            g.io.audio.deserialize(this, item.routing.audio);
-            g.io.midi.deserialize(this, item.routing.midi);
-            g.io.control.deserialize(this, item.routing.control);
-        }
 
         return generated;
     }

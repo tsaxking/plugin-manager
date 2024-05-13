@@ -6,16 +6,31 @@ import { Rack } from './state';
 
 const { max } = Math;
 
-type ioObject = {
-    inputs: string[];
-    outputs: string[];
+// type ioObject = {
+//     inputs: string[];
+//     outputs: string[];
+// };
+
+// export type io = {
+//     midi: ioObject;
+//     audio: ioObject;
+//     control: ioObject;
+// };
+
+export type ioState = {
+    id: string;
+    index: number;
+}
+
+export type SerializedState = {
+    name: string;
+    state?: ioState;
 };
 
-export type io = {
-    midi: ioObject;
-    audio: ioObject;
-    control: ioObject;
-};
+export type SerializedIO = {
+    inputs: SerializedState[];
+    outputs: SerializedState[];
+}
 
 type InputEvents = {
     connect: Output;
@@ -53,28 +68,17 @@ class IOEmitter<Events> {
 const IO_SIZE = 18 + 10 + 4;
 
 export class Input extends IOEmitter<InputEvents> {
-    // public connections: Output[] = [];
     public point = new Point(0, 0);
+    public readonly name: string;
 
     constructor(
         public readonly type: 'midi' | 'audio' | 'control',
         public readonly io: IO,
-        public readonly name: string
+        state: SerializedState
     ) {
         super();
+        this.name = state.name;
     }
-
-    // connect(output: Output) {
-    //     return attempt(() => {
-    //         if (this.rackItem.id === output.rackItem.id) throw new Error('Cannot connect to itself');
-    //         if (this.type !== output.type) throw new Error('Cannot connect different types');
-    //         this.connections.push(output);
-    //     });
-    // }
-
-    // disconnect(output: Output) {
-    //     this.connections = this.connections.filter(c => c !== output);
-    // }
 
     update() {
         const { type } = this;
@@ -137,13 +141,22 @@ export class Input extends IOEmitter<InputEvents> {
 export class Output extends IOEmitter<OutputEvents> {
     public connections: Input[] = [];
     public point = new Point(0, 0);
+    public readonly name: string;
 
     constructor(
         public readonly type: 'midi' | 'audio' | 'control',
         public readonly io: IO,
-        public readonly name: string
+        state: SerializedState
     ) {
         super();
+        this.name = state.name;
+        const r = this.io.rackItem.rack.items.find(i => i.id === state.state?.id);
+        if (r) {
+            const input = r.io[this.type].inputs[state.state?.index || -1]; // should always give an input
+            if (input) {
+                this.connect(input);
+            }
+        }
     }
 
     connect(input: Input) {
@@ -247,20 +260,31 @@ export class IO extends IOEmitter<IOEvents> {
 
     constructor(
         public readonly type: 'midi' | 'audio' | 'control',
-        io: ioObject,
+        io: SerializedIO | undefined,
         public readonly rackItem: RackItem
     ) {
         super();
-        this.inputs = io.inputs.map(i => new Input(type, this, i));
-        this.outputs = io.outputs.map(o => new Output(type, this, o));
+        this.inputs = io ? io.inputs.map(i => new Input(type, this, i)) : [];
+        this.outputs = io ? io.outputs.map(o => new Output(type, this, o)) : [];
     }
 
-    serialize() {
-        return this.outputs.flatMap(o =>
-            o.connections.map(
-                i => i.rackItem.id + ':' + o.index + ':' + i.index
-            )
-        );
+    serialize(): SerializedIO {
+        return {
+            inputs: this.inputs.map(i => ({
+                name: i.name,
+                state: i.connections[0] ? {
+                    id: i.connections[0].rackItem.id,
+                    index: i.connections[0].index
+                } : undefined
+            })),
+            outputs: this.outputs.map(o => ({
+                name: o.name,
+                state: o.connections[0] ? {
+                    id: o.connections[0].rackItem.id,
+                    index: o.connections[0].index
+                } : undefined
+            }))
+        }
     }
 
     deserialize(rack: Rack, data: string[]) {
