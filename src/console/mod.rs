@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
-type F = &'static dyn Fn(Vec<&str>) -> String;
+type F = Box<dyn Fn(Vec<&str>) -> String>;
+
 #[derive(Default)]
 pub struct Cli {
     commands: HashMap<String, F>,
@@ -34,9 +35,9 @@ impl Cli {
 pub fn commands() -> Cli {
     let cli = Cli::new();
 
-    cli.add(String::from("ping"), &|_| String::from("pong"))
-        .add(String::from("echo"), &|args: Vec<&str>| args.join(" "))
-        .add(String::from("help"), &|_| {
+    cli.add(String::from("ping"), Box::new(|_| String::from("pong")))
+        .add(String::from("echo"), Box::new(|args: Vec<&str>| args.join(" ")))
+        .add(String::from("help"), Box::new(|_| {
             let mut output = String::new();
             output.push_str("\nAvailable commands: \n");
             for cmd in [
@@ -50,21 +51,21 @@ pub fn commands() -> Cli {
                 output.push_str(&text);
             }
             output
-        })
-        .add(String::from("greet"), &|_| String::from("Hello World"))
-        .add(String::from("save"), &|args| {
+        }))
+        .add(String::from("greet"), Box::new(|_| String::from("Hello World")))
+        .add(String::from("save"), Box::new(|args| {
             let path = args.join(" ");
             crate::commands::save_load::save(path.clone()).unwrap();
             format!("Saving APP_STATE to {}", path)
-        })
-        .add(String::from("load"), &|args| {
+        }))
+        .add(String::from("load"), Box::new(|args| {
             let path = args.join(" ");
             crate::commands::save_load::load(path.clone()).unwrap();
             format!("Loading APP_STATE from {}", path)
-        })
-        .add(String::from("toggle_play"), &|_| {
+        }))
+        .add(String::from("toggle_play"), Box::new(|_| {
             crate::commands::toggle_playback().unwrap();
             "Playback toggled".to_string()
-        })
-        .add(String::from(""), &|_| String::new())
+        }))
+        .add(String::from(""), Box::new(|_| String::new()))
 }

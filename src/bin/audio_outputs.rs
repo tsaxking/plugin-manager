@@ -18,7 +18,7 @@ fn main() -> anyhow::Result<()> {
     }
 
     commands().add(
-        String::from("audio"), &|args| {
+        String::from("audio"), Box::new(move |args: Vec<&str>| {
             let i = args.first().unwrap().parse::<usize>().unwrap();
             let device = map.get(&i);
 
@@ -27,7 +27,7 @@ fn main() -> anyhow::Result<()> {
             } else {
                 String::from("Device not found")
             }
-        });
+        }));
 
     Ok(())
 }
