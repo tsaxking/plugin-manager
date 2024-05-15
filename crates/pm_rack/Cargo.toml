@@ -4,10 +4,11 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+enum-kinds = "0.5.1"
+enum_dispatch = "0.3.13"
 fundsp = "0.17.1"
 pm_utils = { version = "0.1.0", path = "../pm_utils" }
 serde = { version = "1.0.201", features = ["derive", "rc"] }
 serde_arrays = "0.1.0"
 serde_json = "1.0.117"
 thiserror = "1.0.60"
-typetag = "0.2.16"

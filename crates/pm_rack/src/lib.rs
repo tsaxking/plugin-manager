@@ -5,15 +5,37 @@ use fundsp::{
     hacker::U1,
 };
 use std::{collections::HashMap, sync::Arc};
+use enum_dispatch::enum_dispatch;
 
 #[derive(Default, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Rack {
     #[serde(flatten)]
-    pub items: HashMap<Arc<str>, Box<dyn RackItem>>,
+    pub items: HashMap<Arc<str>, RackItem>,
 }
 
 unsafe impl Send for Rack {}
 unsafe impl Sync for Rack {}
+
+impl Rack {
+    pub fn get(&self, k: Arc<str>) -> Option<&RackItem> {
+        self.items.get(&k)
+    }
+
+    pub fn get_mut(&mut self, k: Arc<str>) -> Option<&mut RackItem> {
+        self.items.get_mut(&k)
+    }
+
+    pub fn insert(&mut self, k: Arc<str>, v: RackItem) -> Option<RackItem> {
+        self.items.insert(k, v)
+    }
+
+    pub fn get_map<T, F>(&mut self, key: &str, f: F) -> Option<T> 
+    where 
+        F: FnOnce(&mut RackItem) -> T 
+    {
+        self.items.get_mut(key).map(f)
+    }
+}
 
 pub fn init_rack(state: Rack) {
     RACK.set(std::sync::Mutex::new(state))
@@ -170,7 +192,7 @@ impl<I: IO> IoDescriptor<I> {
 }
 
 /// Helper storage struct for all the metadata about RackItem
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct RackItemMetadata {
     pub id: Arc<str>,
     pub note: Arc<str>,
@@ -179,8 +201,8 @@ pub struct RackItemMetadata {
     pub color: Arc<str>,
 }
 
-#[typetag::serde(tag = "type")]
-pub trait RackItem: std::fmt::Debug {
+#[enum_dispatch]
+pub trait RackItemT: std::fmt::Debug {
     /// Returns a `RackOutput<Self>` if `output` is valid. Generally, valid outputs (1) exist and
     /// (2) are not already connected to something. It is expected that the default implementation
     /// function is not possible to override.
@@ -237,9 +259,43 @@ pub trait RackItem: std::fmt::Debug {
     fn get_inputs(&self) -> Vec<IoDescriptor<Input>>;
 }
 
+/// This enum represents all possible RackItems. When implementing a new RackItem, its name should
+/// be added to this enum.
+#[enum_dispatch(RackItemT)]
+#[derive(enum_kinds::EnumKind, PartialEq, Debug, serde::Serialize, serde::Deserialize)]
+#[enum_kind(RackItemKind)]
+#[serde(tag = "type")]
+pub enum RackItem {
+    ExampleRackItem,
+}
+
+impl RackItem {
+    pub fn map<T, F>(&mut self, t: RackItemKind, f: F) -> Option<T>
+    where
+        F: FnOnce(&mut RackItem) -> T
+    {
+        if self.matches(t) {
+            Some(f(self))
+        } else {
+            None
+        }
+    }
+
+    pub fn matches(&self, t: RackItemKind) -> bool {
+        t.matches(self)
+    }
+}
+
+impl RackItemKind {
+    pub fn matches(&self, t: &RackItem) -> bool {
+        let other = RackItemKind::from(t);
+        *self == other
+    }
+}
+
 /// Helper struct for dealing with a certain IoKind. Each `RackItem` implementor should only have
 /// one IoComponent per IoKind. Either array may be empty to indicate that there are no ports.
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, PartialEq, Clone, serde::Serialize, serde::Deserialize)]
 pub struct IoComponent<const I: usize, const O: usize> {
     #[serde(with = "serde_arrays")]
     inputs: [InputPort; I],
@@ -285,7 +341,7 @@ impl<const I: usize, const O: usize> Default for IoComponent<I, O> {
 /// - `fundsp::audionode::AudioNode`
 ///
 /// Due to [limitations in serializing trait objects](https://github.com/dtolnay/typetag/issues/1), `RackItem` implementors cannot be generic.
-#[derive(serde::Serialize, serde::Deserialize, Clone, Debug)]
+#[derive(serde::Serialize, serde::Deserialize, PartialEq, Clone, Debug)]
 pub struct ExampleRackItem {
     metadata: RackItemMetadata,
     audio: IoComponent<1, 1>,
@@ -336,8 +392,7 @@ impl Default for ExampleRackItem {
     }
 }
 
-#[typetag::serde]
-impl RackItem for ExampleRackItem {
+impl RackItemT for ExampleRackItem {
     fn is_output_valid(&self, output: &IoDescriptor<Output>) -> bool
     where
         Self: Sized,
@@ -353,7 +408,7 @@ impl RackItem for ExampleRackItem {
             index: target.id,
         };
         let mut lock_guard = RACK.get().unwrap().lock().unwrap();
-        let other = lock_guard.items.get_mut(&*target.rack_item_id).unwrap();
+        let other = lock_guard.get_mut(target.rack_item_id).unwrap();
         other.accept_connection(output.kind, target.id);
     }
 

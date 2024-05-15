@@ -9,7 +9,7 @@ pub use crate::IoPort;
 pub use crate::Output;
 pub use crate::OutputPort;
 pub use crate::RackError;
-pub use crate::RackItem;
+pub use crate::RackItemT;
 pub use crate::RackItemMetadata;
 pub use crate::RackOutput;
 pub use crate::IO;
