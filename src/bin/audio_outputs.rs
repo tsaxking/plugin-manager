@@ -1,5 +1,6 @@
-use cpal::traits::{DeviceTrait, HostTrait};
+use cpal::{traits::{DeviceTrait, HostTrait}, Device};
 use pm::console::commands;
+use std::io::Write;
 
 
 fn main() -> anyhow::Result<()> {
@@ -17,17 +18,33 @@ fn main() -> anyhow::Result<()> {
         }
     }
 
-    commands().add(
+
+    let mut stdout = std::io::stdout();
+    let cli = commands().add(
         String::from("audio"), Box::new(move |args: Vec<&str>| {
             let i = args.first().unwrap().parse::<usize>().unwrap();
             let device = map.get(&i);
 
             if let Some(d) = device {
+                play(d);
                 format!("Selected device: {:?}", d.name())
             } else {
                 String::from("Device not found")
             }
         }));
 
-    Ok(())
+    loop {
+        let mut buf: String = Default::default();
+        write!(stdout, "❯ ").unwrap();
+        stdout.flush().unwrap();
+        std::io::stdin().read_line(&mut buf).unwrap();
+        let response = cli
+            .run(&buf)
+            .unwrap_or(String::from("Did not receive valid command"));
+        writeln!(stdout, "{}", response).unwrap();
+    }
+}
+
+fn play(device: &Device) {
+
 }
