@@ -17,7 +17,7 @@
                     justify-content-between 
                     align-items-center">
             <Gain bind:gain={gain}/>
-            +{gain} db
+            {gain} db
         </div>
     </RackItem>
     <hr>
