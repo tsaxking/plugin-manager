@@ -6,18 +6,21 @@
     --bs-success: #1d6a46;
     --bs-warning: #ad8c33;
     --bs-info: #1690a8;
-    /* --bs-light: #bababa; */
+    --bs-light: #bababa;
+    --border-radius: 8px;
+
+    --navbar-height: 3.5rem;
 }
 
 .modal {
     --bs-modal-header-padding: 0.5rem;
     --bs-modal-padding: 0.5rem;
-    /* --bs-modal-footer-gap: 0px; */
+    --bs-modal-footer-gap: 0px;
 }
 
 .modal-content {
     border: none !important;
-    /* border-radius: 2px !important; */
+    border-radius: 10px !important;
 }
 
 .modal-footer * {
@@ -26,4 +29,8 @@
 
 .modal-footer .btn {
     padding: 0.25rem 0.5rem;
+}
+
+hr {
+    margin: 0 !important;
 }

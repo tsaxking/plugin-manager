@@ -31,9 +31,7 @@ const options: BuildOptions = {
 
 if (args.includes('watch')) {
     esbuildServer.createServer(options).start();
-}
-
-if (args.includes('check')) {
+} else if (args.includes('check')) {
     esbuild
         .build(options)
         .then(() => {
@@ -43,4 +41,6 @@ if (args.includes('check')) {
         .catch(e => {
             throw e;
         });
+} else {
+    esbuild.build(options);
 }
