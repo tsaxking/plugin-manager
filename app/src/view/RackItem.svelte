@@ -16,6 +16,13 @@ import { Stack } from "../utils/event-stack";
     const menus = () => {
         const off = contextmenu([
             {
+                name: 'Open',
+                text: 'Open',
+                action: () => {
+                    item.open();
+                }
+            },
+            {
                 name: item.active ? 'Deactivate' : 'Activate',
                 text: item.active ? 'Deactivate' : 'Activate',
                 action: () => {

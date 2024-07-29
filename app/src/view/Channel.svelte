@@ -15,9 +15,13 @@ import { Stack } from '../utils/event-stack';
     
     let rack: R[] = [];
 
+    const init = () => {
+        console.log('init');
+        channel.getRack().then(r => rack = r.unwrap());
+    }
 
     onMount(() => {
-        channel.getRack().then(r => rack = r.unwrap());
+        init();
     });
 
     </script>
@@ -32,10 +36,10 @@ import { Stack } from '../utils/event-stack';
             {channel.gain} db
         </div>
     <hr>
-    <RackBorder {stack} {channel} index={0}/>
-    {#each rack as item,i}
+    <RackBorder {stack} {channel} index={0} on:add={init}/>
+    {#each rack as item, i}
         <RackItem {item} {stack} />
-        <RackBorder {stack} {channel} index={i+1}/>
+        <RackBorder {stack} {channel} index={i+1} on:add={init}/>
     {/each}
     <hr>
     <div class="bottom">

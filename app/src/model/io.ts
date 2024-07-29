@@ -10,20 +10,13 @@ export class AudioIO {
 
     public static getInputs() {
         return attemptAsync(async () => {
-            if (AudioInput.cache.length) return AudioInput.cache;
             return navigator.mediaDevices
                 .enumerateDevices()
                 .then(devices =>
                     devices.filter(device => device.kind === 'audioinput')
                 )
                 .then(devices =>
-                    devices.map(device => {
-                        const d = new AudioInput({
-                            device,
-                        });
-                        AudioInput.cache.push(d);
-                        return d;
-                    })
+                    devices.map(device => AudioInput.fetch(device))
                 );
         });
     }
@@ -36,20 +29,13 @@ export class AudioIO {
 
     public static getOutputs() {
         return attemptAsync(async () => {
-            if (AudioOutput.cache.length) return AudioOutput.cache;
             return navigator.mediaDevices
                 .enumerateDevices()
                 .then(devices =>
                     devices.filter(device => device.kind === 'audiooutput')
                 )
                 .then(devices =>
-                    devices.map(device => {
-                        const d = new AudioOutput({
-                            device,
-                        });
-                        AudioOutput.cache.push(d);
-                        return d;
-                    })
+                    devices.map(device => AudioOutput.fetch(device))
                 );
         });
     }
@@ -89,7 +75,14 @@ export class AudioIO {
 }
 
 export class AudioInput extends AudioIO {
-    public static readonly cache: AudioInput[] = [];
+    public static readonly cache = new Map<string, AudioInput>();
+    public static fetch(device: MediaDeviceInfo) {
+        if (!AudioInput.cache.has(device.deviceId)) {
+            const input = new AudioInput({ device });
+            AudioInput.cache.set(device.deviceId, input);
+        }
+        return AudioInput.cache.get(device.deviceId) as AudioInput;
+    }
 
     use(channel: Channel) {
         return attemptAsync(async () => {
@@ -108,7 +101,14 @@ export class AudioInput extends AudioIO {
 }
 
 export class AudioOutput extends AudioIO {
-    public static readonly cache: AudioOutput[] = [];
+    public static readonly cache = new Map<string, AudioOutput>();
+    public static fetch(device: MediaDeviceInfo) {
+        if (!AudioOutput.cache.has(device.deviceId)) {
+            const input = new AudioOutput({ device });
+            AudioOutput.cache.set(device.deviceId, input);
+        }
+        return AudioOutput.cache.get(device.deviceId) as AudioOutput;
+    }
 
     use(channel: Channel) {
         return attemptAsync(async () => {

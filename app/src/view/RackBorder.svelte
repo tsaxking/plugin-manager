@@ -1,13 +1,27 @@
 <script lang="ts">
+    import { createEventDispatcher } from "svelte";
 import { Channel } from "../model/channel";
+import { RackItem } from "../model/rack-item";
 import { Stack } from "../utils/event-stack";
 
     export let index: number;
     export let channel: Channel;
     export let stack: Stack;
 
-    const add = () => {
-        console.log('add', channel, index);
+    const d = createEventDispatcher();
+
+    const add = async () => {
+        const id = Math.floor(Math.random() * 1000);
+        const item = new RackItem({
+            id,
+            name: 'New Item - ' + id,
+            inputGain: 0,
+            outputGain: 0,
+            active: true,
+        });
+    
+        (await channel.addRackItem(item, index)).unwrap();
+        d('add', { item, index });
     };
 </script>
 

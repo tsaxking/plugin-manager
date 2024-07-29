@@ -3,7 +3,7 @@
     import Mixer from "./Mixer.svelte";
     import Io from "./IO.svelte";
 import { Stack } from "../utils/event-stack";
-    let page = 'routing';
+    let page = 'mixer';
 
     const mixerStack = new Stack('Mixer');
     const ioStack = new Stack('IO');

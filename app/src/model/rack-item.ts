@@ -3,24 +3,11 @@ import { Channel } from "./channel";
 
 
 export class RackItem {
+    public static readonly cache = new Map<number, RackItem>();
+
     public static all() {
         return attemptAsync(async () => {
-            return [
-                new RackItem({
-                    id: 1,
-                    name: 'Rack 1',
-                    inputGain: 0,
-                    outputGain: 0,
-                    active: false,
-                }),
-                new RackItem({
-                    id: 2,
-                    name: 'Rack 2',
-                    inputGain: 0,
-                    outputGain: 0,
-                    active: true,
-                }),
-            ];
+            return Array.from(RackItem.cache.values());
         });
     }
 
@@ -42,6 +29,8 @@ export class RackItem {
         this._inputGain = data.inputGain;
         this._outputGain = data.outputGain;
         this._active = data.active;
+
+        RackItem.cache.set(this.id, this);
     }
 
     get inputGain() {
@@ -50,6 +39,7 @@ export class RackItem {
 
     set inputGain(value) {
         this._inputGain = value;
+        this.emit('input-gain', value);
     }
 
     get outputGain() {
@@ -58,6 +48,7 @@ export class RackItem {
 
     set outputGain(value) {
         this._outputGain = value;
+        this.emit('output-gain', value);
     }
 
     get active() {
@@ -66,6 +57,7 @@ export class RackItem {
 
     set active(value) {
         this._active = value;
+        this.emit('active', value);
     }
 
     getIOStream(): Promise<Result<[AudioNode, AudioNode]>> {
@@ -121,4 +113,16 @@ export class RackItem {
             channel.rack.splice(index, 1);
         });
     }
+
+    open() {
+        return attemptAsync(async () => {
+            console.log('Opening rack item', this.name);
+        });
+    }
+
+    emit(event: string, data: unknown) {
+        window.dispatchEvent(new CustomEvent(event, { detail: data }));
+    }
 }
+
+Object.assign(window, { RackItem });

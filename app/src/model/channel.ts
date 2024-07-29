@@ -2,6 +2,9 @@ import { attemptAsync, Result } from '../utils/check';
 import { AudioIO } from './io';
 import { RackItem } from './rack-item';
 
+// settings
+// - lock stereo: Force stereo channels to be 1-2, 3-4, 5-6, etc
+// - 
 
 export class Channel {
     public static getChannels(): Promise<Result<Channel[]>> {
@@ -39,6 +42,7 @@ export class Channel {
 
     set name(value) {
         this._name = value;
+        this.emit('channel-name', value);
     }
 
     get gain() {
@@ -47,6 +51,7 @@ export class Channel {
 
     set gain(value) {
         this._gain = value;
+        this.emit('channel-gain', value);
     }
 
     get fader() {
@@ -55,6 +60,7 @@ export class Channel {
 
     set fader(value) {
         this._fader = value;
+        this.emit('channel-fader', value);
     }
 
     get type() {
@@ -63,6 +69,7 @@ export class Channel {
 
     set type(value) {
         this._type = value;
+        this.emit('channel-type', value);
     }
 
     getInput() {
@@ -93,6 +100,10 @@ export class Channel {
             return all.filter(i => this.rack.includes(i.id));
         });
     }
+
+    private emit(event: string, data: unknown) {
+        window.dispatchEvent(new CustomEvent(event, { detail: data }));
+    }
 }
 
 
@@ -104,5 +115,7 @@ const channels = new Array(
     fader: 0,
     rack: [],
     type: 'mono',
-    id: i
+    id: i,
 }));
+
+Object.assign(window, { Channel, channels });

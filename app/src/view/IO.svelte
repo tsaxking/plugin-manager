@@ -36,6 +36,8 @@ export let stack: Stack;
         AudioIO.getInputs().then(i => inputs = i.unwrap());
         AudioIO.getOutputs().then(o => outputs = o.unwrap());
     });
+
+    // TODO: patch 1:1 button
 </script>
 
 
@@ -75,7 +77,10 @@ export let stack: Stack;
                 {#if view === 'inputs'}
                     {#each inputs as i}
                         <td>
-                            <input class="checkbox" type="checkbox" checked={input === i} on:change={async (e) => {
+                            <label
+                                title="Route {i.name} to {channel.name}"
+                            for="ch-{channel.name}-to-input-{i.id}" class="checkbox">
+                            <input name="ch-{channel.name}-to-input-{i.id}" class="checkbox" type="checkbox" checked={input === i} on:change={async (e) => {
                                 const el = e.currentTarget;
                                 if (el.checked) {
                                     const res = await i.use(channel);
@@ -110,12 +115,17 @@ export let stack: Stack;
                                     });
                                 }
                             }}/>
+                            <span class="checkmark"></span>
+                            </label>
                         </td>
                     {/each}
                 {:else}
                     {#each outputs as o}
                         <td>
-                            <input class="checkbox" type="checkbox" checked={output === o} on:change={async (e) => {
+                            <label
+                                title="Route {channel.name} to {o.name}"
+                            for="ch-{channel.name}-to-output-{o.id}" class="checkbox">
+                            <input name="ch-{channel.name}-to-output-{o.id}" class="checkbox" type="checkbox" checked={output === o} on:change={async (e) => {
                                 const el = e.currentTarget;
                                 if (el.checked) {
                                     const res = await o.use(channel);
@@ -149,6 +159,8 @@ export let stack: Stack;
                                     });
                                 }
                             }}/>
+                            <span class="checkmark"></span>
+                            </label>
                         </td>
                     {/each}
                 {/if}
@@ -158,16 +170,39 @@ export let stack: Stack;
 </table>
 
 <style>
+    .checkbox input {
+        /* opacity: 0; */
+        /* height: 0 !important; */
+        /* width: 0 !important; */
+        border-radius: 0px;
+    }   
+
     .checkbox {
-        width: 50px !important;
+        display: block;
+        position: relative;
+        border: var(--bs-secondary) solid 1px !important;
+        user-select: none;
         height: 50px !important;
-        padding: 0 !important;
-        margin: 0 !important;
-        border: none !important;
+        width: 50px !important;
+    }
+
+    .checkmark {
+        position: absolute;
+        top: 0;
+        left: 0;
+        background-color: var(--bs-secondary) !important;
+    } 
+
+    .checkbox:hover input ~ .checkmark {
+        background-color: var(--bs-secondary) !important;
+    }
+
+    .checkbox input:checked ~ .checkmark {
+        background-color: var(--bs-secondary) !important;
     }
 
     .checkbox:checked {
-        /* background-color: var(--primary) !important; */
+        background-color: var(--bs-secondary) !important;
     }
 
     tr {
