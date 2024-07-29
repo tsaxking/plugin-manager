@@ -197,7 +197,11 @@ export const prompt = (
  */
 export const select = (
     message: string,
-    options: string[]
+    options: string[],
+    opts?: {
+        defaultSelected?: number;
+        defaultMessage?: string;
+    }
 ): Promise<number | null> => {
     return new Promise<number | null>(res => {
         const div = create(`
@@ -205,11 +209,10 @@ export const select = (
             <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                <h5 class="modal-title">Alert</h5>
+                <h5 class="modal-title">${message}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                <p>${message}</p>
                 <select class="form-select">
                 </select>
                 </div>
@@ -227,8 +230,19 @@ export const select = (
         const modal = new bootstrap.Modal(div);
 
         const select = div.querySelector('select') as HTMLSelectElement;
+        if (opts?.defaultMessage) {
+            const opt = create(
+                `<option value="-1">${opts.defaultMessage}</option>`
+            ) as HTMLOptionElement;
+            opt.disabled = true;
+            opt.selected = true;
+            select.append(opt);
+        }
         options.forEach((option, index) => {
-            const opt = create(`<option value="${index}">${option}</option>`);
+            const opt = create(
+                `<option value="${index}">${option}</option>`
+            ) as HTMLOptionElement;
+            if (index === opts?.defaultSelected) opt.selected = true;
             select.append(opt);
         });
 
@@ -238,6 +252,7 @@ export const select = (
         const resolve = (data: number | null) => {
             if (resolved) return;
             resolved = true;
+            if (data !== null && data !== -1 && opts?.defaultMessage) data--;
             res(data);
         };
 

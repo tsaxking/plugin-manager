@@ -9,18 +9,21 @@
     --bs-light: #bababa;
     --border-radius: 8px;
 
-    --navbar-height: 3.5rem;
+    --navbar-height: 1.75rem;
 }
 
 .modal {
-    --bs-modal-header-padding: 0.5rem;
-    --bs-modal-padding: 0.5rem;
-    --bs-modal-footer-gap: 0px;
+    /* --bs-modal-header-padding: 0.5rem !important; */
+    /* --bs-modal-header-padding-x: 0.5rem !important; */
+    /* --bs-modal-header-padding-y: 0.5rem !important; */
+    --bs-modal-padding: 0.5rem !important;
+    --bs-modal-footer-gap: 0px !important;
+    --bs-modal-title-line-height: .75 !important;
 }
 
 .modal-content {
     border: none !important;
-    border-radius: 10px !important;
+    border-radius: 0px !important;
 }
 
 .modal-footer * {
@@ -34,3 +37,15 @@
 hr {
     margin: 0 !important;
 }
+
+p {
+    margin-bottom: 0.5rem !important;
+}
+
+.btn,
+button,
+.form-control,
+.form-select {
+    border-radius: 0 !important;
+}
+
