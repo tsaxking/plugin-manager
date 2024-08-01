@@ -4,66 +4,73 @@ use pm::commands;
 use std::io::Write;
 use std::sync::mpsc;
 use std::thread;
+use commands::TauriEvent;
 
 fn main() -> anyhow::Result<()> {
     pm::rack::init_rack(pm::rack::Rack::default());
 
-    let host = cpal::default_host();
-    let device = host
-        .default_output_device()
-        .expect("Failed to find a default output device");
-    let config = device.default_output_config().unwrap();
+    // let host = cpal::default_host();
+    // let device = host
+    //     .default_output_device()
+    //     .expect("Failed to find a default output device");
+    // let config = device.default_output_config().unwrap();
 
-    let (tx, rx): (mpsc::Sender<usize>, mpsc::Receiver<usize>) = mpsc::channel();
-    pm::init_play_tx(tx);
+    let (tx, rx): (mpsc::Sender<TauriEvent>, mpsc::Receiver<TauriEvent>) = mpsc::channel();
+    pm::init_tauri_tx(tx);
 
     let thread_handles = [
         // Audio Thread
-        thread::spawn(move || {
-            let stream = match config.sample_format() {
-                cpal::SampleFormat::F32 => {
-                    make_stream::<f32>(&device, &config.clone().into()).unwrap()
-                }
-                cpal::SampleFormat::I16 => {
-                    make_stream::<i16>(&device, &config.clone().into()).unwrap()
-                }
-                cpal::SampleFormat::U16 => {
-                    make_stream::<u16>(&device, &config.clone().into()).unwrap()
-                }
-                _ => panic!("Unsupported format"),
-            };
-            loop {
-                stream.play().unwrap();
-                rx.recv().unwrap();
-                stream.pause().unwrap();
-                rx.recv().unwrap();
-            }
-        }),
-        // CLI thread
+        // thread::spawn(move || {
+        //     let stream = match config.sample_format() {
+        //         cpal::SampleFormat::F32 => {
+        //             make_stream::<f32>(&device, &config.clone().into()).unwrap()
+        //         }
+        //         cpal::SampleFormat::I16 => {
+        //             make_stream::<i16>(&device, &config.clone().into()).unwrap()
+        //         }
+        //         cpal::SampleFormat::U16 => {
+        //             make_stream::<u16>(&device, &config.clone().into()).unwrap()
+        //         }
+        //         _ => panic!("Unsupported format"),
+        //     };
+        //     loop {
+        //         stream.play().unwrap();
+        //         rx.recv().unwrap();
+        //         stream.pause().unwrap();
+        //         rx.recv().unwrap();
+        //     }
+        // }),
+        // // CLI thread
+        // #[cfg(debug_assertions)]
+        // thread::spawn(move || {
+        //     use pm::console;
+        //     let mut stdout = std::io::stdout();
+        //     let cli = console::commands();
+        //     loop {
+        //         let mut buf: String = Default::default();
+        //         write!(stdout, "❯ ").unwrap();
+        //         stdout.flush().unwrap();
+        //         std::io::stdin().read_line(&mut buf).unwrap();
+        //         let response = cli
+        //             .run(&buf)
+        //             .unwrap_or(String::from("Did not receive valid command"));
+        //         writeln!(stdout, "{}", response).unwrap();
+        //     }
+        // }),
+        // Tauri Reciever
         #[cfg(debug_assertions)]
         thread::spawn(move || {
-            use pm::console;
             let mut stdout = std::io::stdout();
-            let cli = console::commands();
             loop {
-                let mut buf: String = Default::default();
-                write!(stdout, "❯ ").unwrap();
-                stdout.flush().unwrap();
-                std::io::stdin().read_line(&mut buf).unwrap();
-                let response = cli
-                    .run(&buf)
-                    .unwrap_or(String::from("Did not receive valid command"));
-                writeln!(stdout, "{}", response).unwrap();
+                let data = rx.recv().unwrap();
+                writeln!(stdout, "{:?}", data).unwrap();
             }
         }),
     ];
 
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
-            commands::get_effects_state,
-            commands::toggle_playback,
-            commands::save_load::save,
-            commands::save_load::load,
+            commands::global,
         ])
         .run(tauri::generate_context!())
         .unwrap();
