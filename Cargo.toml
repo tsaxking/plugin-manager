@@ -10,6 +10,7 @@ version = "0.1.0"
 edition = "2021"
 license = "Copyright"
 repository = "https://github.com/tsaxking/plugin-manager"
+default-run = "pm"
 
 [[bin]]
 name = "output_json"
@@ -20,12 +21,13 @@ bench = false
 [dependencies]
 pm_rack = { path = "./crates/pm_rack" }
 anyhow = "1.0.83"
-cpal = "0.15.3"
-fundsp = "0.17.1"
 serde = { version = "1.0.200", features = ["derive"] }
 serde_json = "1.0.116"
 tauri = { version = "1.6.2", features = ["custom-protocol"] }
 thiserror = "1.0.60"
+bevy_ecs = "0.14.0"
+tracing = "0.1.40"
+tracing-subscriber = "0.3.18"
 
 [build-dependencies]
 tauri-build = { version = "1.5.1", features = [] }
