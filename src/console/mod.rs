@@ -52,19 +52,19 @@ pub fn commands() -> Cli {
             output
         })
         .add(String::from("greet"), &|_| String::from("Hello World"))
-        .add(String::from("save"), &|args| {
-            let path = args.join(" ");
-            crate::commands::save_load::save(path.clone()).unwrap();
-            format!("Saving APP_STATE to {}", path)
-        })
-        .add(String::from("load"), &|args| {
-            let path = args.join(" ");
-            crate::commands::save_load::load(path.clone()).unwrap();
-            format!("Loading APP_STATE from {}", path)
-        })
-        .add(String::from("toggle_play"), &|_| {
-            crate::commands::toggle_playback().unwrap();
-            "Playback toggled".to_string()
-        })
+        // .add(String::from("save"), &|args| {
+        //     let path = args.join(" ");
+        //     crate::commands::save_load::save(path.clone()).unwrap();
+        //     format!("Saving APP_STATE to {}", path)
+        // })
+        // .add(String::from("load"), &|args| {
+        //     let path = args.join(" ");
+        //     crate::commands::save_load::load(path.clone()).unwrap();
+        //     format!("Loading APP_STATE from {}", path)
+        // })
+        // .add(String::from("toggle_play"), &|_| {
+        //     crate::commands::toggle_playback().unwrap();
+        //     "Playback toggled".to_string()
+        // })
         .add(String::from(""), &|_| String::new())
 }

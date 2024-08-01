@@ -40,9 +40,6 @@ export class Ok<T = unknown> {
     }
 
     unwrap(): T {
-        console.warn(
-            'Warning: Unwrapping Ok result, this is not recommended for anything other than testing.'
-        );
         return this.value;
     }
 }
@@ -90,11 +87,8 @@ export class Err<E = Error, T = unknown> {
         return new Ok(value);
     }
 
-    unwrap(): E {
-        console.warn(
-            'Warning: Unwrapping Err result, this is not recommended for anything other than testing.'
-        );
-        return this.error;
+    unwrap(): T {
+        throw this.error;
     }
 }
 
