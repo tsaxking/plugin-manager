@@ -6,7 +6,7 @@ export let value = 0;
 
 export let stack: Stack;
 
-const primary = Color.fromBootstrap('primary').toString('rgb');
+const primary = '#0f14f0';
 const dark = Color.fromName('black').toString('rgb');
 
 let input: HTMLInputElement;

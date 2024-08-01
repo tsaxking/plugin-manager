@@ -5,6 +5,7 @@ export let fader = 0;
 import { Stack } from '../../utils/event-stack';
 
 export let stack: Stack;
+export let vertical = true;
 
 let value = (() => {
     switch (true) {
@@ -12,12 +13,12 @@ let value = (() => {
             return 0;
         case fader < 0:
             // -60db to 0db
-            return Math.round(((fader + 60) / 60) * 80);
+            return Math.round(((fader + 60) / 60) * 60);
         case fader === 0:
-            return 80;
+            return 60;
         case fader < 10:
             // 0db to 10db
-            return Math.round((fader * 20) / 10 + 80);
+            return Math.round((fader * 20) / 10 + 60);
         default:
             return 100;
     }
@@ -31,22 +32,20 @@ $: {
         case value === 0:
             fader = -Infinity;
             break;
-        case value < 80:
+        case value < 60:
             // -60db to 0db
-            fader = Math.round(-60 + (value / 80) * 60);
+            fader = Math.round(-60 + (value / 60) * 60);
             break;
-        case value === 80:
+        case value === 60:
             fader = 0;
             break;
         case value < 100:
             // 0db to 10db
-            fader = Math.round(((value - 80) * 10) / 20);
+            fader = Math.round(((value - 60) * 10) / 20);
             break;
     }
 }
 
-const primary = Color.fromBootstrap('primary').toString('rgb');
-const dark = Color.fromName('black').toString('rgb');
 
 let input: HTMLInputElement;
 
@@ -78,22 +77,38 @@ onMount(() => {
 });
 </script>
 
-<div class="fader">
-    <input
-    type="range"
-    class="input-slider"
-    data-width=150
-    data-height=10
-    bind:value
-    data-bgcolor="{dark}"
-    data-fgcolor="{primary}"
-    bind:this={input}
-    />
+<div class="w-100">
+    <div class="fader">
+    {#if vertical}
+        <input
+        type="range"
+        class="fader input-slider"
+        data-src="../src/images/fader_knob.png"
+        data-sprites="200"
+        data-width=30
+        data-height=150
+        bind:value
+        bind:this={input}
+        />
+        {:else} 
+        <input
+        type="range"
+        class="fader input-slider"
+        data-width=150
+        data-fgcolor="#0f14f0"
+        data-height=12
+        bind:value
+        bind:this={input}
+        />
+        {/if}
+    </div>
 
     <p class="
     p-0
-    m-0
-    ws-nowrap">
+    ws-nowrap
+    w-100
+    text-center
+    ">
         {
             fader === -Infinity
                 ? '-∞'
@@ -104,9 +119,10 @@ onMount(() => {
 
 <style>
     .fader {
+        /* margin: 0 auto; */
         /* box-sizing: border-box; */
-        /* display: flex; */
-        /* justify-content: space-between; */
+        display: flex;
+        justify-content: center;
         /* flex-direction: row; */
         /* align-items: center; */
     }

@@ -68,15 +68,15 @@ import { Stack } from "../utils/event-stack";
     });
 </script>
 
-<div class="rack-item py-1"
+<div class="rack-item pt-3"
     class:bg-secondary={!item.active}
     bind:this={target}
 >
     <!-- <Meter bind:audio={inputStream}/> -->
-    <Fader bind:fader={item.inputGain} {stack}/>
+    <Fader bind:fader={item.inputGain} {stack} vertical={false} />
     <p>
         {item.name}
     </p>
-    <Fader bind:fader={item.outputGain} {stack}/>
+    <Fader bind:fader={item.outputGain} {stack} vertical={false} />
     <!-- <Meter bind:audio={outputStream}/> -->
 </div>

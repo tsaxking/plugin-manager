@@ -61,7 +61,7 @@ import { Stack } from '../utils/event-stack';
         .channel {
             display: flex;
             flex-direction: column;
-            width: 152px;
+            width: 100px;
             height: 100%;
             /* border-radius: var(--border-radius); */
             border: var(--bs-secondary) 1px solid;
