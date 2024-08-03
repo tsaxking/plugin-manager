@@ -114,5 +114,9 @@
         "./node_modules",
         "./node_modules/*",
         "./node_modules/@types/node/index.d.ts"
-    ]
+    ],
+    "ts-node": {
+        "files": true,
+        "transpileOnly": true
+    }
 }
