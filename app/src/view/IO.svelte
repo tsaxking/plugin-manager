@@ -1,120 +1,226 @@
 <script lang="ts">
-import { Cable } from '../model/cable';
-import { IO, Input, Output } from '../model/io';
-import { colors } from '../model/rack-item';
-import { capitalize } from '../utils/text';
+import { onMount } from "svelte";
+    import { Channel } from "../model/channel";
+import { AudioInput, AudioIO, AudioOutput } from "../model/io";
+import { resolveAll, attemptAsync } from '../utils/check';
+import { alert } from '../utils/prompt';
+import { Stack } from '../utils/event-stack';
 
-export let io: IO;
+export let stack: Stack;
 
-let color = colors[io.type];
+    let channels: {
+        channel: Channel;
+        input?: AudioInput;
+        output?: AudioOutput
+    }[] = [];
+    let inputs: AudioInput[] = [];
+    let outputs: AudioOutput[] = [];
 
-let active: Input | Output | null = Cable.state;
+    let view = 'inputs';
 
-Cable.on('change', a => (active = a));
-
-const click = (io: Input | Output) => {
-    if (Cable.state) {
-        if (Cable.state instanceof Output && io instanceof Input) {
-            if (Cable.state.isConnected(io)) {
-                Cable.state.disconnect(io);
-            } else {
-                Cable.state.connect(io);
-            }
-        } else if (Cable.state instanceof Input && io instanceof Output) {
-            if (io.isConnected(Cable.state)) {
-                io.disconnect(Cable.state);
-            } else {
-                io.connect(Cable.state);
-            }
-        } else {
-            console.log('Invalid connection');
-        }
-        Cable.state = null;
-    } else {
-        Cable.state = io;
+    $: {
+        console.log(view);
+        stack.clear();
     }
-};
+
+    onMount(() => {
+        Channel.getChannels().then(async c => {
+            channels = resolveAll(await Promise.all(c.unwrap().map(channel => {
+                return attemptAsync(async () => {
+                    const input = await channel.getInput();
+                    const output = await channel.getOutput();
+                    return { channel, input: input.unwrap(), output: output.unwrap() };
+                });
+            }))).unwrap();
+        });
+        AudioIO.getInputs().then(i => inputs = i.unwrap());
+        AudioIO.getOutputs().then(o => outputs = o.unwrap());
+    });
+
+    // TODO: patch 1:1 button
 </script>
 
-<!-- {#each io.inputs as i, index}
-    <div class="d-flex w-100 justify-content-start">
-        {#if !!i}
-            <p
-                class="text-light px-1"
-                style="background-color: {color.toString()};"
-            >
-                {capitalize(i.type)} {index + 1}
-            </p>
-        {/if}
-    </div>
-{/each}
-{#each io.outputs as o, index}
-    <div class="d-flex w-100 justify-content-end">
-        {#if !!o}
-            <p
-                class="text-light px-1"
-                style="background-color: {color.toString()};"
-            >
-                {capitalize(o.type)} {index + 1}
-            </p>
-        {/if}
-    </div>
-{/each} -->
 
-<div class="container-fluid no-select">
-    <div class="row">
-        <div class="col-6">
-            <div class="container-fluid">
-                {#each io.inputs as i, index}
-                    <div class="d-flex justify-content-start">
-                        <p
-                            on:click="{() => click(i)}"
-                            class="text-light cursor-pointer"
-                            style="background-color: {color
-                                .clone()
-                                .setAlpha(Object.is(active, i) ? 0.5 : 1)
-                                .toString()};"
-                        >
-                            {capitalize(i.name)}
-                        </p>
-                    </div>
-                {/each}
-            </div>
-        </div>
-        <div class="col-6">
-            <div class="container-fluid">
-                {#each io.outputs as o, index}
-                    <div class="d-flex justify-content-end">
-                        <p
-                            on:click="{() => click(o)}"
-                            class="text-light cursor-pointer"
-                            style="background-color: {color
-                                .clone()
-                                .setAlpha(Object.is(active, o) ? 0.5 : 1)
-                                .toString()};"
-                        >
-                            {capitalize(o.name)}
-                        </p>
-                    </div>
-                {/each}
-            </div>
-        </div>
+<div class="btn-group" role="group">
+    <button class="btn btn-primary"
+        disabled={view === 'inputs'}
+        on:click={() => view = 'inputs'}
+    >
+    Inputs
+    </button>
+    <button class="btn btn-primary"
+        disabled={view === 'outputs'}
+        on:click={() => view = 'outputs'}
+    >Outputs</button>
     </div>
-</div>
+<table>
+    <thead>
+        <tr>
+            <th></th>
+            {#if view === 'inputs'}
+                {#each inputs as input}
+                    <th class="ws-nowrap"><div>{input.name}</div></th>
+                {/each}
+            {:else}
+                {#each outputs as output}
+                    <th class="ws-nowrap"><div>{output.name}</div></th>
+                {/each}
+            {/if}
+        </tr>
+    </thead>
+    <tbody>
+        {#each channels as { channel, input, output }}
+            <tr>
+                <th>
+                    <p class="ws-nowrap">{channel.name}</p>
+                </th>
+                {#if view === 'inputs'}
+                    {#each inputs as i}
+                        <td>
+                            <label
+                                title="Route {i.name} to {channel.name}"
+                            for="ch-{channel.name}-to-input-{i.id}" class="checkbox">
+                            <input name="ch-{channel.name}-to-input-{i.id}" class="checkbox" type="checkbox" checked={input === i} on:change={async (e) => {
+                                const el = e.currentTarget;
+                                if (el.checked) {
+                                    const res = await i.use(channel);
+                                    if (res.isErr()) {
+                                        alert(res.error.message);
+                                        return el.checked = false;
+                                    }
+
+                                    stack.push({
+                                        name: 'Input change',
+                                        undo: () => {
+                                            i.release();
+                                            el.checked = false;
+                                        },
+                                        redo: () => {
+                                            i.use(channel);
+                                            el.checked = true;
+                                        },
+                                    });
+                                } else {
+                                    i.release();
+                                    stack.push({
+                                        name: 'Input change',
+                                        undo: () => {
+                                            i.use(channel);
+                                            el.checked = true;
+                                        },
+                                        redo: () => {
+                                            i.release();
+                                            el.checked = false;
+                                        },
+                                    });
+                                }
+                            }}/>
+                            <span class="checkmark"></span>
+                            </label>
+                        </td>
+                    {/each}
+                {:else}
+                    {#each outputs as o}
+                        <td>
+                            <label
+                                title="Route {channel.name} to {o.name}"
+                            for="ch-{channel.name}-to-output-{o.id}" class="checkbox">
+                            <input name="ch-{channel.name}-to-output-{o.id}" class="checkbox" type="checkbox" checked={output === o} on:change={async (e) => {
+                                const el = e.currentTarget;
+                                if (el.checked) {
+                                    const res = await o.use(channel);
+                                    if (res.isErr()) {
+                                        alert(res.error.message);
+                                        return el.checked = false;
+                                    }
+                                    stack.push({
+                                        name: 'Output change',
+                                        undo: () => {
+                                            o.release();
+                                            el.checked = false;
+                                        },
+                                        redo: () => {
+                                            o.use(channel);
+                                            el.checked = true;
+                                        },
+                                    })
+                                } else {
+                                    o.release();
+                                    stack.push({
+                                        name: 'Output change',
+                                        undo: () => {
+                                            o.use(channel);
+                                            el.checked = true;
+                                        },
+                                        redo: () => {
+                                            o.release();
+                                            el.checked = false;
+                                        },
+                                    });
+                                }
+                            }}/>
+                            <span class="checkmark"></span>
+                            </label>
+                        </td>
+                    {/each}
+                {/if}
+            </tr>
+        {/each}
+    </tbody>
+</table>
 
 <style>
-p {
-    font-size: 12px;
-    margin: 5px 0px;
-    padding: 2px 5px;
-    width: min-content;
-    white-space: nowrap;
-}
+    .checkbox input {
+        /* opacity: 0; */
+        /* height: 0 !important; */
+        /* width: 0 !important; */
+        border-radius: 0px;
+    }   
 
-.container-fluid,
-.row,
-.col-6 {
-    padding: 0 !important;
-    margin: 0 !important;
-}
+    .checkbox {
+        display: block;
+        position: relative;
+        border: var(--bs-secondary) solid 1px !important;
+        user-select: none;
+        height: 50px !important;
+        width: 50px !important;
+    }
+
+    .checkmark {
+        position: absolute;
+        top: 0;
+        left: 0;
+        background-color: var(--bs-secondary) !important;
+    } 
+
+    .checkbox:hover input ~ .checkmark {
+        background-color: var(--bs-secondary) !important;
+    }
+
+    .checkbox input:checked ~ .checkmark {
+        background-color: var(--bs-secondary) !important;
+    }
+
+    .checkbox:checked {
+        background-color: var(--bs-secondary) !important;
+    }
+
+    tr {
+        padding: 0 !important;
+        margin: 0 !important;
+        border: none !important;
+    }
+
+    thead tr th, td {
+        padding: 0 !important;
+        margin: 0 !important;
+        border: none !important;
+        max-width: 50px !important;
+        max-height: 50px !important;
+    }
+
+    thead tr th {
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+    }
 </style>

@@ -1,321 +1,127 @@
-import { RackItem } from './rack-item';
-import { EventEmitter } from '../utils/event-emitter';
-import { attempt } from '../utils/check';
-import { Point } from '../utils/calcs/linear-algebra/point';
-import { Rack } from './state';
+import { attemptAsync } from '../utils/check';
+import { Channel } from './channel';
 
-const { max } = Math;
-
-export type ioState = {
-    id: string;
-    index: number;
-};
-
-export type SerializedState = {
-    name: string;
-};
-
-export type InputSerializedState = SerializedState & {
-    state: 'Disconnected' | 'Connected';
-};
-
-export type OutputSerializedState = SerializedState & {
-    state: 'Disconnected' | ioState;
-};
-
-export type SerializedIO = {
-    inputs: InputSerializedState[];
-    outputs: OutputSerializedState[];
-};
-
-export type ioObject = {
-    audio?: SerializedIO;
-    midi?: SerializedIO;
-    control?: SerializedIO;
-};
-
-type InputEvents = {
-    connect: Output;
-    disconnect: Output;
-};
-
-type OutputEvents = {
-    connect: Input;
-    disconnect: Input;
-};
-
-type IOEvents = {
-    connect: { input: Input; output: Output };
-    disconnect: { input: Input; output: Output };
-    change: void;
-};
-
-class IOEmitter<Events> {
-    public readonly emitter = new EventEmitter<keyof Events>();
-
-    on<K extends keyof Events>(event: K, cb: (data: Events[K]) => void) {
-        this.emitter.on(event, cb);
-    }
-
-    emit<K extends keyof Events>(event: K, data: Events[K]) {
-        this.emitter.emit(event, data);
-    }
-
-    off<K extends keyof Events>(event: K, cb: (data: Events[K]) => void) {
-        this.emitter.off(event, cb);
-    }
-}
-
-// font size + margin + padding
-const IO_SIZE = 18 + 10 + 4;
-
-export class Input extends IOEmitter<InputEvents> {
-    public point = new Point(0, 0);
-    public readonly name: string;
-
-    constructor(
-        public readonly type: 'midi' | 'audio' | 'control',
-        public readonly io: IO,
-        state: InputSerializedState
-    ) {
-        super();
-        this.name = state.name;
-    }
-
-    update() {
-        const { type } = this;
-        const { x, y } = this.rackItem;
-        const { index } = this;
-
-        const maxAudio = max(
-            this.rackItem.io.audio.inputs.length,
-            this.rackItem.io.audio.outputs.length
-        );
-        const maxMidi = max(
-            this.rackItem.io.midi.inputs.length,
-            this.rackItem.io.midi.outputs.length
-        );
-
-        let displacement = 0;
-        switch (type) {
-            case 'control':
-                displacement = maxAudio + maxMidi + index;
-                break;
-            case 'midi':
-                displacement = maxAudio + index;
-                break;
-            case 'audio':
-                displacement = index;
-                break;
-        }
-
-        this.point.x = x * 16;
-        this.point.y = y * 380 + 60 + displacement * IO_SIZE + 16;
-
-        return this.point;
-    }
-
-    get rackItem() {
-        return this.io.rackItem;
-    }
-
-    get rack() {
-        return this.rackItem.rack;
-    }
-
-    get index() {
-        return this.io.inputs.indexOf(this);
-    }
-
-    isConnected(output: Output) {
-        return output.isConnected(this);
-    }
-
-    get connections(): Output[] {
-        return this.rack.items.flatMap(i => {
-            return i.io[this.type].outputs.filter(o => o.isConnected(this));
+export class AudioIO {
+    public static getAvailableInputs() {
+        return attemptAsync(async () => {
+            return (await AudioIO.getInputs()).unwrap().filter(o => !o.inUse);
         });
     }
 
-    disconnectAll() {
-        for (const output of this.connections) {
-            output.disconnect(this);
-        }
-    }
-}
-
-export class Output extends IOEmitter<OutputEvents> {
-    public connections: Input[] = [];
-    public point = new Point(0, 0);
-    public readonly name: string;
-
-    constructor(
-        public readonly type: 'midi' | 'audio' | 'control',
-        public readonly io: IO,
-        state: OutputSerializedState
-    ) {
-        super();
-        this.name = state.name;
-        const s = state.state;
-        if (s !== 'Disconnected') {
-            const r = this.io.rackItem.rack.items.find(i => i.id === s.id);
-            if (r) {
-                const input = r.io[this.type].inputs[s.index]; // should always give an input
-                if (input) {
-                    this.connect(input);
-                }
-            }
-        }
-    }
-
-    connect(input: Input) {
-        return attempt(() => {
-            if (this.type !== input.type)
-                throw new Error('Cannot connect different types');
-            if (this.rackItem.id === input.rackItem.id)
-                throw new Error('Cannot connect to itself');
-            if (this.connections.length) {
-                throw new Error('Output already connected');
-            }
-            if (input.connections.length) {
-                throw new Error('Input already connected');
-            }
-            this.connections.push(input);
-            this.emit('connect', input);
-            IO.emit('change', undefined);
+    public static getInputs() {
+        return attemptAsync(async () => {
+            return navigator.mediaDevices
+                .enumerateDevices()
+                .then(devices =>
+                    devices.filter(device => device.kind === 'audioinput')
+                )
+                .then(devices =>
+                    devices.map(device => AudioInput.fetch(device))
+                );
         });
     }
 
-    disconnect(input: Input) {
-        this.connections = this.connections.filter(c => c !== input);
-        IO.emit('change', undefined);
+    public static getAvailableOutputs() {
+        return attemptAsync(async () => {
+            return (await AudioIO.getOutputs()).unwrap().filter(o => !o.inUse);
+        });
     }
 
-    update() {
-        const { type } = this;
-        const { x, y } = this.io.rackItem;
-        const index = this.io.outputs.indexOf(this);
-
-        const maxAudio = max(
-            this.rackItem.io.audio.inputs.length,
-            this.rackItem.io.audio.outputs.length
-        );
-        const maxMidi = max(
-            this.rackItem.io.midi.inputs.length,
-            this.rackItem.io.midi.outputs.length
-        );
-
-        let displacement = 0;
-        switch (type) {
-            case 'control':
-                displacement = maxAudio + maxMidi + index;
-                break;
-            case 'midi':
-                displacement = maxAudio + index;
-                break;
-            case 'audio':
-                displacement = index;
-                break;
-        }
-
-        this.point.x = x * 16 + 16 * this.io.rackItem.width;
-        this.point.y = y * 380 + 60 + displacement * IO_SIZE + 16;
-
-        return this.point;
+    public static getOutputs() {
+        return attemptAsync(async () => {
+            return navigator.mediaDevices
+                .enumerateDevices()
+                .then(devices =>
+                    devices.filter(device => device.kind === 'audiooutput')
+                )
+                .then(devices =>
+                    devices.map(device => AudioOutput.fetch(device))
+                );
+        });
     }
 
-    get rackItem() {
-        return this.io.rackItem;
+    public channel?: Channel;
+    public readonly device: MediaDeviceInfo;
+
+    constructor(data: { device: MediaDeviceInfo }) {
+        this.device = data.device;
     }
 
-    get index() {
-        return this.io.outputs.indexOf(this);
+    get id() {
+        return this.device.deviceId;
     }
 
-    isConnected(input: Input) {
-        return this.connections.includes(input);
+    get name() {
+        return this.device.label;
     }
 
-    disconnectAll() {
-        for (const input of this.connections) {
-            this.disconnect(input);
-        }
+    get inUse() {
+        return !!this.channel;
+    }
+
+    release() {
+        this.channel = undefined;
+    }
+
+    getStream() {
+        return attemptAsync(async () => {
+            return navigator.mediaDevices.getUserMedia({
+                audio: {
+                    deviceId: this.id,
+                },
+            });
+        });
     }
 }
 
-export class IO extends IOEmitter<IOEvents> {
-    private static readonly emitter = new EventEmitter<keyof IOEvents>();
-
-    public static on<K extends keyof IOEvents>(
-        event: K,
-        cb: (data: IOEvents[K]) => void
-    ) {
-        IO.emitter.on(event, cb);
-    }
-
-    public static emit<K extends keyof IOEvents>(event: K, data: IOEvents[K]) {
-        IO.emitter.emit(event, data);
-    }
-
-    public static off<K extends keyof IOEvents>(
-        event: K,
-        cb: (data: IOEvents[K]) => void
-    ) {
-        IO.emitter.off(event, cb);
-    }
-
-    public readonly inputs: Input[];
-    public readonly outputs: Output[];
-
-    constructor(
-        public readonly type: 'midi' | 'audio' | 'control',
-        io: SerializedIO | undefined,
-        public readonly rackItem: RackItem
-    ) {
-        super();
-        this.inputs = io ? io.inputs.map(i => new Input(type, this, i)) : [];
-        this.outputs = io ? io.outputs.map(o => new Output(type, this, o)) : [];
-    }
-
-    serialize(): SerializedIO {
-        return {
-            inputs: this.inputs.map(i => ({
-                name: i.name,
-                state: i.connections.length ? 'Connected' : 'Disconnected',
-            })),
-            outputs: this.outputs.map(o => ({
-                name: o.name,
-                state: o.connections[0]
-                    ? {
-                          id: o.connections[0].rackItem.id,
-                          index: o.connections[0].index,
-                      }
-                    : 'Disconnected',
-            })),
-        };
-    }
-
-    deserialize(rack: Rack, data: string[]) {
-        for (const connection of data) {
-            const [id, title, outputIndex, inputIndex] = connection.split(':');
-            const output = this.rackItem.io[this.type].outputs[+outputIndex];
-            const input = rack.items.find(i => i.id === id + ':' + title)?.io[
-                this.type
-            ].inputs[+inputIndex];
-            if (output && input) {
-                output.connect(input);
-            } else {
-                console.warn('Unable to connect IOs: ', output, input);
-            }
+export class AudioInput extends AudioIO {
+    public static readonly cache = new Map<string, AudioInput>();
+    public static fetch(device: MediaDeviceInfo) {
+        if (!AudioInput.cache.has(device.deviceId)) {
+            const input = new AudioInput({ device });
+            AudioInput.cache.set(device.deviceId, input);
         }
+        return AudioInput.cache.get(device.deviceId) as AudioInput;
     }
 
-    destroy() {
-        for (const input of this.inputs) {
-            input.disconnectAll();
+    use(channel: Channel) {
+        return attemptAsync(async () => {
+            const input = (await channel.getInput()).unwrap();
+            if (input)
+                throw new Error(
+                    `Channel ${channel.name} already has an input, it must be released first`
+                );
+            if (this.inUse)
+                throw new Error(
+                    `Input already in use with channel ${this.channel?.name}`
+                );
+            this.channel = channel;
+        });
+    }
+}
+
+export class AudioOutput extends AudioIO {
+    public static readonly cache = new Map<string, AudioOutput>();
+    public static fetch(device: MediaDeviceInfo) {
+        if (!AudioOutput.cache.has(device.deviceId)) {
+            const input = new AudioOutput({ device });
+            AudioOutput.cache.set(device.deviceId, input);
         }
-        for (const output of this.outputs) {
-            output.disconnectAll();
-        }
+        return AudioOutput.cache.get(device.deviceId) as AudioOutput;
+    }
+
+    use(channel: Channel) {
+        return attemptAsync(async () => {
+            const output = (await channel.getOutput()).unwrap();
+            if (output)
+                throw new Error(
+                    `Channel ${channel.name} already has an output, it must be released first`
+                );
+            if (this.inUse)
+                throw new Error(
+                    `Output already in use with channel ${this.channel?.name}`
+                );
+            this.channel = channel;
+        });
     }
 }

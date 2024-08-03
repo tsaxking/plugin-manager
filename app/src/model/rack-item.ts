@@ -1,189 +1,128 @@
-import { attempt } from '../utils/check';
-import { EventEmitter } from '../utils/event-emitter';
-import { Point2D } from '../utils/calcs/linear-algebra/point';
-import { IO, SerializedIO } from './io';
-import { Color } from '../utils/color';
-import { abbreviate } from '../utils/text';
-import { Rack } from './state';
+import { attemptAsync, Result } from "../utils/check";
+import { Channel } from "./channel";
 
-export type SerializedRackItem = {
-    type: string;
-    metadata: {
-        id: string;
-        note: string;
-        point: Point2D;
-        width: number;
-        color: string;
-    };
-
-    audio?: SerializedIO;
-    midi?: SerializedIO;
-    control?: SerializedIO;
-};
-
-export const colors = {
-    audio: Color.fromHex('#425df5'),
-    midi: Color.fromHex('#30a136'),
-    control: Color.fromHex('#f54242'),
-};
-
-type Events = {
-    destroy: void;
-    move: { x: number; y: number };
-    update: void;
-};
-
-type GlobalEvents = {
-    destroy: RackItem;
-    move: RackItem;
-    update: RackItem;
-    new: RackItem;
-    display: 'io' | 'control';
-};
 
 export class RackItem {
-    private static readonly emitter = new EventEmitter<keyof GlobalEvents>();
-    public static on<K extends keyof GlobalEvents>(
-        event: K,
-        listener: (e: GlobalEvents[K]) => void
-    ): void {
-        this.emitter.on(event, listener);
-    }
+    public static readonly cache = new Map<number, RackItem>();
 
-    public static off<K extends keyof GlobalEvents>(
-        event: K,
-        listener?: (e: GlobalEvents[K]) => void
-    ): void {
-        this.emitter.off(event, listener);
-    }
-
-    public static emit<K extends keyof GlobalEvents>(
-        event: K,
-        e: GlobalEvents[K]
-    ): void {
-        this.emitter.emit(event, e);
-    }
-
-    private readonly emitter = new EventEmitter<keyof Events>();
-
-    public x = 0;
-    public y = 0;
-    public io: {
-        midi: IO;
-        audio: IO;
-        control: IO;
-    };
-    public readonly id: string;
-    public color: string;
-    public width: number;
-    public type: string;
-    private readonly _note: string;
-
-    constructor(
-        public readonly rack: Rack,
-        serialized: SerializedRackItem
-    ) {
-        this.id = serialized.metadata.id;
-        this.color = serialized.metadata.color;
-        this.width = serialized.metadata.width;
-        this.type = serialized.type;
-        this.io = {
-            midi: new IO('midi', serialized.midi, this),
-            audio: new IO('audio', serialized.audio, this),
-            control: new IO('control', serialized.control, this),
-        };
-        [this.x, this.y] = serialized.metadata.point;
-        this._note = serialized.metadata.note;
-
-        if (this.width < 8) throw new Error('Invalid width');
-
-        // this.io = {
-        //     midi: new IO('midi', io.midi, this),
-        //     audio: new IO('audio', io.audio, this),
-        //     control: new IO('control', io.control, this),
-        // };
-        // this._note = note;
-
-        rack.items.push(this);
-        RackItem.emit('new', this);
-    }
-
-    get note() {
-        return abbreviate(this._note, 10 + Math.floor(this.width * 1.25));
-    }
-
-    get end() {
-        return this.x + this.width;
-    }
-
-    moveTo(x: number, y: number) {
-        return attempt(() => {
-            if (x < 0 || y < 0) throw new Error('Invalid position');
-            // console.log('moving to', x, y);
-            // check if the new position is valid
-            const { items } = this.rack;
-            const end = x + this.width;
-
-            for (const item of items) {
-                if (item === this) continue;
-                if (item.y === y) {
-                    if (item.x < end && item.end > x) {
-                        throw new Error('Invalid position');
-                    }
-                }
-            }
-
-            this.x = x;
-            this.y = y;
-            this.emit('move', { x, y });
-            RackItem.emit('move', this);
+    public static all() {
+        return attemptAsync(async () => {
+            return Array.from(RackItem.cache.values());
         });
     }
 
-    destroy() {
-        const index = this.rack.items.indexOf(this);
-        if (index !== -1) {
-            this.io.audio.destroy();
-            this.io.midi.destroy();
-            this.io.control.destroy();
-            this.rack.items = this.rack.items.filter(i => i !== this);
-            RackItem.emit('destroy', this);
-        }
+    public readonly id: number;
+    public readonly name: string;
+    private _inputGain: number;
+    private _outputGain: number;
+    private _active: boolean;
+
+    constructor(data: {
+        id: number;
+        name: string;
+        inputGain: number;
+        outputGain: number;
+        active: boolean;
+    }) {
+        this.id = data.id;
+        this.name = data.name;
+        this._inputGain = data.inputGain;
+        this._outputGain = data.outputGain;
+        this._active = data.active;
+
+        RackItem.cache.set(this.id, this);
     }
 
-    on<K extends keyof Events>(
-        event: K,
-        listener: (e: Events[K]) => void
-    ): void {
-        this.emitter.on(event, listener);
+    get inputGain() {
+        return this._inputGain;
     }
 
-    off<K extends keyof Events>(
-        event: K,
-        listener?: (e: Events[K]) => void
-    ): void {
-        this.emitter.off(event, listener);
+    set inputGain(value) {
+        this._inputGain = value;
+        this.emit('input-gain', value);
     }
 
-    emit<K extends keyof Events>(event: K, e: Events[K]): void {
-        this.emitter.emit(event, e);
+    get outputGain() {
+        return this._outputGain;
     }
 
-    update() {}
+    set outputGain(value) {
+        this._outputGain = value;
+        this.emit('output-gain', value);
+    }
 
-    serialize(): SerializedRackItem {
-        return {
-            type: this.type,
-            metadata: {
-                id: this.id,
-                note: this._note,
-                point: [this.x, this.y],
-                width: this.width,
-                color: this.color,
-            },
-            audio: this.io.audio?.serialize(),
-            midi: this.io.midi?.serialize(),
-            control: this.io.control?.serialize(),
-        };
+    get active() {
+        return this._active;
+    }
+
+    set active(value) {
+        this._active = value;
+        this.emit('active', value);
+    }
+
+    getIOStream(): Promise<Result<[AudioNode, AudioNode]>> {
+        return attemptAsync(() => {
+            return new Promise(res => {
+                const sample = '/app/samples/file_example_WAV_1MG.wav';
+                const audioContext = new AudioContext();
+                const source = audioContext.createBufferSource();
+                
+                document.onclick = async () => {
+                    const response = await fetch(sample);
+                    const arrayBuffer = await response.arrayBuffer();
+                    const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+                    source.buffer = audioBuffer;
+                    source.connect(audioContext.destination);
+                    source.start();
+                    res([source, audioContext.destination]);
+                }
+            })
+        });
+    }
+
+    getChannel() {
+        return attemptAsync(async () => {
+            const channels = (await Channel.getChannels()).unwrap();
+            return channels.find((c) => c.rack.includes(this.id));
+        });
+    }
+
+    insertAfter(item: RackItem) {
+        return attemptAsync(async () => {
+            const channel = (await this.getChannel()).unwrap();
+            if (!channel) throw new Error('Rack item not in use');
+            const index = channel.rack.indexOf(this.id);
+            channel.rack.splice(index + 1, 0, item.id);
+        });
+    }
+
+    insertBefore(item: RackItem) {
+        return attemptAsync(async () => {
+            const channel = (await this.getChannel()).unwrap();
+            if (!channel) throw new Error('Rack item not in use');
+            const index = channel.rack.indexOf(this.id);
+            channel.rack.splice(index, 0, item.id);
+        });
+    }
+
+    remove() {
+        return attemptAsync(async () => {
+            const channel = (await this.getChannel()).unwrap();
+            if (!channel) throw new Error('Rack item not in use');
+            const index = channel.rack.indexOf(this.id);
+            channel.rack.splice(index, 1);
+        });
+    }
+
+    open() {
+        return attemptAsync(async () => {
+            console.log('Opening rack item', this.name);
+        });
+    }
+
+    emit(event: string, data: unknown) {
+        window.dispatchEvent(new CustomEvent(event, { detail: data }));
     }
 }
+
+Object.assign(window, { RackItem });

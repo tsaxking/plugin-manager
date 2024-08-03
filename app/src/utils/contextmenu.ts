@@ -28,7 +28,7 @@ const rightClickContextMenu = (e: MouseEvent, el: HTMLDivElement) => {
         y: e.clientY,
     };
 
-    const { width, height, top, left } = el.getBoundingClientRect();
+    const { width, height } = el.getBoundingClientRect();
 
     return {
         x: pos.x + width > browser.w ? pos.x - width : pos.x,
@@ -59,32 +59,35 @@ export const contextmenu = (
         'list-group',
         'list-group-flush',
         'border-0',
-        'p-0',
-        'rounded'
+        'p-0'
     );
     body.appendChild(list);
     for (const o of options) {
         const li = create('li');
-        li.classList.add('list-group-item', 'border-0');
+        li.classList.add('list-group-item', 'border-0', 'p-0', 'm-0');
 
         if (o === null) {
             const hr = create('hr');
-            hr.classList.add('dropdown-divider');
+            hr.classList.add('dropdown-divider', 'bg-secondary');
+            hr.style.height = '1px';
+            hr.style.width = '100%';
             list.appendChild(hr);
         } else if (typeof o === 'string') {
-            const h6 = create('h6');
-            h6.classList.add('text-center', 'text-muted', 'p-2');
-            h6.textContent = o;
-            li.appendChild(h6);
+            const p = create('p');
+            p.classList.add('text-muted', 'p-2', 'm-0');
+            p.textContent = o;
+            li.appendChild(p);
             list.appendChild(li);
         } else {
             const button = create('button');
             button.classList.add(
                 'btn',
+                'btn-dark',
                 'border-0',
                 'text-start',
                 'w-100',
-                'p-0'
+                'p-2',
+                'rounded-0'
             );
             // const i = create('i');
             // i.classList.add(...o.class.split(' '), 'me-2');
@@ -118,5 +121,9 @@ export const contextmenu = (
         document.addEventListener('click', rm);
     };
 
-    // target.addEventListener('contextmenu', fn);
+    target.addEventListener('contextmenu', fn);
+
+    return () => {
+        target.removeEventListener('contextmenu', fn);
+    }
 };

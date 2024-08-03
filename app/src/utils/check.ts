@@ -39,7 +39,30 @@ export class Ok<T = unknown> {
         return false;
     }
 
+    /**
+     * Unwraps the result
+     * ONLY USE FOR TESTING OR WITHIN OTHER ATTEMPTS
+     *
+     * @returns {T}
+     */
     unwrap(): T {
+        // console.warn(
+        //     'Warning: Unwrapping Ok result, this is not recommended for anything other than testing.'
+        // );
+        return this.value;
+    }
+
+    /**
+     * If the result is an error, throw an error with the message
+     * ONLY USE FOR TESTING OR WITHIN OTHER ATTEMPTS
+     *
+     * @param {string} message
+     * @returns {T}
+     */
+    expect(message: string): T {
+        // console.warn(
+        //     'Warning: Expecting Ok result, this is not recommended for anything other than testing.'
+        // );
         return this.value;
     }
 }
@@ -83,6 +106,12 @@ export class Err<E = Error, T = unknown> {
         return true;
     }
 
+    /**
+     * Converts the result to an Ok
+     *
+     * @param {T} value
+     * @returns {Ok<T>}
+     */
     handle(value: T) {
         return new Ok(value);
     }
@@ -246,6 +275,14 @@ export const check = (data: unknown, type: Primitive | O | A): boolean => {
     return runCheck(data, type);
 };
 
+/**
+ * Converts an array of results to a single result
+ * The return type of all results must be the same
+ *
+ * @template T
+ * @param {Result<T>[]} results
+ * @returns {Result<T[]>}
+ */
 export const resolveAll = <T>(results: Result<T>[]): Result<T[]> => {
     if (results.some(r => r.isErr())) {
         const e = results.find(r => r.isErr());

@@ -1,8 +1,11 @@
-import { Result } from "./utils/check";
-import { call } from "./utils/tauri";
+import './styles/style.css';
+import './styles/global.css';
+import './utils/knob';
+// import { alert } from './utils/prompt';
+import Main from './view/Main.svelte';
 
-const log = (data: Promise<Result<unknown>>) => data.then((res) => console.log(res.unwrap()));
+new Main({
+    target: document.body,
+});
 
-log(call('MyEvent', { data: 'payload' }));
-log(call('Play', { channel: 5 }));
-log(call('Yo', {}));
+// alert('Test');
