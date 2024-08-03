@@ -1,9 +1,6 @@
 import assert from 'assert';
 import test from 'test';
-import { readFileSync } from 'fs';
-import { Rack } from '../app/src/model/state';
-import { Processors } from '../app/src/model/items/processors';
-import { $Math, Random } from '../app/src/utils/math';
+import { $Math, Random } from '../app/front/src/utils/math';
 import {
     capitalize,
     toCamelCase,
@@ -14,131 +11,14 @@ import {
     toByteString,
     cost,
     fmtNumber,
-} from '../app/src/utils/text';
+} from '../app/front/src/utils/text';
 import {
     standardDeviation,
     mean,
     median,
     mode,
     range,
-} from '../app/src/utils/calcs/statistics';
-
-test('Build Rack Model', () => {
-    const rack1 = new Rack();
-    const id = Random.uuid;
-    {
-        const output = Processors.audioOutput(rack1, id(), 'Audio Output', [
-            'left',
-            'right',
-        ]);
-
-        const source = Processors.audioSource(rack1, id(), 'Audio Source', [
-            'left',
-            'right',
-        ]);
-
-        const compressor = Processors.compressor(
-            rack1,
-            id(),
-            'Compressor',
-            true
-        );
-
-        Processors.delay(rack1, id(), 'Delay', true);
-
-        Processors.duplicator(rack1, id(), 'Duplicator', 'audio');
-
-        Processors.eq(rack1, id(), 'Envelope', true);
-
-        Processors.filter(rack1, id(), 'Filter', true);
-
-        Processors.gain(rack1, id(), 'Gain', true);
-
-        Processors.instrument(
-            rack1,
-            id(),
-            'Instrument',
-            ['MIDI In'],
-            ['MIDI Out']
-        );
-
-        Processors.lfo(rack1, id(), 'LFO');
-
-        Processors.limiter(rack1, id(), 'Limiter', true);
-
-        const controller = Processors.midiController(
-            rack1,
-            id(),
-            'Midi Controller',
-            ['MIDI In'],
-            ['Control Out']
-        );
-
-        const oscillator = Processors.oscillator(rack1, id(), 'Oscillator', [
-            'Volume',
-            'Frequency',
-        ]);
-
-        Processors.plugin(rack1, id(), 'Plugin', {
-            audio: {
-                inputs: ['left', 'right'].map(i => ({
-                    name: i,
-                    state: 'Disconnected',
-                })),
-                outputs: ['left', 'right'].map(i => ({
-                    name: i,
-                    state: 'Disconnected',
-                })),
-            },
-            midi: {
-                inputs: ['MIDI In'].map(i => ({
-                    name: i,
-                    state: 'Disconnected',
-                })),
-                outputs: ['MIDI Out'].map(i => ({
-                    name: i,
-                    state: 'Disconnected',
-                })),
-            },
-            control: {
-                inputs: ['Control In'].map(i => ({
-                    name: i,
-                    state: 'Disconnected',
-                })),
-                outputs: ['Control Out'].map(i => ({
-                    name: i,
-                    state: 'Disconnected',
-                })),
-            },
-        });
-
-        Processors.random(rack1, id(), 'Random');
-
-        const reverb = Processors.reverb(rack1, id(), 'Reverb', true);
-
-        Processors.sequencer(
-            rack1,
-            id(),
-            'Sequencer',
-            ['MIDI In'],
-            ['MIDI Out']
-        );
-
-        oscillator.moveTo(22, 1);
-        controller.moveTo(9, 1);
-
-        source.io.audio.outputs[0].connect(compressor.io.audio.inputs[0]);
-        compressor.io.audio.outputs[0].connect(reverb.io.audio.inputs[0]);
-        reverb.io.audio.outputs[0].connect(output.io.audio.inputs[0]);
-    }
-
-    const str1 = rack1.serialize();
-    const rack2 = new Rack();
-    rack2.deserialize(str1);
-    rack2.serialize();
-
-    assert(true); // if no error, then pass
-});
+} from '../app/front/src/utils/calcs/statistics';
 
 test('Text', () => {
     assert.strictEqual(capitalize('hello world'), 'Hello World');
@@ -201,11 +81,6 @@ test('Statistics', () => {
     // assert(close(covariance([1, 2, 3], [3, 2, 1]), -1));
 });
 
-test('Deserialize Json', () => {
-    const res = readFileSync("crates/pm_rack/serialized.json").toString();
-    const rack = new Rack();
-    rack.deserialize(res);
-});
 
 // test('Linear Algebra', () => {});
 

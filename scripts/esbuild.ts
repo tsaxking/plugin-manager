@@ -8,9 +8,9 @@ import { BuildOptions } from 'esbuild';
 const args = process.argv.map(a => a.toLowerCase());
 
 const options: BuildOptions = {
-    entryPoints: ['./app/src/index.ts'],
+    entryPoints: ['./app/front/src/index.ts'],
     bundle: true,
-    outdir: './app/dist',
+    outdir: './app/front/dist',
     minify: true,
     plugins: [
         esbuildSvelte({

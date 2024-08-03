@@ -4,15 +4,17 @@
         "dev": "npm run build watch",
         "format": "prettier ./app/ --write",
         "test": "ts-node scripts/test.ts",
-        "lint": "npx eslint **/*.ts --fix"
+        "lint": "npx eslint **/*.ts --fix",
+        "start": "electron ./app"
     },
     "dependencies": {
-        "@tauri-apps/api": "^1.5.5",
+        "@types/electron": "^1.6.10",
         "bootstrap": "^5.3.3",
         "esbuild-plugin-tailwindcss": "^1.2.0",
         "esbuild-sass-plugin": "^3.2.0",
         "esbuild-svelte": "^0.8.0",
         "fuzzy-search": "^3.2.1",
+        "i": "^0.3.7",
         "interactjs": "^1.10.27",
         "prettier-plugin-svelte": "^3.2.3",
         "svelte": "^4.2.15",
@@ -21,10 +23,10 @@
     },
     "devDependencies": {
         "@eslint/js": "^9.2.0",
-        "@tauri-apps/cli": "^1.5.12",
         "@types/bootstrap": "^5.2.10",
         "@types/fuzzy-search": "^2.1.5",
         "@types/jquery": "^3.5.29",
+        "electron": "^31.3.1",
         "esbuild": "^0.20.2",
         "esbuild-server": "^0.3.0",
         "eslint": "^8.57.0",
