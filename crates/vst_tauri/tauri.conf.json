@@ -3,7 +3,7 @@
         "beforeBuildCommand": "cd app && npm run build",
         "beforeDevCommand": "cd app && npm run dev",
         "devPath": "http://localhost:8080",
-        "distDir": "./app/dist"
+        "distDir": "../../app/dist"
     },
     "tauri": {
         "bundle": {

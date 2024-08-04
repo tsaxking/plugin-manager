@@ -2,12 +2,19 @@ import { invoke } from '@tauri-apps/api/tauri';
 import { attempt, attemptAsync } from './check';
 
 export const call = <T>(event: string, payload: unknown) => attemptAsync(async () => {
+    if (event.includes(':')) throw new Error('Event name cannot contain ":"');
     return invoke('global', {
         data: {
             event,
             payload: JSON.stringify(payload),
         }
     }) as Promise<T>;
+});
+
+export const direct = <T>(event: string, payload: unknown = null) => attemptAsync(async () => {
+    return await invoke(event, {
+        data: payload,
+    }) as T;
 });
 
 

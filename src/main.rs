@@ -1,5 +1,4 @@
 use bevy_ecs::prelude::*;
-use pm::commands;
 // use std::io::Write;
 // use std::sync::mpsc;
 // use std::thread;
@@ -36,7 +35,6 @@ fn main() -> anyhow::Result<()> {
     // ];
 
     // add the tauri events
-    commands::register_commands();
 
     // for handle in thread_handles.into_iter() {
     //     handle.join().unwrap();

@@ -1,0 +1,12 @@
+[package]
+name = "vst-tauri"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+tauri-plugin-websocket = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v1" }
+tauri = { version = "1.6.2", features = ["custom-protocol"] }
+serde = { version = "1.0.200", features = ["derive"] }
+
+[build-dependencies]
+tauri-build = { version = "1.5.1", features = [] }

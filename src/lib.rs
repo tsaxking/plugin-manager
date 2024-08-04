@@ -2,7 +2,6 @@
 #![warn(unsafe_code)]
 #![allow(clippy::needless_return, clippy::multiple_crate_versions)]
 
-pub mod commands;
 #[cfg(debug_assertions)]
 pub mod console;
 pub mod rack {
