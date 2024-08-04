@@ -283,12 +283,12 @@ export const select = (
  * @param {string} b
  * @returns {Promise<string|null>}
  */
-export const choose = (
+export const choose = <A extends string, B extends string>(
     message: string,
-    a: string,
-    b: string
-): Promise<string | null> => {
-    return new Promise<string | null>(res => {
+    a: A,
+    b: B
+): Promise<A | B | null> => {
+    return new Promise<A | B | null>(res => {
         const div = create(`
             <div class="modal fade" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
             <div class="modal-dialog">
@@ -311,19 +311,20 @@ export const choose = (
         const modal = new bootstrap.Modal(div);
 
         let resolved = false;
-        const resolve = (data: string | null) => {
+        const resolve = (data: A | B | null) => {
             if (resolved) return;
             resolved = true;
             res(data);
+            modal.dispose();
         };
 
         div.querySelector('.a')?.addEventListener('click', () => {
-            resolve(a);
+            resolve(a as A);
             modal.hide();
         });
 
         div.querySelector('.b')?.addEventListener('click', () => {
-            resolve(b);
+            resolve(b as B);
             modal.hide();
         });
 

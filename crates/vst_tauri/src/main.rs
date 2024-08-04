@@ -22,7 +22,7 @@ fn global_tauri(data: ControllerValue) {
 }
 
 #[tauri::command]
-fn find_connections() -> Result<Vec<String>, String> {
+fn scan_devices() -> Result<Vec<String>, String> {
     // Find all available connections with the port 8080
     // An available connection is a connection that responds correctly to a specific message
 
@@ -59,7 +59,7 @@ fn find_connections() -> Result<Vec<String>, String> {
 }
 
 #[tauri::command]
-fn connect_to_ip (data: String) -> Result<(), String> {
+fn connect_to_device (data: String) -> Result<(), String> {
     let stream = TcpStream::connect(data).unwrap();
     TCP.set(Mutex::new(stream)).unwrap();
     return Ok(());
@@ -77,8 +77,8 @@ fn main() {
         .plugin(tauri_plugin_websocket::init())
         .invoke_handler(tauri::generate_handler![
             global_tauri,
-            connect_to_ip,
-            find_connections,
+            connect_to_device,
+            scan_devices,
             is_connected,
         ])
         .run(tauri::generate_context!())
