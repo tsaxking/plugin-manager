@@ -10,7 +10,7 @@ class Controller<T extends ControllerType> {
     public static readonly controllers = new Map<number, Controller<ControllerType>>();
 
     private readonly em = new EventEmitter<{
-        change: T;
+        change: ControllerValue<T>;
     }>();
 
     constructor(
@@ -30,6 +30,10 @@ class Controller<T extends ControllerType> {
             value
         });
     }
+
+    public on = this.em.on;
+    public off = this.em.off;
+    public emit = this.em.emit;
 }
 
 export class NumberController extends Controller<'number'> {
@@ -63,7 +67,11 @@ socket.on('controller_change', (data: unknown) => {
 
             const { type } = controller;
             if (typeof obj.payload === type) {
-                controller._value = obj.payload as ControllerValue<typeof type>;
+                if (controller._value !== obj.payload) { 
+                    // if it's the same, then it originated from this client
+                    controller._value = obj.payload as ControllerValue<typeof type>;
+                    controller.emit('change', obj.payload as ControllerValue<typeof type>);
+                }
             }
         }
     }

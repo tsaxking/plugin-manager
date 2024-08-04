@@ -1,9 +1,10 @@
 use serde::{Deserialize, Serialize};
 use std::io::prelude::*;
-use std::net::TcpStream;
+use std::net::UdpSocket;
 use std::sync::{Arc, Mutex, OnceLock};
+use vst_tauri::utils::{self, Server};
 
-static TCP: OnceLock<Mutex<TcpStream>> = OnceLock::new();
+static UDP: OnceLock<Mutex<Server>> = OnceLock::new();
 
 #[derive(Deserialize, Serialize)]
 struct ControllerValue {
@@ -12,13 +13,12 @@ struct ControllerValue {
 }
 
 #[tauri::command]
-fn global_tauri(data: ControllerValue) {
-    if let Ok(mut stream) = TCP.get().unwrap().lock() {
-        let event = data.event;
-        let payload = data.payload;
-        let message = String::from(event + ":" + &payload);
-        stream.write(message.as_bytes()).unwrap();
+fn global_tauri(data: ControllerValue) -> Result<String, String> {
+    if let Ok(mut server) = UDP.get().unwrap().lock() {
+        server.send(&data.event, &data.payload);
     }
+
+    return Err("Not connected to a device".to_string());
 }
 
 #[tauri::command]
@@ -42,17 +42,7 @@ fn scan_devices() -> Result<Vec<String>, String> {
     }
 
     for ip_address in ip_addresses {
-        let mut stream = TcpStream::connect(ip_address.to_string()).unwrap();
-        let message = String::from("ping");
-        stream.write(message.as_bytes()).unwrap();
-        let mut buffer = [0; 1024];
-        stream.read(&mut buffer).unwrap();
-        let response = String::from_utf8_lossy(&buffer[..]);
-        if response == "pong" {
-            available_connections.push(ip_address.to_string());
-        }
 
-        stream.shutdown(std::net::Shutdown::Both).unwrap();
     }
 
     return Ok(available_connections);
@@ -60,18 +50,27 @@ fn scan_devices() -> Result<Vec<String>, String> {
 
 #[tauri::command]
 fn connect_to_device (data: String) -> Result<(), String> {
-    let stream = TcpStream::connect(data).unwrap();
-    TCP.set(Mutex::new(stream)).unwrap();
+    let server = Server::new(&data);
+    UDP.set(Mutex::new(server)).unwrap();
+
+    // listen to all incoming messages
+    tauri::async_runtime::spawn(async move {
+        if let Ok(server) = UDP.get().unwrap().lock() {
+            server.listen();
+        }
+    });
+
     return Ok(());
 }
 
 #[tauri::command]
 fn is_connected() -> Result<bool, String> {
-    Ok(TCP.get().is_some())
+    Ok(UDP.get().is_some())
 }
 
 fn main() {
     println!("Hello, world!");
+    tauri::async_runtime::spawn(utils::start_server());
     // Tauri app
     tauri::Builder::default()
         .plugin(tauri_plugin_websocket::init())

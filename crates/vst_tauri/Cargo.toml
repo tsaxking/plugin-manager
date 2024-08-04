@@ -7,6 +7,9 @@ edition = "2021"
 tauri-plugin-websocket = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v1" }
 tauri = { version = "1.6.2", features = ["custom-protocol"] }
 serde = { version = "1.0.200", features = ["derive"] }
+tokio = { version = "1", features = ["net"] }
+futures-util = "0.3"
+tokio-tungstenite = "0.23"
 
 [build-dependencies]
 tauri-build = { version = "1.5.1", features = [] }
