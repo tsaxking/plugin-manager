@@ -1,9 +1,8 @@
 use bevy_ecs::prelude::*;
-use commands::TauriEvent;
 use pm::commands;
 // use std::io::Write;
-use std::sync::mpsc;
-use std::thread;
+// use std::sync::mpsc;
+// use std::thread;
 
 #[derive(SystemSet, Debug, Clone, PartialEq, Eq, Hash)]
 pub struct FlushEvents;
@@ -15,55 +14,33 @@ fn main() -> anyhow::Result<()> {
 
     pm::rack::init_rack(pm::rack::Rack::default());
 
-    let mut world = World::new();
-    pm::commands::register_events(&mut world);
-    let mut schedule = Schedule::default();
-    schedule.add_systems(bevy_ecs::event::event_update_system.in_set(FlushEvents));
 
-    let (tx, rx): (mpsc::Sender<TauriEvent>, mpsc::Receiver<TauriEvent>) =
-        mpsc::channel();
-    pm::init_tauri_tx(tx);
+    // let thread_handles = [
+    //     // // CLI thread
+    //     // #[cfg(debug_assertions)]
+    //     // thread::spawn(move || {
+    //     //     use pm::console;
+    //     //     let mut stdout = std::io::stdout();
+    //     //     let cli = console::commands();
+    //     //     loop {
+    //     //         let mut buf: String = Default::default();
+    //     //         write!(stdout, "❯ ").unwrap();
+    //     //         stdout.flush().unwrap();
+    //     //         std::io::stdin().read_line(&mut buf).unwrap();
+    //     //         let response = cli
+    //     //             .run(&buf)
+    //     //             .unwrap_or(String::from("Did not receive valid command"));
+    //     //         writeln!(stdout, "{}", response).unwrap();
+    //     //     }
+    //     // }),
+    // ];
 
-    let thread_handles = [
-        // // CLI thread
-        // #[cfg(debug_assertions)]
-        // thread::spawn(move || {
-        //     use pm::console;
-        //     let mut stdout = std::io::stdout();
-        //     let cli = console::commands();
-        //     loop {
-        //         let mut buf: String = Default::default();
-        //         write!(stdout, "❯ ").unwrap();
-        //         stdout.flush().unwrap();
-        //         std::io::stdin().read_line(&mut buf).unwrap();
-        //         let response = cli
-        //             .run(&buf)
-        //             .unwrap_or(String::from("Did not receive valid command"));
-        //         writeln!(stdout, "{}", response).unwrap();
-        //     }
-        // }),
-        // Tauri Reciever
-        #[cfg(debug_assertions)]
-        thread::spawn(move || {
-            // let mut stdout = std::io::stdout();
-            let mut world = world;
-            loop {
-                if let Ok(event) = rx.recv() {
-                    pm::commands::dispatch_event(&mut world, event);
-                }
-                schedule.run(&mut world);
-            }
-        }),
-    ];
+    // add the tauri events
+    commands::register_commands();
 
-    tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![commands::global,])
-        .run(tauri::generate_context!())
-        .unwrap();
-
-    for handle in thread_handles.into_iter() {
-        handle.join().unwrap();
-    }
+    // for handle in thread_handles.into_iter() {
+    //     handle.join().unwrap();
+    // }
 
     Ok(())
 }

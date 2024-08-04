@@ -4,10 +4,12 @@
         "dev": "npm run build watch",
         "format": "prettier ./app/ --write",
         "test": "ts-node scripts/test.ts",
-        "lint": "npx eslint **/*.ts --fix"
+        "lint": "npx eslint **/*.ts --fix",
+        "tauri": "tauri dev"
     },
     "dependencies": {
         "@tauri-apps/api": "^1.5.5",
+        "@tauri-apps/plugin-websocket": "^2.0.0-rc.0",
         "bootstrap": "^5.3.3",
         "esbuild-plugin-tailwindcss": "^1.2.0",
         "esbuild-sass-plugin": "^3.2.0",

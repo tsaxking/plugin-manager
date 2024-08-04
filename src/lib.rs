@@ -1,7 +1,6 @@
 #![warn(clippy::all)]
 #![warn(unsafe_code)]
 #![allow(clippy::needless_return, clippy::multiple_crate_versions)]
-use commands::TauriEvent;
 
 pub mod commands;
 #[cfg(debug_assertions)]
@@ -10,18 +9,6 @@ pub mod rack {
     pub use pm_rack::*;
 }
 
-use std::sync;
-
-
-
-pub static TAURI_TX: sync::OnceLock<sync::Mutex<sync::mpsc::Sender<TauriEvent>>> =
-    sync::OnceLock::new();
-
-pub fn init_tauri_tx(tx: sync::mpsc::Sender<TauriEvent>) {
-    TAURI_TX
-        .set(sync::Mutex::new(tx))
-        .expect("Critical Error: Could not set PLAY_TX");
-}
 
 pub fn test_json() -> String {
     use crate::rack::RackItem;

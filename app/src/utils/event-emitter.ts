@@ -1,11 +1,10 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Callback for event listeners
  * @date 10/12/2023 - 1:46:22 PM
  *
  * @typedef {ListenerCallback}
  */
-type ListenerCallback = (...args: any[]) => void;
+type ListenerCallback<T> = (data: T) => void;
 
 /**
  * Event emitter object, this is used to emit events and listen for events
@@ -18,7 +17,7 @@ type ListenerCallback = (...args: any[]) => void;
  * @typedef {EventEmitter}
  * @template [allowedEvents=(string | number | '*')]
  */
-export class EventEmitter<allowedEvents = string | number | '*'> {
+export class EventEmitter<Events = Record<string, unknown>> {
     /**
      * All events and their listeners as a map
      * @date 10/12/2023 - 1:46:22 PM
@@ -27,7 +26,7 @@ export class EventEmitter<allowedEvents = string | number | '*'> {
      * @readonly
      * @type {Map<allowedEvents, ListenerCallback[]>}
      */
-    public readonly events = new Map<allowedEvents, ListenerCallback[]>();
+    public readonly events = new Map<keyof Events, ListenerCallback<Events[keyof Events]>[]>();
 
     /**
      * Adds a listener for the given event
@@ -36,7 +35,7 @@ export class EventEmitter<allowedEvents = string | number | '*'> {
      * @param {allowedEvents} event
      * @param {ListenerCallback} callback
      */
-    on(event: allowedEvents, callback: ListenerCallback) {
+    on<K extends keyof Events>(event: K, callback: ListenerCallback<Events[K]>) {
         if (typeof event !== 'string' && typeof event !== 'number') {
             throw new Error('Event must be a string');
         }
@@ -44,7 +43,7 @@ export class EventEmitter<allowedEvents = string | number | '*'> {
             this.events.set(event, []);
         }
 
-        this.events.get(event)?.push(callback);
+        this.events.get(event)?.push(callback as ListenerCallback<Events[keyof Events]>);
     }
 
     /**
@@ -52,9 +51,9 @@ export class EventEmitter<allowedEvents = string | number | '*'> {
      * @date 10/12/2023 - 1:46:22 PM
      *
      * @param {allowedEvents} event
-     * @param {...unknown[]} args
+     * @param {...unknown[]} data
      */
-    emit(event: allowedEvents, ...args: unknown[]) {
+    emit<K extends keyof Events>(event: K, data: Events[K]) {
         if (typeof event !== 'string' && typeof event !== 'number') {
             throw new Error('Event must be a string');
         }
@@ -62,10 +61,10 @@ export class EventEmitter<allowedEvents = string | number | '*'> {
             return;
         }
 
-        this.events.get(event)?.forEach(callback => callback(...args));
+        this.events.get(event)?.forEach(callback => callback(data));
         this.events
-            .get('*' as allowedEvents)
-            ?.forEach(callback => callback(...args));
+            .get('*' as keyof Events)
+            ?.forEach(callback => callback(data));
     }
 
     /**
@@ -75,7 +74,7 @@ export class EventEmitter<allowedEvents = string | number | '*'> {
      * @param {allowedEvents} event
      * @param {?ListenerCallback} [callback]
      */
-    off(event: allowedEvents, callback?: ListenerCallback) {
+    off<K extends keyof Events>(event: K, callback?: ListenerCallback<Events[K]>) {
         if (typeof event !== 'string' && typeof event !== 'number') {
             throw new Error('Event must be a string');
         }
@@ -98,9 +97,9 @@ export class EventEmitter<allowedEvents = string | number | '*'> {
      * @param event
      * @param callback
      */
-    once(event: allowedEvents, callback: ListenerCallback) {
-        const onceCallback = (...args: unknown[]) => {
-            callback(...args);
+    once<K extends keyof Events>(event: K, callback: ListenerCallback<Events[K]>) {
+        const onceCallback = (data: Events[K]) => {
+            callback(data);
             this.off(event, onceCallback);
         };
 
@@ -113,7 +112,7 @@ export class EventEmitter<allowedEvents = string | number | '*'> {
      */
     destroy() {
         for (const event of Object.keys(this.events)) {
-            this.off(event as allowedEvents);
+            this.off(event as keyof Events);
         }
     }
 }

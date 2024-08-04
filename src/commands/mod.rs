@@ -1,68 +1,27 @@
-use crate::TAURI_TX;
-use bevy_ecs::{
-    event::{Event, EventRegistry},
-    world::World,
-};
 use serde::{Deserialize, Serialize};
-use thiserror::Error;
+use std::io::prelude::*;
+use std::net::TcpStream;
 
-#[derive(Event, Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Hash)]
-pub struct PlayEvent {
-    id_: usize,
-}
-
-#[derive(Event, Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Hash)]
-pub struct MyEvent {
-    id_: usize,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub enum TauriEvent {
-    MyEvent(MyEvent),
-    Play(PlayEvent),
-}
-
-
-pub fn register_events(world: &mut World) {
-    EventRegistry::register_event::<PlayEvent>(world);
-    EventRegistry::register_event::<MyEvent>(world);
-}
-
-pub fn dispatch_event(world: &mut World, event: TauriEvent) {
-    match event {
-        TauriEvent::MyEvent(my_event) => {
-            world.send_event(my_event);
-        }
-        TauriEvent::Play(play_event) => {
-            world.send_event(play_event);
-        }
-    }
-}
-
-#[derive(Error, Serialize, Deserialize, Debug, Clone, PartialEq, PartialOrd)]
-pub enum CommandError {
-    #[error("The Tauri command channel has not been initialized")]
-    ChannelNotExist,
-    #[error("Failed to acquire mutex on command sender: it was poisoned")]
-    MutexPoisoned,
-    #[error("Failed to send the message on the channel.. is the reciever deallocated?")]
-    SendFailed,
+#[derive(Deserialize, Serialize)]
+struct ControllerValue {
+    event: String,
+    payload: String,
 }
 
 #[tauri::command]
-pub fn global(data: TauriEvent) -> Result<(), CommandError> {
-    let Some(mutex) = TAURI_TX.get() else {
-        return Err(CommandError::ChannelNotExist);
-    };
-
-    let Ok(guard) = mutex.lock() else {
-        return Err(CommandError::MutexPoisoned);
-    };
-
-    let Ok(_) = guard.send(data) else {
-        return Err(CommandError::SendFailed);
-    };
-
-    Ok(())
+pub fn global(data: ControllerValue) {
 }
 
+
+pub fn register_commands() {
+    tauri::Builder::default()
+        .plugin(tauri_plugin_websocket::init())
+        .invoke_handler(tauri::generate_handler![
+        ])
+        .run(tauri::generate_context!())
+        .unwrap()
+}
+
+pub fn initilaize_tcp_connection() {
+    let mut stream = TcpStream::connect("192.168.0.1:8080").unwrap();
+}

@@ -59,6 +59,7 @@ export class Ok<T = unknown> {
      * @param {string} message
      * @returns {T}
      */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     expect(message: string): T {
         // console.warn(
         //     'Warning: Expecting Ok result, this is not recommended for anything other than testing.'
