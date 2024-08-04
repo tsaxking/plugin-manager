@@ -1,6 +1,4 @@
-use bevy::prelude::*;
-use bevy_egui::egui;
-use bevy_egui::{egui::RichText, EguiContexts};
+use bevy_ecs::prelude::*;
 use std::time::Instant;
 
 #[derive(Resource)]
@@ -63,31 +61,3 @@ pub fn set_stats(
 
     debug_stats.memory_usage = crate::PEAK_ALLOC.current_usage_as_mb();
 }
-
-
-#[cfg(debug_assertions)]
-pub fn debug_ui(
-    debug_stats: Res<DebugStats>,
-    frame_rate: Res<FrameRate>,
-    mut contexts: EguiContexts,
-) {
-
-
-    egui::SidePanel::right("debug")
-        .show_separator_line(false)
-        .exact_width(50.0)
-        .show(contexts.ctx_mut(), |ui| {
-            let fps = frame_rate.calc();
-            let fps_text_raw = format!("{:.0} fps\n", fps);
-            let fps_text = RichText::new(fps_text_raw)
-                .color(egui::Color32::GREEN)
-                .line_height(Some(7.0));
-            let mem_text_raw = format!("{:.0} MB", debug_stats.memory_usage);
-            let mem_text =
-                RichText::new(mem_text_raw).color(egui::Color32::GREEN);
-
-            ui.label(fps_text);
-            ui.label(mem_text);
-        });
-}
-
