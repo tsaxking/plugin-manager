@@ -1,19 +1,23 @@
 use bevy_app::prelude::*;
-use bevy_ecs::prelude::*;
+use bevy_log::Level;
+use bevy_log::LogPlugin;
+use bevy_log::prelude::*;
 
 fn main() {
-    #[cfg(debug_assertions)]
-    tracing_subscriber::fmt()
-        .with_max_level(tracing::Level::DEBUG)
-        .init();
-    #[cfg(not(debug_assertions))]
-    tracing_subscriber::fmt()
-        .with_max_level(tracing::Level::WARN)
-        .init();
-
     let mut app = App::new();
     app.set_runner(event_loop);
 
+    app.add_plugins(LogPlugin {
+        #[cfg(debug_assertions)]
+        level: Level::DEBUG,
+        #[cfg(debug_assertions)]
+        filter: "info,pm=debug".into(),
+        #[cfg(not(debug_assertions))]
+        level: Level::ERROR,
+        #[cfg(not(debug_assertions))]
+        filter: "".to_string(),
+        custom_layer: |_| None,
+    });
     #[cfg(debug_assertions)]
     {
         use pm::debug::set_stats;
@@ -33,6 +37,7 @@ fn main() {
 }
 
 fn event_loop(mut app: App) -> AppExit {
+    info!("App Start");
     loop {
         app.update();
         if let Some(exit) = app.should_exit() {
