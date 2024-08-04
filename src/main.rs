@@ -1,29 +1,21 @@
-use bevy::{
-    log::{self, Level, LogPlugin},
-    prelude::*,
-};
-use bevy_egui::{EguiPlugin, EguiSet};
+use bevy_app::prelude::*;
+use bevy_ecs::prelude::*;
 
 fn main() {
-    let mut app = App::new();
-    app.add_plugins(DefaultPlugins.set(LogPlugin {
-        #[cfg(debug_assertions)]
-        level: Level::DEBUG,
-        #[cfg(debug_assertions)]
-        filter: "info,wgpu=warn,wgpu_core=warn,wgpu_hal=warn,pm=debug".into(),
-        #[cfg(not(debug_assertions))]
-        level: Level::ERROR,
-        #[cfg(not(debug_assertions))]
-        filter: "".to_string(),
-        update_subscriber: None,
-    }))
-    .add_plugins(EguiPlugin);
+    #[cfg(debug_assertions)]
+    tracing_subscriber::fmt()
+        .with_max_level(tracing::Level::DEBUG)
+        .init();
+    #[cfg(not(debug_assertions))]
+    tracing_subscriber::fmt()
+        .with_max_level(tracing::Level::WARN)
+        .init();
 
-    app.add_systems(Update, hello_system);
+    let mut app = App::new();
+    app.set_runner(event_loop);
 
     #[cfg(debug_assertions)]
     {
-        use pm::debug::debug_ui;
         use pm::debug::set_stats;
         use pm::debug::DebugStats;
         use pm::debug::FrameRate;
@@ -35,13 +27,16 @@ fn main() {
             .insert_resource::<LastFrameTime>(LastFrameTime {
                 time: std::time::Instant::now(),
             });
-
-        app.add_systems(PreUpdate, debug_ui.after(EguiSet::BeginFrame));
     }
 
     app.run();
 }
 
-fn hello_system() {
-    // log::debug!("Hello, World!");
+fn event_loop(mut app: App) -> AppExit {
+    loop {
+        app.update();
+        if let Some(exit) = app.should_exit() {
+            return exit;
+        }
+    }
 }
