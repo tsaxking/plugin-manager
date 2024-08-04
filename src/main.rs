@@ -1,7 +1,7 @@
 use bevy_app::prelude::*;
+use bevy_log::prelude::*;
 use bevy_log::Level;
 use bevy_log::LogPlugin;
-use bevy_log::prelude::*;
 
 fn main() {
     let mut app = App::new();

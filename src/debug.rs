@@ -61,4 +61,3 @@ pub fn set_stats(
 
     debug_stats.memory_usage = crate::PEAK_ALLOC.current_usage_as_mb();
 }
-
